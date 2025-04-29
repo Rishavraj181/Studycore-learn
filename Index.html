@@ -17,14 +17,26 @@
                 <li><a href="#">Question Bank</a></li>
             </ul>
         </nav>
+           <!-- Right side actions -->
+        <div class="header-actions">
             <a href="#" class="refer-earn">Refer</a>
-            <i class="fas fa-bell notification-icon"></i> <!-- Placeholder icon -->
-            <div class="user-profile">
-                <div class="profile-icon">U</div> <!-- Placeholder Initial -->
+            <i class="fas fa-bell notification-icon"></i>
+
+            <!-- User Profile Section (Shown when logged in) -->
+            <div id="user-profile-section" class="user-profile" style="display: none;"> <!-- Hide by default -->
+                <div class="profile-icon" id="user-profile-icon">U</div>
                 <div class="user-details">
-                    <span>USER1</span>
+                    <span id="username-display">USER</span> <!-- ID to display username -->
                 </div>
+                <button id="logout-button" class="logout-button" style="display: none;">Logout</button> <!-- Hide logout by default too -->
             </div>
+
+            <!-- Login LINK (Shown when logged out) -->
+            <!-- *** Changed to an <a> tag *** -->
+            <a href="Login/login.html" id="login-link" class="login-link" style="display: inline-block;">Login</a> <!-- Show by default -->
+             <!-- *** Adjust href path if Login.html is not in root *** -->
+
+        </div>
         </div>
     </div>
 </header>
@@ -60,5 +72,6 @@
         </section>
     </div>
 </main>
+<script src="Js\auth.js"></script> <!-- Adjust path if needed -->
 </body>
 </html>

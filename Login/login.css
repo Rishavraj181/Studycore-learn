@@ -1,0 +1,89 @@
+/* CSS/login.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    background-color: #fff;
+    padding: 40px 50px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-logo {
+    display: block;
+    font-size: 2.2em;
+    font-weight: bold;
+    color: #d90000; /* Primary Red */
+    text-decoration: none;
+    margin-bottom: 25px;
+}
+
+.login-container h2 {
+    margin-bottom: 30px;
+    color: #333;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 500;
+    font-size: 0.95em;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box; /* Include padding in width */
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #d90000; /* Highlight focus */
+    outline: none;
+}
+
+#login-submit-button {
+    width: 100%;
+    padding: 12px 20px;
+    background-color: #d90000; /* Primary Red */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px; /* Space above button */
+}
+
+#login-submit-button:hover {
+    background-color: #b30000; /* Darker Red */
+}
+
+.login-note {
+    margin-top: 25px;
+    font-size: 0.85em;
+    color: #777;
+}

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEC- StudyCore</title> <!-- Specific Title -->
+
+    <!-- Link main site styles FIRST (Optional - if header/footer need it) -->
+    <!-- <link rel="stylesheet" href="../../../CSS/styleindex.css"> -->
+
+    <!-- Link Chapter-Specific Styles SECOND -->
+    <!-- Assumes chapter-styles.css is in the root CSS folder -->
+    <link rel="stylesheet" href="../../../CSS/stylechapter.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+<body>
+
+    <!-- Optional: Include standard site header -->
+    <header class="main-header">
+        <div class="container header-container">
+            <!-- Logo links back to main Index -->
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Chapter Header: Back Button + Title -->
+            <div class="chapter-header">
+                <!-- Link back to the JEE Physics page -->
+                <a href="../JEE.html" class="back-button" title="Back to JEE Physics">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h1 class="chapter-title">Electrostatics-1</h1>
+            </div>
+
+            <!-- Chapter Tab Navigation -->
+            <nav class="chapter-nav">
+                <ul>
+                    <!-- Added data-tab attribute matching content IDs -->
+                    <li><a href="#" class="active" data-tab="live-class-content">Live class</a></li>
+                    <li><a href="#" data-tab="exercise-content">PYQ Practice/Test</a></li>
+                    <li><a href="#" data-tab="dpp-content">PYQ PDF</a></li>
+                    <li><a href="#" data-tab="notes-content">Notes</a></li>
+                </ul>
+            </nav>
+
+            <!-- Tab Content Areas -->
+
+            <!-- == Live Class Content (Initially Active) == -->
+            <div id="live-class-content" class="tab-content active">
+                <div class="lectures-list">
+                    <!-- Lecture Card 1 -->
+                    <div class="lecture-card">
+                        <div class="lecture-thumbnail">
+                            <!-- Assumes images folder is in root -->
+                            <img src="../../../images/placeholder-instructor.png" alt="Instructor">
+                        </div>
+                        <div class="lecture-details">
+                            <h3>MEC_Lec_01</h3>
+                            <p class="instructor">Comming Soon</p>
+                            <div class="lecture-meta">
+                                <span><i class="fas fa-calendar-alt"></i> xxxx-xx-xx</span>
+                                <span><i class="fas fa-clock"></i> xx min</span>
+                            </div>
+                        </div>
+                        <div class="lecture-action">
+                            <!-- Link to the actual video page or player -->
+                            <a href="" class="watch-button">Watch now</a>
+                        </div>
+                    </div>
+                     <!-- Add more .lecture-card divs as needed -->
+
+                </div> <!-- End lectures-list -->
+            </div> <!-- End live-class-content -->
+
+            <!-- == Exercise Content (Hidden by default) == -->
+            <!-- == Exercise Content (Hidden by default) == -->
+<div id="exercise-content" class="tab-content">
+
+    <!-- List of Exercises -->
+    <div class="exercise-list">
+
+        <!-- Exercise Card 1 -->
+        <div class="exercise-card">
+            <div class="exercise-details">
+                <h4>2025</h4>
+                <p class="question-count">35 Questions</p>
+            </div>
+            <!-- Link to the quiz page for Exercise 1 -->
+            <a href="" class="start-practice-link">
+                Start  <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+
+        <!-- Exercise Card 2 -->
+        <div class="exercise-card">
+            <div class="exercise-details">
+                <h4>2024</h4>
+                <p class="question-count">11 Questions</p>
+            </div>
+             <!-- Link to the quiz page for Exercise 2 -->
+            <a href="#" class="start-practice-link">
+                Start <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+
+        <!-- Exercise Card 3 -->
+        <div class="exercise-card">
+            <div class="exercise-details">
+                <h4>2023</h4>
+                <p class="question-count">7 Questions</p>
+            </div>
+             <!-- Link to the quiz page for Exercise 3 -->
+            <a href="#" class="start-practice-link">
+                Start  <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+
+        <!-- Exercise Card 4 -->
+        <div class="exercise-card">
+            <div class="exercise-details">
+                <h4>2022</h4>
+                <p class="question-count">7 Questions</p>
+            </div>
+             <!-- Link to the quiz page for Exercise 4 -->
+            <a href="#" class="start-practice-link">
+                Start  <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+        <!-- Exercise Card 4 -->
+        <div class="exercise-card">
+             <div class="exercise-details">
+             <h4>JA 2020-2025</h4>
+            <p class="question-count">7 Questions</p>
+             </div>
+            <!-- Link to the quiz page for Exercise 4 -->
+             <a href="#" class="start-practice-link">
+             Start  <i class="fas fa-chevron-right"></i>
+             </a>
+    </div>
+
+        <!-- Add more .exercise-card divs for other exercises -->
+
+    </div> <!-- End exercise-list -->
+
+</div> <!-- End exercise-content -->
+
+            <!-- == DPP Content (Hidden by default) == -->
+            <div id="dpp-content" class="tab-content">
+                 <p>PYQ PDF  will be available here soon.</p>
+                 <!-- Example link:
+                 <a href="DPP/units-dimensions-dpp-01.pdf" class="note-card" target="_blank">
+                    <i class="fas fa-tasks"></i>
+                    <span>Units & Dimensions DPP 01</span>
+                    <i class="fas fa-download download-indicator"></i>
+                 </a>
+                 -->
+            </div>
+
+            <!-- == Notes Content (Hidden by default) == -->
+            <div id="notes-content" class="tab-content">
+                <div class="notes-list">
+                    <!-- Links to PDFs inside the Notes subfolder -->
+                    <a href="../../NCERT/MEC.pdf" class="note-card" target="_blank">
+                        <i class="fas fa-file-pdf"></i>
+                        <span> NCERT chapter </span>
+                        <i class="fas fa-download download-indicator"></i>
+                    </a>
+
+                    <a href="Notes/basic-maths-summary.pdf" class="note-card" target="_blank">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>Basic Maths Formula Summary</span>
+                         <i class="fas fa-download download-indicator"></i>
+                    </a>
+
+                     <!-- Add more .note-card links for other relevant PDF files -->
+
+                </div> <!-- End notes-list -->
+            </div> <!-- End notes-content -->
+
+            <!-- == Additional Videos Content (Hidden by default) == -->
+            <div id="additional-videos-content" class="tab-content">
+                <p>Additional video resources related to this chapter will appear here.</p>
+                 <!-- Example link:
+                 <div class="lecture-card">
+                     Add structure similar to live class lectures if needed
+                 </div>
+                 -->
+            </div>
+
+        </div> <!-- End container -->
+    </main>
+
+    <!-- Link the universal tab switcher script -->
+    <!-- Assumes tab-switcher.js is in the root Js folder -->
+    <script src="../../../Js/chapterjava.js"></script>
+
+</body>
+</html>

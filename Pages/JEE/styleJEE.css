@@ -1,4 +1,4 @@
-/* styles.css / styleindex.css - Complete Code */
+/* styles.css / styleindex.css - Complete Code - MODIFIED */
 
 /* Basic Reset & Body Styles */
 * {
@@ -11,7 +11,7 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     line-height: 1.6;
     color: #333;
-    background-color: #f4f4f4;
+    background-color: #f8f9fa; /* Slightly lighter background */
 }
 
 .container {
@@ -20,7 +20,7 @@ body {
     padding: 0 20px;
 }
 
-/* Header Styles */
+/* Header Styles (Keep as is) */
 .main-header {
     background-color: #fff;
     padding: 10px 0;
@@ -38,87 +38,68 @@ body {
     font-size: 1.8em;
     font-weight: bold;
     color: #d90000; /* Primary Red */
+    text-decoration: none; /* Ensure logo isn't underlined */
 }
 
-/* --- Navigation --- */
+/* --- Navigation (Keep as is) --- */
 .main-nav {
     margin-left: 30px;
     margin-right: auto; /* Pushes subsequent items right */
 }
+.main-nav ul { list-style: none; display: flex; align-items: center; }
+.main-nav li { margin-right: 20px; }
+.main-nav li:last-child { margin-right: 0; }
+.main-nav a { text-decoration: none; color: #555; padding: 5px 0px; font-size: 0.95em; transition: color 0.3s ease; display: inline-flex; align-items: center; gap: 5px; }
+.main-nav a:hover { color: #000; }
+.main-nav a.active { color: #d90000; font-weight: bold; border-bottom: 2px solid #d90000; }
 
-.main-nav ul {
-    list-style: none;
+/* --- Header Right-Side Actions (Keep as is) --- */
+.refer-earn { text-decoration: none; color: #555; font-size: 0.9em; margin-left: 20px; }
+.notification-icon { font-size: 1.2em; color: #777; cursor: pointer; margin-left: 20px; }
+/* Add/Update in styleindex.css */
+
+.header-actions {
     display: flex;
     align-items: center;
+    gap: 15px; /* Adjust spacing */
 }
 
-.main-nav li {
-    margin-right: 20px;
-}
-.main-nav li:last-child {
-    margin-right: 0;
-}
-
-.main-nav a {
-    text-decoration: none;
-    color: #555;
-    padding: 5px 0px;
-    font-size: 0.95em;
-    transition: color 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px; /* Space for icons like dropdown arrow */
-}
-
-.main-nav a:hover {
-    color: #000;
-}
-
-.main-nav a.active {
-    color: #d90000; /* Primary Red */
-    font-weight: bold;
-    border-bottom: 2px solid #d90000; /* Primary Red */
-}
-
-/* --- Header Right-Side Actions --- */
-.refer-earn {
-    text-decoration: none;
-    color: #555;
-    font-size: 0.9em;
-    margin-left: 20px;
-}
-
-.notification-icon {
-    font-size: 1.2em;
-    color: #777;
+/* Style for the Login LINK */
+.login-link {
+    padding: 6px 15px;
+    border: 1px solid #007bff; /* Blue border */
+    background-color: #e7f1ff; /* Light blue background */
+    color: #0056b3; /* Blue text */
+    border-radius: 5px;
     cursor: pointer;
-    margin-left: 20px;
-}
-
-.user-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-left: 20px;
-}
-
-.profile-icon {
-    width: 35px;
-    height: 35px;
-    background-color: #d90000; /* Primary Red */
-    color: #fff;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    font-size: 1.1em;
-}
-
-.user-details span {
-    display: block;
-    font-weight: bold;
     font-size: 0.9em;
+    font-weight: 500;
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.login-link:hover {
+    background-color: #cfe2ff;
+    color: #003f80;
+}
+
+
+/* Style for the Logout Button */
+.logout-button {
+    padding: 6px 15px;
+    border: 1px solid #f5c6cb; /* Light red border */
+    background-color: #f8d7da; /* Lighter red background */
+    color: #721c24; /* Darker red text */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    margin-left: 10px; /* Space it from username */
+}
+
+.logout-button:hover {
+    background-color: #f1b0b7;
 }
 
 /* Main Content Styles */
@@ -126,186 +107,242 @@ body {
     padding: 30px 0;
 }
 
-/* Promo Banner Styles */
+/* Promo Banner Styles (Keep as is - matches screenshot well) */
 .promo-banner {
-    background-color: #ffe8cc; /* Light orange placeholder */
-    /* background-image: url('../images/your-banner.jpg'); */ /* Example relative path */
-    background-size: cover;
-    background-position: center;
+    background-color: #fff0dd; /* Adjusted to match screenshot light orange */
     border-radius: 15px;
     padding: 50px 40px;
     text-align: center;
     position: relative;
     color: #333;
-    min-height: 250px;
+    min-height: 200px; /* Slightly reduced height */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 40px; /* Increased space below banner */
 }
-
-.banner-content h1 {
-    font-size: 3.5em;
-    color: #333;
+.profile-icon {
+    width: 35px;
+    height: 35px;
+    background-color: #d90000; /* Primary Red */
+    color: #fff;
+    border-radius: 50%; /* This makes it a circle */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-weight: bold;
-    margin-bottom: 10px;
+    font-size: 1.1em;
 }
+.banner-content h1 { font-size: 3em; /* Adjusted size */ color: #333; font-weight: bold; margin-bottom: 10px; }
+.banner-content h2 { font-size: 1.5em; /* Adjusted size */ margin-bottom: 0; font-weight: normal; color: #444; /* Slightly darker text */ }
+.banner-content h2 strong { font-weight: bold; }
+.banner-logo { position: absolute; top: 20px; right: 30px; font-size: 1.3em; font-weight: bold; color: #d90000; }
 
-.banner-content h2 {
-    font-size: 1.6em;
-    margin-bottom: 20px;
-    font-weight: normal;
-    color: #333;
-}
 
-.banner-content h2 strong {
-    font-weight: bold;
-}
+/* ====================================================== */
+/* MODIFIED: Subject Selectors (Tabs) Styling           */
+/* ====================================================== */
 
-.banner-logo {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #d90000; /* Primary Red */
-}
-
-/* Container for Cards (Used for Subjects and Chapters) */
+/* Container for Subject Tabs */
 .subject-cards {
     display: flex;
-    justify-content: flex-start; /* Align cards to the left */
-    gap: 20px; /* Space between cards */
-    flex-wrap: wrap; /* Allow cards to wrap to next line */
-    margin-bottom: 30px; /* Space below the card section */
+    justify-content: flex-start; /* Align tabs to the left */
+    gap: 15px; /* Space between tabs */
+    margin-bottom: 40px; /* Space below the tab section */
+    border-bottom: 1px solid #dee2e6; /* Optional line below tabs */
+    padding-bottom: 15px; /* Space for the line */
 }
 
-/* General Card Styling */
-.card {
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+/* --- Base Styling for Subject Tabs (replaces generic .card) --- */
+.subject-card-button {
+    /* Removed card-like background/shadow from base */
+    border-radius: 8px; /* Slightly less rounded corners */
     cursor: pointer;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     align-items: center; /* Vertically center content */
-    padding: 15px 20px; /* Default padding */
-    min-width: 180px;
-    flex: 1 1 220px;  /* Grow, shrink, base width */
-    max-width: 28%;  /* Approx 3 cards per row, adjust as needed */
-    justify-content: center; /* Center content (good for text only) */
-    text-align: center;
-    min-height: 60px; /* Ensure minimum height */
+    padding: 12px 25px; /* Adjusted padding for tab feel */
+    border: 2px solid transparent; /* Base border for active state */
+    flex-grow: 0; /* Don't grow like cards */
+    flex-shrink: 0; /* Don't shrink */
+    background-color: #f8f9fa; /* Default light grey background */
+    min-height: 50px;
+    justify-content: center; /* Center icon and text */
 }
 
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+/* --- Styling for Icon and Text inside Tabs --- */
+.subject-card-button .card-icon {
+    font-size: 1.3em; /* Slightly smaller icon */
+    margin-right: 8px; /* Space between icon and text */
+    color: #6c757d; /* Default grey icon color */
 }
 
-/* Styling for Icons within Cards (if present) */
-.card-icon {
-    font-size: 1.8em;
-    margin-right: 10px; /* Space between icon and text */
-}
-
-/* Styling for Text within Cards */
-.card span {
-    font-size: 1em;
+.subject-card-button span {
+    font-size: 0.95em;
     font-weight: 500;
+    color: #495057; /* Default grey text color */
 }
 
-/* Adjust alignment if icon is present */
-.card .card-icon + span {
-    text-align: left;
-}
-.card:has(.card-icon) { /* If card has an icon */
-    justify-content: flex-start; /* Align content left */
+/* --- Specific INACTIVE Tab Backgrounds and Icon Colors --- */
+.physics-card { background-color: #e7f5ff; } /* Very light blue */
+.physics-card .card-icon { color: #4dabf7; }
+.physics-card span { color: #1c7ed6; }
+
+.chemistry-card { background-color: #fff0f6; } /* Very light pink */
+.chemistry-card .card-icon { color: #f783ac; }
+.chemistry-card span { color: #d6336c; }
+
+.math-card { background-color: #f3f0ff; } /* Very light lavender */
+.math-card .card-icon { color: #9775fa; }
+.math-card span { color: #7048e8; }
+
+/* Add similar for Biology/English if needed */
+.biology-card { background-color: #f4fce3; }
+.biology-card .card-icon { color: #94d82d; }
+.biology-card span { color: #66a80f; }
+
+.english-card { background-color: #fff9db; }
+.english-card .card-icon { color: #ffc078; }
+.english-card span { color: #f59f00; }
+
+
+/* --- Hover State for INACTIVE Tabs --- */
+.subject-card-button:not(.active):hover {
+    /* Subtle hover - maybe slight background darken or border */
+     background-color: #e9ecef;
+     transform: none; /* No lift on hover */
+     box-shadow: none; /* No shadow on hover */
 }
 
-/* Reset link styles when a link IS a card */
-a.card {
+/* --- Styling for the ACTIVE Subject Tab --- */
+.subject-card-button.active {
+    background-color: #e7f5ff; /* Matching light blue */
+    border-color: #4dabf7; /* Medium/Dark blue border */
+    box-shadow: 0 2px 5px rgba(77, 171, 247, 0.2); /* Subtle blue glow */
+    transform: none; /* No lift when active */
+}
+/* Ensure active tab icon/text colors are set (if not using specific card styles) */
+.subject-card-button.active .card-icon,
+.subject-card-button.active span {
+    color: #1c7ed6; /* Darker blue text/icon for active */
+}
+/* Override specific inactive colors when active */
+/* Physics */
+.physics-card.active { background-color: #e7f5ff; border-color: #4dabf7; box-shadow: 0 2px 5px rgba(77, 171, 247, 0.2); }
+.physics-card.active .card-icon, .physics-card.active span { color: #1c7ed6; }
+/* Chemistry */
+.chemistry-card.active { background-color: #fff0f6; border-color: #f783ac; box-shadow: 0 2px 5px rgba(247, 131, 172, 0.2); }
+.chemistry-card.active .card-icon, .chemistry-card.active span { color: #d6336c; }
+/* Math */
+.math-card.active { background-color: #f3f0ff; border-color: #9775fa; box-shadow: 0 2px 5px rgba(151, 117, 250, 0.2); }
+.math-card.active .card-icon, .math-card.active span { color: #7048e8; }
+/* Biology */
+.biology-card.active { background-color: #f4fce3; border-color: #94d82d; box-shadow: 0 2px 5px rgba(148, 216, 45, 0.2); }
+.biology-card.active .card-icon, .biology-card.active span { color: #66a80f; }
+/* English */
+.english-card.active { background-color: #fff9db; border-color: #ffc078; box-shadow: 0 2px 5px rgba(255, 192, 120, 0.2); }
+.english-card.active .card-icon, .english-card.active span { color: #f59f00; }
+
+
+/* ====================================================== */
+/* Chapters Display Area & List Styling                  */
+/* ====================================================== */
+
+.chapters-display-area {
+    margin-top: 30px; /* Reduced space above */
+    padding-top: 0; /* Remove padding */
+    border-top: none; /* Remove separator line */
+}
+
+/* --- Chapter List Styling (Keep base) --- */
+.chapter-list {
+    background-color: #fff;
+    padding: 30px 35px; /* Slightly increased padding */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Slightly increased shadow */
+    margin-bottom: 30px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* --- Chapter List Heading - Dynamic Border Color --- */
+.chapter-list h3 {
+    font-size: 1.5em; /* Slightly smaller heading */
+    color: #343a40; /* Darker heading color */
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    /* Default border color - matches active Physics */
+    border-bottom: 3px solid #4dabf7;
+    display: inline-block;
+}
+/* Override border color based on active subject - REQUIRES JS to add class */
+/* Example JS would add 'physics-list-active' to #physics-chapters when physics tab is active */
+.chapter-list.physics-list-active h3 { border-bottom-color: #4dabf7; }
+.chapter-list.chemistry-list-active h3 { border-bottom-color: #f783ac; }
+.chapter-list.math-list-active h3 { border-bottom-color: #9775fa; }
+.chapter-list.biology-list-active h3 { border-bottom-color: #94d82d; }
+.chapter-list.english-list-active h3 { border-bottom-color: #ffc078; }
+
+
+/* --- Chapter List UL (Keep column layout) --- */
+.chapter-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    column-count: 2; /* Keep 2 columns */
+    column-gap: 35px; /* Slightly wider gap */
+}
+.chapter-list li {
+    break-inside: avoid-column;
+    padding-bottom: 0; /* Remove padding here, apply margin to link */
+}
+
+/* ====================================================== */
+/* MODIFIED: Chapter Link Styling                       */
+/* ====================================================== */
+.chapter-link {
+    display: block;
+    padding: 12px 15px; /* Increased padding */
     text-decoration: none;
-    color: inherit; /* Use default text color */
+    color: #343a40; /* Standard text color */
+    background-color: #f8f9fa; /* Very light grey background */
+    border-radius: 6px; /* Slightly more rounded */
+    margin-bottom: 10px; /* Space between links */
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    border: 1px solid #e9ecef; /* Subtle border */
+    font-size: 0.9em; /* Slightly smaller text */
+    line-height: 1.5;
 }
 
-/* Reset link styles when a link IS the logo */
-a.logo {
-    text-decoration: none;
-    color: inherit; /* Use .logo defined color */
+.chapter-link:hover {
+    background-color: #e9ecef; /* Slightly darker on hover */
+    border-color: #dee2e6;
+    color: #0056b3; /* Blue text on hover */
+    transform: none; /* No shift on hover */
 }
 
+/* ====================================================== */
 
-/* --- Specific Card Background/Icon Colors --- */
-
-/* Index Page Cards */
-.JEE-card { background-color: #e0f2f7; }
-.JEE-card .card-icon { color: #00acc1; }
-
-.NEET-card { background-color:#fce4ec; }
-.NEET-card .card-icon { color: #ec407a; }
-
-.classboard-card { background-color: #ede7f6; }
-.classboard-card .card-icon { color: #7e57c2; }
-
-/* Subject Cards (Physics, Chem, Math, Bio) */
-.physics-card { background-color: #e0f2f7; }
-.physics-card .card-icon { color: #00acc1; }
-
-.chemistry-card { background-color: #fce4ec; }
-.chemistry-card .card-icon { color: #ec407a; }
-
-.math-card { background-color: #ede7f6; }
-.math-card .card-icon { color: #7e57c2; }
-.maths-card { background-color: #ede7f6; } /* Keep both just in case */
-.maths-card .card-icon { color: #7e57c2; }
-
-.biology-card { background-color: #f1f8e9; }
-.biology-card .card-icon { color: #9ccc65; }
-
-/* === Specific styles for PHYSICS chapter cards === */
-.physicschapter-card {
-    background-color: #e0f2f7; /* <<< THE CORRECT PHYSICS COLOR */
-    /* You can add other specific overrides here if needed */
-    /* e.g., padding: 18px 22px; */
-    /* e.g., min-width: 200px; */
-}
-.chemistrychapter-card {
-    background-color: #fce4ec; /* Example: Light pink */
-}
-.mathschapter-card {
-    background-color: #ede7f6; /* Example: Light purple */
+/* Responsive adjustments (Keep as is) */
+@media (max-width: 768px) {
+    .chapter-list ul {
+        column-count: 1; /* Single column on smaller screens */
+    }
+    .subject-cards {
+        justify-content: center; /* Center tabs on smaller screens */
+    }
+    .subject-card-button {
+         padding: 10px 20px; /* Adjust padding */
+    }
 }
 
-
-/* ================================================ */
-
-/* Add similar rules if you create chemistrychapter-card, mathschapter-card etc. */
-/* Example: */
-/*
-.chemistrychapter-card {
-    background-color: #fce4ec; // Light Pink
-}
-.mathschapter-card {
-    background-color: #ede7f6; // Light Purple
-}
-*/
-
-
-/* --- Chapter List Section Title --- */
-.chapter-list h2 {
-    font-size: 1.8em;
-    margin-bottom: 20px;
-    text-align: center; /* Or left */
-    color: #444;
+/* Fade-in animation (Keep as is) */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-
-/* Font Awesome Icon Fallback Color (if needed) */
-.card-icon i {
-    color: #555; /* Default if specific color isn't set */
-}
-
-/* Font Awesome Import (Recommended to link in HTML <head> instead) */
-/* @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'); */
+/* Removed redundant/unused styles */
+/* .JEE-card, .NEET-card, .classboard-card specific styles removed if only used on index */
+/* .card related styles simplified into .subject-card-button */
+/* .chapter-list h2 removed if not used */

@@ -1,0 +1,373 @@
+/* ===================================================== */
+/* CSS for Chapter Detail Pages                         */
+/* File: chapter-styles.css                            */
+/* ===================================================== */
+
+/* --- Basic Resets & Body (Include if not linking main CSS) --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4; /* Light background for the page */
+}
+
+/* --- Container (Include if not linking main CSS) --- */
+.container {
+    max-width: 1100px; /* Slightly narrower for content focus */
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* --- Main Content Area --- */
+.main-content {
+    padding: 20px 0 40px 0; /* Adjust padding as needed */
+}
+
+
+/* --- Chapter Header (Back Button + Title) --- */
+.chapter-header {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee; /* Optional separator */
+}
+
+.back-button {
+    font-size: 1.5em;
+    color: #555;
+    text-decoration: none;
+    margin-right: 20px;
+    padding: 5px 10px; /* Add padding for easier clicking */
+    line-height: 1; /* Align icon better */
+}
+.back-button:hover {
+    color: #000;
+}
+
+.chapter-title {
+    font-size: 1.6em;
+    color: #333;
+    font-weight: bold;
+    text-align: center;
+    flex-grow: 1; /* Allows title to take remaining space */
+    /* Adjust margin to roughly balance the back button space */
+    /* Margin might not be needed if using flex-grow correctly */
+}
+
+/* --- Chapter Tab Navigation --- */
+.chapter-nav {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    overflow-x: auto; /* Allow horizontal scrolling on small screens */
+    background-color: #fff; /* Give tabs a background */
+    padding-top: 10px;
+    border-radius: 8px 8px 0 0; /* Optional rounded top corners */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.chapter-nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center; /* Center tabs */
+    gap: 25px; /* Space between tabs */
+    padding: 0 15px; /* Padding inside the nav bar */
+    margin: 0;
+    white-space: nowrap; /* Prevent tabs wrapping */
+}
+
+.chapter-nav li a {
+    text-decoration: none;
+    color: #555;
+    padding: 8px 15px;
+    font-size: 1em;
+    font-weight: 500;
+    border-bottom: 3px solid transparent; /* Placeholder for active border */
+    transition: color 0.3s ease, border-color 0.3s ease;
+    display: block; /* Make link fill list item */
+}
+
+.chapter-nav li a:hover {
+    color: #d90000; /* Red hover */
+}
+
+.chapter-nav li a.active {
+    color: #d90000; /* Red color */
+    font-weight: bold;
+    border-bottom-color: #d90000; /* Red underline */
+}
+
+/* --- Tab Content Visibility --- */
+.tab-content {
+    display: none; /* Hide all tab content by default */
+    margin-top: 20px; /* Add some space above the content */
+    padding: 15px; /* Add padding inside content area */
+    background-color: #fff; /* White background for content */
+    border-radius: 0 0 8px 8px; /* Match tab nav rounding */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    border-top: none;
+    animation: fadeIn 0.5s ease-in-out; /* Optional fade-in effect */
+}
+.tab-content.active {
+    display: block; /* Show the active tab content */
+}
+
+/* Optional Fade-in Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* --- Lecture List Container --- */
+.lectures-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between lecture cards */
+}
+
+/* --- Lecture Card Styling --- */
+.lecture-card {
+    background-color: #fff; /* Usually content bg is enough */
+    border: 1px solid #eee; /* Add border */
+    border-radius: 10px;
+    padding: 20px;
+    /* box-shadow: 0 2px 8px rgba(0,0,0,0.08); Removed, use border */
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Space between image and details/button */
+    flex-wrap: wrap; /* Allow wrapping on very small screens */
+}
+
+.lecture-thumbnail img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+    border: 1px solid #eee; /* Subtle border on image */
+}
+
+.lecture-details {
+    flex-grow: 1;
+    min-width: 200px;
+}
+
+.lecture-details h3 {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+}
+
+.lecture-details .instructor,
+.lecture-meta span {
+    font-size: 0.85em;
+    color: #666;
+    display: block; /* Ensure they stack */
+    margin-bottom: 5px;
+}
+
+.lecture-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.lecture-meta i {
+    margin-right: 5px;
+    color: #888;
+}
+
+.lecture-action {
+     margin-left: auto;
+     padding-left: 15px;
+}
+
+.lecture-action .watch-button {
+    background-color: #d90000; /* Red color */
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+    font-size: 0.9em;
+}
+
+.lecture-action .watch-button:hover {
+    background-color: #b30000;
+}
+/* ---PYQ practice  --- */
+
+/* Filter Buttons Container */
+.exercise-filters {
+    display: flex;
+    justify-content: center; /* Center the buttons */
+    gap: 15px; /* Space between buttons */
+    margin-bottom: 30px; /* Space below filters */
+}
+
+/* Filter Button Styling */
+.filter-button {
+    padding: 8px 20px;
+    border-radius: 20px; /* Pill shape */
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 500;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Inactive Filter Button Style */
+.filter-button {
+    background-color: #fff;
+    color: #333;
+    border-color: #ccc;
+}
+.filter-button:hover { /* Hover for inactive button */
+     background-color: #f0f0f0;
+     border-color: #aaa;
+}
+
+/* Active Filter Button Style */
+.filter-button.active {
+    background-color: #333; /* Dark background */
+    color: #fff; /* White text */
+    border-color: #333; /* Matching border */
+}
+/* No hover change needed for active, or define if desired */
+
+
+/* Exercise List Container */
+.exercise-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between exercise cards */
+}
+
+/* Individual Exercise Card Styling */
+.exercise-card {
+    background-color: #fff; /* White background */
+    border-radius: 10px;
+    padding: 15px 20px;
+    border: 1px solid #eee; /* Subtle border */
+    display: flex;
+    justify-content: space-between; /* Pushes details left, link right */
+    align-items: center; /* Vertically center content */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    gap: 15px; /* Space between details and link if they wrap */
+}
+
+/* Exercise Details Styling */
+.exercise-details h4 {
+    font-size: 1.05em; /* Slightly larger than normal text */
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 3px; /* Small space below title */
+}
+
+.exercise-details .question-count {
+    font-size: 0.85em;
+    color: #666;
+    margin: 0; /* Remove default paragraph margin */
+}
+
+/* Start Practice Link Styling */
+.start-practice-link {
+    text-decoration: none;
+    color: #d90000; /* Red color */
+    font-weight: bold;
+    font-size: 0.9em;
+    display: inline-flex; /* Use inline-flex for icon alignment */
+    align-items: center;
+    gap: 5px; /* Space between text and icon */
+    white-space: nowrap; /* Prevent wrapping */
+    transition: color 0.3s ease;
+}
+
+.start-practice-link i {
+    font-size: 0.8em; /* Make icon slightly smaller */
+}
+
+.start-practice-link:hover {
+    color: #b30000; /* Darker red on hover */
+}
+
+/* ====================================== */
+
+
+/* --- Notes List Container --- */
+.notes-list {
+    display: flex;
+    flex-wrap: wrap; /* Allow notes cards to wrap */
+    gap: 15px;
+}
+
+/* --- Note Card Styling --- */
+.note-card {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef; /* Border for definition */
+    border-radius: 8px;
+    padding: 15px 20px;
+    /* box-shadow: 0 1px 4px rgba(0,0,0,0.06); Removed, use border */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    flex: 1 1 300px; /* Grow/shrink, target base width */
+    min-width: 250px;
+}
+
+.note-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.09); /* Add subtle shadow on hover */
+    background-color: #e9ecef; /* Slightly darken background */
+    color: #000;
+}
+
+.note-card i.fa-file-pdf { /* PDF Icon */
+    font-size: 1.6em;
+    color: #d90000; /* Red icon */
+    flex-shrink: 0;
+}
+
+.note-card span { /* Note title text */
+    flex-grow: 1;
+    font-size: 1em;
+    font-weight: 500;
+    text-align: left;
+}
+
+.note-card .download-indicator { /* Optional download icon */
+    font-size: 1.2em;
+    color: #555;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-left: 10px;
+}
+
+
+/* --- Placeholder Text Styles (if needed) --- */
+.tab-content > p { /* Style simple paragraphs inside tab content */
+    padding: 20px;
+    text-align: center;
+    color: #777;
+    font-style: italic;
+}

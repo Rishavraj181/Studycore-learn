@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - StudyCore</title>
+    <!-- Link Login Specific CSS -->
+    <link rel="stylesheet" href="login.css"> <!-- Adjust path if needed -->
+    <!-- Font Awesome (Optional, for icons if desired) -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> -->
+</head>
+<body>
+    <div class="login-container">
+        <!-- Optional: Logo link back to Index -->
+         <a href="Index.html" class="login-logo">StudyCore</a>
+
+        <h2>Login / Sign Up</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="login-name">Full Name:</label>
+                <input type="text" id="login-name" name="name" required placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label for="login-email">Email ID:</label>
+                <input type="email" id="login-email" name="email" required placeholder="Enter your email address">
+            </div>
+            <button type="submit" id="login-submit-button">Enter StudyCore</button>
+        </form>
+         <p class="login-note">Note: This is a simulation. Your data is stored locally in your browser.</p>
+    </div>
+
+    <!-- Link the Shared Authentication JS -->
+    <script src="../Js/auth.js"></script> <!-- Adjust path if needed -->
+</body>
+</html>

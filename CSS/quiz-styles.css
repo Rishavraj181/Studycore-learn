@@ -1,0 +1,535 @@
+/* ======================================== */
+/* quiz.css - Complete Stylesheet         */
+/* Includes Review Mode Styling           */
+/* ======================================== */
+
+/* --- Basic Reset & Body --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5; /* Light grey background */
+    color: #333;
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align container top */
+    min-height: 100vh;
+    padding-top: 20px; /* Space above container */
+}
+
+/* --- Quiz Container & Layout --- */
+.quiz-container {
+    width: 95%;
+    max-width: 1400px; /* Max width */
+    background-color: #fff; /* Content background */
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Contain children */
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 40px); /* Fill viewport height minus padding */
+}
+
+.quiz-body {
+    display: flex;
+    flex-grow: 1; /* Allow body to take remaining space */
+    overflow: hidden; /* Prevent internal scrolling issues */
+}
+
+/* --- Header --- */
+.quiz-header {
+    background-color: #343a40; /* Dark header */
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Adjusted gap */
+    border-bottom: 1px solid #495057;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.question-counter {
+    font-weight: bold;
+    background-color: #495057;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+.timer {
+    font-weight: bold;
+    background-color: #28a745; /* Green timer background */
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+.timer i {
+    margin-right: 5px;
+}
+
+/* NEW: Header Score Display */
+.score-display-header {
+    background-color: #6c757d; /* Neutral grey background */
+    color: white;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: bold;
+    white-space: nowrap;
+    /* display: none; */ /* Controlled by JS */
+}
+
+.quiz-title-header {
+    flex-grow: 1; /* Take available space */
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: bold;
+    min-width: 150px; /* Prevent excessive squishing */
+}
+
+.language-switcher .lang-btn {
+    background: none;
+    border: 1px solid #ccc;
+    color: #ccc;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    margin-left: 5px;
+}
+.language-switcher .lang-btn.active {
+    background-color: #fff;
+    color: #343a40;
+    border-color: #fff;
+    font-weight: bold;
+}
+
+.quiz-back-button {
+    color: #ccc;
+    font-size: 1.4em;
+    text-decoration: none;
+    padding: 5px;
+    margin-left: auto; /* Push to far right */
+}
+.quiz-back-button:hover {
+    color: #fff;
+}
+
+
+/* --- Question Area --- */
+.question-area {
+    flex-grow: 1; /* Take most space */
+    padding: 25px 30px;
+    overflow-y: auto; /* Scroll if content overflows */
+    background-color: #fff; /* Ensure white bg */
+}
+
+#question-content {
+    margin-bottom: 20px;
+}
+
+.question-meta {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; /* Wrap if needed */
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+.q-number {
+    font-weight: bold;
+}
+
+.question-text {
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    font-weight: 500;
+    color: #212529; /* Slightly darker text */
+}
+
+/* Options */
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.option-item {
+    display: block; /* Make label a block */
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    background-color: #fff;
+    position: relative; /* For potential checkmark overlays */
+}
+
+.option-item:hover {
+    border-color: #adb5bd;
+    background-color: #f8f9fa;
+}
+
+.option-item input[type="radio"] {
+    margin-right: 10px;
+    display: inline-block; /* Ensure space is taken */
+    vertical-align: middle;
+}
+
+/* Option Selection/Answer States */
+.option-item.selected { /* User's current selection during quiz */
+    border-color: #ffc107; /* Yellow border for selected */
+    background-color: #fff9e6;
+}
+.option-item.correct { /* Marks the correct answer in review/solution */
+    border-color: #28a745; /* Green border for correct */
+    background-color: #e9f7ec;
+}
+.option-item.incorrect { /* Marks user's WRONG selection in review/solution */
+     border-color: #dc3545; /* Red border for incorrect */
+    background-color: #f8d7da;
+}
+
+
+/* --- Review Mode Disabled Visuals --- */
+.option-item input[type="radio"]:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+/* Target labels when functionally disabled by JS */
+.option-item[style*="pointer-events: none"] {
+    cursor: default;
+    opacity: 0.9; /* Slightly fade disabled options */
+}
+/* Keep correct/incorrect state styles fully visible when disabled */
+.option-item.correct[style*="pointer-events: none"],
+.option-item.incorrect[style*="pointer-events: none"] {
+    opacity: 1;
+}
+.option-item.selected[style*="pointer-events: none"] { /* Keep user selection visible */
+    opacity: 1;
+}
+
+
+/* Solution Area */
+.solution-area {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px dashed #adb5bd;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    display: none; /* Hidden by default */
+}
+.solution-area.visible { /* Class potentially added by JS if needed */
+    display: block;
+}
+.solution-area h4 {
+    margin-bottom: 10px;
+    color: #007bff;
+}
+.solution-area p {
+    margin-bottom: 10px;
+    font-size: 0.95em;
+}
+.view-video-solution-btn {
+     background-color: #343a40;
+     color: white;
+     border: none;
+     padding: 8px 15px;
+     border-radius: 5px;
+     cursor: pointer;
+     font-size: 0.9em;
+     margin-top: 10px;
+     transition: background-color 0.2s;
+}
+.view-video-solution-btn:hover {
+    background-color: #23272b;
+}
+
+
+/* Report Error Link */
+.report-error-link {
+    display: block;
+    margin-top: 25px;
+    text-align: right;
+    font-size: 0.85em;
+    color: #dc3545;
+    text-decoration: none;
+}
+.report-error-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Question Palette (Sidebar) --- */
+.question-palette {
+    width: 300px; /* Fixed width */
+    flex-shrink: 0; /* Prevent shrinking */
+    background-color: #f8f9fa; /* Light sidebar background */
+    border-left: 1px solid #dee2e6;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.palette-header {
+    padding: 15px;
+    border-bottom: 1px solid #dee2e6;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.palette-header h4 { margin: 0; font-size: 1em; font-weight: 600; }
+#toggle-view-mode { background: none; border: none; font-size: 1.2em; color: #6c757d; cursor: pointer; }
+
+
+.palette-legend {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 15px;
+    font-size: 0.8em;
+    color: #666;
+    border-bottom: 1px solid #dee2e6;
+    background-color: #fff;
+    flex-wrap: wrap; /* Allow wrap */
+    gap: 10px;
+}
+.legend-box { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+.legend-box.completed { background-color: #28a745; border: 1px solid #1e7e34;}
+.legend-box.pending { background-color: #fff; border: 1px solid #ced4da;}
+/* Add more legend styles if needed */
+
+
+.palette-list {
+    list-style: none;
+    padding: 15px;
+    margin: 0;
+    overflow-y: auto; /* Allow scrolling */
+    flex-grow: 1; /* Take remaining vertical space */
+    display: grid; /* Use grid for layout */
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); /* Responsive grid */
+    gap: 10px;
+    align-content: flex-start; /* Align items to top */
+}
+
+.palette-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #495057;
+    font-weight: bold;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    background-color: #fff;
+}
+
+.palette-item:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+/* Palette Item States */
+.palette-item.current { /* Current question being viewed */
+    border-color: #007bff;
+    background-color: #e7f1ff;
+    color: #0056b3;
+}
+.palette-item.answered { /* Question has been answered (used in quiz and review) */
+    background-color: #28a745; /* Green background for answered */
+    border-color: #1e7e34;
+    color: #fff;
+}
+.palette-item.answered.current { /* Current and answered */
+     /* Example: Keep green bg, add prominent border */
+     border: 2px solid #0056b3;
+     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+/* Add reviewed state if needed */
+
+
+/* --- Footer --- */
+.quiz-footer {
+    background-color: #fff;
+    border-top: 1px solid #dee2e6;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrapping */
+    gap: 15px; /* Space between items if they wrap */
+}
+
+.quiz-button {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, opacity 0.3s ease;
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+.quiz-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.quiz-button i {
+    margin-right: 5px; /* Space icon and text */
+}
+.quiz-button.next-button i { margin-left: 5px; margin-right: 0;} /* Icon after text */
+
+
+.prev-button {
+    background-color: #6c757d; /* Grey */
+    color: #fff;
+}
+.prev-button:hover:not(:disabled) {
+    background-color: #5a6268;
+}
+
+
+.footer-center-buttons {
+    display: flex;
+    gap: 15px;
+    /* Ensure center buttons don't get squeezed */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.solution-button {
+    background-color: #ffc107; /* Yellow */
+    color: #333;
+}
+.solution-button:hover:not(:disabled) {
+    background-color: #e0a800;
+}
+
+.next-button {
+    background-color: #dc3545; /* Red */
+    color: #fff;
+}
+.next-button:hover:not(:disabled) {
+    background-color: #c82333;
+}
+
+.submit-button {
+     background-color: #198754; /* Green for submit */
+     color: #fff;
+}
+.submit-button:hover:not(:disabled) {
+     background-color: #157347;
+}
+
+/* NEW: Back to Chapter Button */
+.quiz-button.back-button {
+    background-color: #0d6efd; /* Primary Blue */
+    color: #fff;
+    /* Ensure it's positioned reasonably in the center group */
+}
+.quiz-button.back-button:hover:not(:disabled) {
+    background-color: #0b5ed7;
+}
+
+
+/* --- Modal Styles (for Submit Confirmation) --- */
+.modal {
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+    display: flex; /* Use flexbox for centering */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    text-align: center;
+    width: 90%;
+    max-width: 450px; /* Max width */
+    position: relative;
+    animation: fadeInModal 0.3s ease-out;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.close-modal-button { color: #aaa; position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; }
+.close-modal-button:hover, .close-modal-button:focus { color: black; text-decoration: none; }
+.modal-illustration { width: 100px; height: auto; margin-bottom: 20px; }
+.modal-content h2 { margin-bottom: 10px; font-size: 1.5em; }
+.modal-content p { margin-bottom: 25px; color: #555; }
+.modal-actions { display: flex; justify-content: center; gap: 15px; }
+.modal-button { padding: 10px 30px; border-radius: 5px; border: none; font-size: 1em; font-weight: bold; cursor: pointer; transition: background-color 0.2s; }
+.modal-button.cancel { background-color: #fff; border: 1px solid #ccc; color: #555; }
+.modal-button.cancel:hover { background-color: #f8f9fa; }
+.modal-button.confirm { background-color: #198754; /* Match submit button green */ color: white; }
+.modal-button.confirm:hover { background-color: #157347; }
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+    .quiz-body {
+        flex-direction: column; /* Stack palette below on smaller screens */
+    }
+    .question-palette {
+        width: 100%; /* Full width */
+        border-left: none;
+        border-top: 1px solid #dee2e6;
+        max-height: 300px; /* Limit height */
+    }
+    .palette-list {
+        grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); /* Adjust grid */
+        gap: 8px;
+    }
+     .quiz-header {
+        gap: 10px; /* Reduce gap */
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-center-buttons {
+        /* Allow center buttons to wrap if needed */
+        flex-wrap: wrap;
+        justify-content: center;
+         margin-left: 0; /* Remove auto margins */
+         margin-right: 0;
+         width: 100%; /* Take full width if wrapping */
+         order: 1; /* Place center group below prev/next if wrapping occurs */
+    }
+    .prev-button { order: 0;}
+    .next-button { order: 2;} /* Keep next button potentially on the right */
+    .submit-button { order: 2;} /* Keep submit button potentially on the right */
+
+     .quiz-header .quiz-title-header {
+         order: -1; /* Move title towards start */
+         width: 100%; /* Allow title to take full width */
+         text-align: left;
+         margin-bottom: 5px; /* Space below title if it wraps */
+     }
+}

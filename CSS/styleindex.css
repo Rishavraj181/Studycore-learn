@@ -99,11 +99,50 @@ body {
     margin-left: 20px;
 }
 
-.user-profile {
+/* Add/Update in styleindex.css */
+
+.header-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-left: 20px;
+    gap: 15px; /* Adjust spacing */
+}
+
+/* Style for the Login LINK */
+.login-link {
+    padding: 6px 15px;
+    border: 1px solid #007bff; /* Blue border */
+    background-color: #e7f1ff; /* Light blue background */
+    color: #0056b3; /* Blue text */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-decoration: none; /* Remove underline */
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.login-link:hover {
+    background-color: #cfe2ff;
+    color: #003f80;
+}
+
+
+/* Style for the Logout Button */
+.logout-button {
+    padding: 6px 15px;
+    border: 1px solid #f5c6cb; /* Light red border */
+    background-color: #f8d7da; /* Lighter red background */
+    color: #721c24; /* Darker red text */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    margin-left: 10px; /* Space it from username */
+}
+
+.logout-button:hover {
+    background-color: #f1b0b7;
 }
 
 .profile-icon {

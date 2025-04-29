@@ -3,62 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JEE</title>
-    <link rel="stylesheet" href="styleJEE.css">
-    </head>
+    <title>JEE - StudyCore</title> <!-- Updated Title -->
+    <!-- Link Main Stylesheet -->
+    <link rel="stylesheet" href="styleJEE.css"> <!-- Adjust path if root CSS -->
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
 <body>
+
 <header class="main-header">
-<div class="container header-container">
-    <a href="../../Index.html" class="logo">StudyCore</a>
-<nav class="main-nav">
-<ul>
-<li><a href="JEE.html" class="active">Home</a></li>
+    <div class="container header-container">
+        <a href="../../Index.html" class="logo">StudyCore</a>
+        <nav class="main-nav">
+            <ul>
+                <!-- Make JEE active since this is the JEE page -->
+                <li><a href="JEE.html" class="active">JEE</a></li>
+                <li><a href="../NEET/NEET.html">NEET</a></li>
                 <li><a href="../Class 12/Class 12 Board.html">Class 12 Boards</a></li>
             </ul>
         </nav>
+         <!-- Right side actions -->
+         <div class="header-actions">
             <a href="#" class="refer-earn">Refer</a>
-            <i class="fas fa-bell notification-icon"></i> <!-- Placeholder icon -->
-            <div class="user-profile">
-                <div class="profile-icon">U</div> <!-- Placeholder Initial -->
+            <i class="fas fa-bell notification-icon"></i>
+
+            <!-- User Profile Section (Shown when logged in) -->
+            <div id="user-profile-section" class="user-profile" style="display: none;"> <!-- Hide by default -->
+                <div class="profile-icon" id="user-profile-icon">U</div>
                 <div class="user-details">
-                    <span>USER1</span>
+                    <span id="username-display">USER</span> <!-- ID to display username -->
                 </div>
+                <button id="logout-button" class="logout-button" style="display: none;">Logout</button> <!-- Hide logout by default too -->
             </div>
-        </div>
+
+            <!-- Login LINK (Shown when logged out) -->
+            <!-- *** Changed to an <a> tag *** -->
+            <a href="../../Login/login.html" id="login-link" class="login-link" style="display: inline-block;">Login</a> <!-- Show by default -->
+             <!-- *** Adjust href path if Login.html is not in root *** -->
+
     </div>
+    <!-- Removed extra closing div -->
 </header>
 
 <main class="main-content">
     <div class="container">
         <section class="promo-banner">
-            <!-- Background image would be set via CSS -->
             <div class="banner-content">
-                
-                <h1>WELCOME </h1>
+                <h1>WELCOME</h1>
                 <h2>To <strong>JEE</strong> Resource hub</h2>
                 <div class="banner-logo">StudyCore</div>
-                 
             </div>
         </section>
 
+        <!-- Subject Cards Section -->
         <section class="subject-cards">
-           <a href="JEE Physics.html" class="card physics-card">
+            <!-- Changed to DIVs with data attributes -->
+            <div class="card physics-card subject-card-button" data-subject="physics">
                 <div class="card-icon"><i class="fas fa-atom"></i></div>
                 <span>Physics</span>
-            </a>
-            <a href="JEE Chemistry.html" class="card chemistry-card">
-                <div class="card-icon"><i class="fas fa-atom"></i></div>
+            </div>
+            <div class="card chemistry-card subject-card-button" data-subject="chemistry">
+                <!-- Using beaker icon for chemistry -->
+                <div class="card-icon"><i class="fas fa-flask"></i></div>
                 <span>Chemistry</span>
-            </a>
-             <a href="JEE Math.html" class="card math-card">
-                <div class="card-icon"><i class="fas fa-atom"></i></div>
+            </div>
+             <div class="card math-card subject-card-button" data-subject="math">
+                 <!-- Using calculator icon for math -->
+                <div class="card-icon"><i class="fas fa-calculator"></i></div>
                 <span>Math</span>
-            </a>
-           
-            
-           
+            </div>
         </section>
-    </div>
+
+        <!-- Chapter Lists Section (Hidden by default) -->
+        <section class="chapters-display-area">
+
+            <!-- Physics Chapters Container -->
+            <div id="physics-chapters" class="chapter-list" style="display: none;">
+                <h3>Physics Chapters</h3>
+                <ul>
+                    <a href="../JEE/PhysicsChapters/Electrostatics1.html"class="chapter-link">Electrostatics-1</a>
+                    <a href="../JEE/PhysicsChapters/Electrostatics2.html"class="chapter-link">Electrostatics-2</a>
+                    <a href="../JEE/PhysicsChapters/Current-Electricity.html"class="chapter-link">Current Electricity</a>
+                    <a href=""class="chapter-link">Capacitor</a>
+                    <a href=""class="chapter-link">Gravitation</a>
+                    <a href="../JEE/PhysicsChapters/MEC.html"class="chapter-link">Magnetic Effect of Electric Current</a>
+                    <a href="../JEE/PhysicsChapters/Magnetism-and-Matter.html"class="chapter-link">Magnetism and Matter</a>
+                    <a href="../JEE/PhysicsChapters/EMI.html"class="chapter-link">EMI</a>
+                    <a href="../JEE/PhysicsChapters/AC.html"class="chapter-link">AC</a>
+                    <a href="../JEE/PhysicsChapters/EM-Waves.html"class="chapter-link">EM Waves</a>
+                    <a href=""class="chapter-link">Modern Physics 1</a>
+                    <a href=""class="chapter-link">Modern Physics 2</a>
+                    <a href=""class="chapter-link">Ray Optics</a>
+                    <a href=""class="chapter-link">String and Sound Waves</a>
+                    <a href="../JEE/PhysicsChapters/Wave-optics.html" class="chapter-link"><span>Wave Optics</span></a>
+                    <a href=""class="chapter-link">Errors </a>
+                    <a href=""class="chapter-link">Semiconductor</a>
+                    <a href="../JEE/PhysicsChapters/units-dimention-basic-math.html" class="chapter-link"> Units & Dimensions and Basic Maths</a>
+                    <a href=""class="chapter-link">Kinematics</a>
+                    <a href=""class="chapter-link">NLM and Friction</a>
+                    <a href=""class="chapter-link">Circular Motion</a>
+                    <a href=""class="chapter-link">Work Power and Energy</a>
+                    <a href=""class="chapter-link">Center of Mass</a>
+                    <a href=""class="chapter-link">Rotation</a>
+                    <a href=""class="chapter-link">Heat(Elasticity,Thrermal Expansion,calorimetry,Heat Transfer)</a>
+                    <a href=""class="chapter-link">KTG and Thermodynamic</a>
+                    <a href="" class="chapter-link"> Fluid Mechanics</a>
+
+                </ul>
+            </div>
+
+            <!-- Chemistry Chapters Container -->
+            <div id="chemistry-chapters" class="chapter-list" style="display: none;">
+                <h3>Physical Chapters</h3>
+                 <ul>
+                    <li><a href="ChemistryChapters/mole-concept.html" class="chapter-link">Mole Concept</a></li>
+                    <a href=""class="chapter-link">Concentration Terms</a>
+                    <a href=""class="chapter-link">Redox Reaction</a>
+                    <li><a href="ChemistryChapters/atomic-structure.html" class="chapter-link">Atomic Structure</a></li>
+                    <a href=""class="chapter-link">Thermodynamics and Thermochemistry</a>
+                    <a href=""class="chapter-link">Chemical Equlibrium</a>
+                    <a href=""class="chapter-link">Ionic Equlibrium</a>
+                    <a href=""class="chapter-link">Electrochemistry</a>
+                    <a href=""class="chapter-link">Chemical Kinetics</a>
+                    <a href=""class="chapter-link">Liquid Solution</a>
+                    <a href=""class="chapter-link">Solid State</a>
+                    <a href=""class="chapter-link">Ideal and Real Gas</a>
+                    <a href=""class="chapter-link">Surface Chemistry</a>
+                    </ul>
+                <h3>Inorganic Chemistry</h3>
+                <ul>
+                    <li><a href="ChemistryChapters/periodic-table.html" class="chapter-link">Periodic Table</a></li>
+                    <li><a href="ChemistryChapters/chemical-bonding.html" class="chapter-link">Chemical Bonding</a></li>
+                    <a href=""class="chapter-link">S-Block</a>
+                    <a href=""class="chapter-link">P-Block</a>
+                    <a href=""class="chapter-link">D&F Block</a>
+                    <a href=""class="chapter-link">Cordination Chemistry</a>
+                    <a href=""class="chapter-link">Meallurgy</a>
+                    <a href=""class="chapter-link">Salt Analysis</a>
+                </ul>
+                <h3>Organic Chemestry</h3>
+                    <a href=""class="chapter-link">IUPAC</a>
+                    <a href=""class="chapter-link">GOC</a>
+                    <a href=""class="chapter-link">Isomerism</a>
+                    <a href=""class="chapter-link">Hydrocarbon</a>
+                    <!-- Add all other chemistry chapter links -->
+                </ul>
+            </div>
+
+            <!-- Math Chapters Container -->
+            <div id="math-chapters" class="chapter-list" style="display: none;">
+                 <h3>Math Chapters</h3>
+                 <ul>
+                    <li><a href="MathChapters/sets-relations-functions.html" class="chapter-link">Sets, Relations & Functions</a></li>
+                    <li><a href="MathChapters/logarithms.html" class="chapter-link">Logarithms</a></li>
+                    <li><a href="MathChapters/quadratic-equations.html" class="chapter-link">Quadratic Equations</a></li>
+                    <li><a href="MathChapters/sequences-series.html" class="chapter-link">Sequences & Series</a></li>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a> 
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                    <a href=""class="chapter-link"></a>
+                </ul>
+            </div>
+
+        </section> <!-- End chapters-display-area -->
+
+    </div> <!-- End container -->
 </main>
+
+<!-- Link the JavaScript file -->
+<!-- Assumes Js folder is in root, adjust path if needed -->
+<script src="../../Js/javaindex.js"></script>
+   <script src="../../Js/auth.js"></script>
 </body>
 </html>
