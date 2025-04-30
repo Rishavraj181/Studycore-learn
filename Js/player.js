@@ -1,266 +1,225 @@
-// player.js
-
-/**
- * Function to display an error message to the user, typically replacing the player area.
- * @param {string} message The error message to display.
- */
-function displayError(message) {
-    console.error("Player Error:", message); // Log detailed error to console
-    const videoContainer = document.querySelector('.video-container');
-    if (videoContainer) {
-        videoContainer.innerHTML = `<p style="color: red; background-color: #ffe0e0; padding: 20px; border: 1px solid red; text-align: center;">Error loading video: ${message}</p>`;
-    }
-    // Optionally hide the tabs as well if the core video failed
-    const tabs = document.querySelector('.video-info-tabs');
-    if (tabs) {
-        tabs.style.display = 'none';
-    }
-}
-
-/**
- * Handles switching between content tabs below the video player.
- * @param {Event|null} evt The click event object (or null if called programmatically).
- * @param {string} tabName The ID of the tab content element to display.
- */
-function openTab(evt, tabName) {
-    let i, tabcontent, tablinks;
-
-    // Hide all tab content sections
-    tabcontent = document.getElementsByClassName("tab-content");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-        tabcontent[i].classList.remove("active");
-    }
-
-    // Remove 'active' class from all tab buttons
-    tablinks = document.getElementsByClassName("tab-button");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].classList.remove("active");
-    }
-
-    // Show the target tab content
-    const currentTab = document.getElementById(tabName);
-    if (currentTab) {
-        currentTab.style.display = "block";
-        currentTab.classList.add("active"); // For potential styling
-    } else {
-        console.warn(`Tab content with ID '${tabName}' not found.`);
-    }
-
-    // Add 'active' class to the clicked button (if called by event)
-    // Or find the button corresponding to tabName if called programmatically
-    if (evt && evt.currentTarget) {
-        evt.currentTarget.classList.add("active");
-    } else if (tabName) {
-         // Find the button whose onclick contains the target tabName
-         const initialButton = document.querySelector(`.tab-button[onclick*="'${tabName}'"]`);
-         if (initialButton) {
-             initialButton.classList.add('active');
-         }
-    }
-}
-
-
-/**
- * Placeholder function to load timeline data (replace with actual logic).
- * @param {string|null} videoId The unique ID of the video.
- * @param {HTMLElement|null} listElement The UL element to populate.
- */
-function loadTimelineData(videoId, listElement) {
-    console.log(`Attempting to load timeline for videoId: ${videoId || 'N/A'}`);
-    if (!listElement) {
-        console.warn("Timeline list element not found.");
-        return;
-    }
-    // --- Replace with your actual timeline loading logic ---
-    // Example: Fetch data based on videoId, then populate the list.
-    // You might have a mapping in JS or fetch from an API if you add a backend.
-    listElement.innerHTML = `<li>Timeline data for '${videoId || 'this video'}' is not yet implemented.</li>`;
-    // Example of how seeking would work if you had items like <li data-time="120">...</li>
-    /*
-    listElement.querySelectorAll('li[data-time]').forEach(item => {
-        item.style.cursor = 'pointer';
-        item.onclick = (event) => {
-            const time = parseFloat(event.currentTarget.dataset.time);
-            const player = videojs.getPlayer('lecture-player'); // Get player instance
-            if (player && !isNaN(time)) {
-                player.currentTime(time);
-                player.play(); // Optional: start playing after seeking
-            }
-        };
-    });
-    */
-}
-
-/**
- * Placeholder function to load related videos (replace with actual logic).
- * @param {string|null} videoId The unique ID of the video.
- * @param {HTMLElement|null} containerElement The DIV element to populate.
- */
-function loadRelatedVideos(videoId, containerElement) {
-    console.log(`Attempting to load related videos for videoId: ${videoId || 'N/A'}`);
-     if (!containerElement) {
-         console.warn("Related videos container element not found.");
-         return;
-     }
-    // --- Replace with your actual related videos loading logic ---
-    // Example: Fetch data based on videoId or current category, then create cards.
-    containerElement.innerHTML = `<p>Loading related videos for '${videoId || 'this video'}' is not yet implemented.</p>`;
-    /* Example card structure if you loaded data:
-       const relatedVideo = { title: "Another Lecture", instructor: "Some Instructor", link: "player.html?videoId=...", thumb: "..." };
-       containerElement.innerHTML += `
-           <div class="related-video-card">
-               <img src="${relatedVideo.thumb}" alt="Instructor">
-               <div>
-                   <h4>${relatedVideo.title}</h4>
-                   <p>by ${relatedVideo.instructor}</p>
-                   <a href="${relatedVideo.link}" class="watch-button">Watch Now</a>
-               </div>
-           </div>
-       `;
-    */
-}
-
-
-// --- Main Execution Logic ---
-// Wait for the HTML document structure to be fully loaded and parsed
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM fully loaded and parsed.");
+    // --- Get Elements ---
+    const playerContainer = document.getElementById('player-container');
+    const video = document.getElementById('videoPlayer');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const muteBtn = document.getElementById('muteBtn');
+    const volumeBar = document.getElementById('volumeBar');
+    const progressBar = document.getElementById('progressBar');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const videoTitleElement = document.getElementById('videoTitle');
+    const errorMessageElement = document.getElementById('error-message');
 
-    // --- 1. Get and Validate URL Parameters ---
-    const params = new URLSearchParams(window.location.search);
-    console.log("URL Search Params:", params.toString());
+    let isDraggingProgress = false; // Flag for dragging progress bar
 
-    const videoId = params.get('videoId'); // Optional, but useful for related data
-    const videoSrc = params.get('videoSrc');
-    const title = params.get('title');
-    const posterSrc = params.get('posterSrc');
-    const studyMaterialSrc = params.get('studyMaterialSrc');
-
-    console.log(`Extracted Params: videoId=${videoId}, videoSrc=${videoSrc}, title=${title}, posterSrc=${posterSrc}, studyMaterialSrc=${studyMaterialSrc}`);
-
-    // **Critical Validation:** We absolutely need a video source.
-    if (!videoSrc) {
-        displayError("No video source (videoSrc) provided in the URL.");
-        return; // Stop execution
+    // --- Helper Functions ---
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
-    // --- 2. Update Static HTML Elements ---
-    const breadcrumbsContainer = document.getElementById('breadcrumbs-container');
-    const notesTitle = document.getElementById('notes-lecture-title');
-    const ratingsTitle = document.getElementById('ratings-lecture-title');
-    const studyMaterialContent = document.getElementById('study-material-content');
-
-    // Set Page Title
-    document.title = title ? `${title} | Video Player` : 'Video Player';
-
-    // Set Breadcrumbs (customize path as needed)
-    if (breadcrumbsContainer) {
-        breadcrumbsContainer.textContent = `Physics > ${title || 'Current Lecture'}`;
-    }
-
-    // Set Titles within Tabs
-    const lectureDisplayName = title || 'this Lecture';
-    if (notesTitle) notesTitle.textContent = lectureDisplayName;
-    if (ratingsTitle) ratingsTitle.textContent = lectureDisplayName;
-
-    // Update Study Material Tab
-    if (studyMaterialContent) {
-        if (studyMaterialSrc) {
-            // Use textContent for safety if the title might have HTML, but innerHTML is needed for the link
-             studyMaterialContent.innerHTML = `
-                <a href="${studyMaterialSrc}" download="StudyMaterial_${videoId || 'Lecture'}.pdf"> <!-- Optional: Suggest a filename -->
-                    Download Study Material for ${lectureDisplayName}
-                    <span class="download-icon">📥</span>
-                </a>`;
-        } else {
-            studyMaterialContent.textContent = 'No study material available for this lecture.';
+    function getQueryParams() {
+        const params = {};
+        const queryString = window.location.search.substring(1); // Remove '?'
+        const regex = /([^&=]+)=([^&]*)/g;
+        let m;
+        while (m = regex.exec(queryString)) {
+            // Decode URI components for both key and value
+            params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
         }
-    } else {
-         console.warn("Study material content element not found.");
+        return params;
     }
 
+    function displayError(message) {
+        errorMessageElement.textContent = message;
+        errorMessageElement.style.display = 'block';
+        playerContainer.style.display = 'none'; // Hide the player
+        videoTitleElement.style.display = 'none'; // Hide the title area too
+        document.title = "Error"; // Update page title
+    }
 
-    // --- 3. Prepare Video.js Options ---
-    const playerOptions = {
-        controls: true,
-        autoplay: false, // Standard practice unless specifically required
-        preload: 'auto', // 'auto' (load metadata + maybe some data), 'metadata' (only metadata), 'none'
-        playbackRates: [0.5, 1, 1.5, 2, 2.5, 3, 4], // Customize speeds as needed
-        sources: [
-            {
-                src: videoSrc,
-                // Determine type dynamically if needed, but mp4 is common
-                type: 'video/mp4'
-                // Example for other types:
-                // type: videoSrc.endsWith('.webm') ? 'video/webm' : 'video/mp4'
+    // --- Core Player Functions --- (Mostly same as before)
+    function togglePlay() {
+        if (!video.src) return; // Don't try to play if no source loaded
+        if (video.paused || video.ended) {
+            video.play();
+        } else {
+            video.pause();
+        }
+    }
+
+    function updatePlayPauseIcon() {
+        const icon = playPauseBtn.querySelector('i');
+        if (video.paused || video.ended) {
+            icon.classList.remove('fa-pause');
+            icon.classList.add('fa-play');
+            playerContainer.classList.add('paused'); // Keep controls visible
+        } else {
+            icon.classList.remove('fa-play');
+            icon.classList.add('fa-pause');
+            playerContainer.classList.remove('paused');
+        }
+    }
+
+    function updateProgress() {
+         if (isNaN(video.duration)) return; // Don't update if duration isn't available yet
+        const percentage = (video.currentTime / video.duration) * 100;
+        progressBar.value = percentage;
+        const currentTime = formatTime(video.currentTime);
+        const duration = formatTime(video.duration);
+        timeDisplay.textContent = `${currentTime} / ${duration}`;
+    }
+
+    function scrub(e) {
+         if (isNaN(video.duration)) return;
+        const scrubTime = (e.offsetX / progressBar.offsetWidth) * video.duration;
+        video.currentTime = scrubTime;
+    }
+
+    function handleProgressMouseDown(e) {
+        if (isNaN(video.duration)) return;
+        isDraggingProgress = true;
+        scrub(e);
+    }
+    function handleProgressMouseMove(e) {
+        if (!isDraggingProgress || isNaN(video.duration)) return;
+        e.preventDefault();
+        scrub(e);
+    }
+    function handleProgressMouseUp() {
+         if (!isDraggingProgress) return;
+        isDraggingProgress = false;
+    }
+
+    function toggleMute() {
+        video.muted = !video.muted;
+    }
+
+    function updateMuteIcon() {
+        const icon = muteBtn.querySelector('i');
+        if (video.muted || video.volume === 0) {
+            icon.classList.remove('fa-volume-up');
+            icon.classList.add('fa-volume-mute');
+            volumeBar.value = 0;
+        } else {
+            icon.classList.remove('fa-volume-mute');
+            icon.classList.add('fa-volume-up');
+            volumeBar.value = video.volume;
+        }
+    }
+
+    function handleVolumeChange() {
+        video.volume = volumeBar.value;
+        video.muted = volumeBar.value === 0;
+        updateMuteIcon();
+    }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement && !document.mozFullScreenElement &&
+            !document.webkitFullscreenElement && !document.msFullscreenElement) {
+            if (playerContainer.requestFullscreen) {
+                playerContainer.requestFullscreen();
+            } else if (playerContainer.mozRequestFullScreen) { playerContainer.mozRequestFullScreen(); }
+            else if (playerContainer.webkitRequestFullscreen) { playerContainer.webkitRequestFullscreen(); }
+            else if (playerContainer.msRequestFullscreen) { playerContainer.msRequestFullscreen(); }
+             updateFullscreenIcon(true);
+        } else {
+            if (document.exitFullscreen) { document.exitFullscreen(); }
+            else if (document.mozCancelFullScreen) { document.mozCancelFullScreen(); }
+            else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+            else if (document.msExitFullscreen) { document.msExitFullscreen(); }
+             updateFullscreenIcon(false);
+        }
+    }
+
+    function updateFullscreenIcon(isFullscreen) {
+        const icon = fullscreenBtn.querySelector('i');
+        if (isFullscreen) {
+            icon.classList.remove('fa-expand');
+            icon.classList.add('fa-compress');
+        } else {
+            icon.classList.remove('fa-compress');
+            icon.classList.add('fa-expand');
+        }
+    }
+
+    // --- Initialization and URL Parameter Handling ---
+    function initializePlayer() {
+        const params = getQueryParams();
+        const videoSrc = params['src']; // Use bracket notation for safety
+        const videoTitle = params['title'] || 'Video Player'; // Default title
+        const videoPoster = params['poster'];
+
+        // **Crucial: Check if video source exists**
+        if (!videoSrc) {
+            displayError("Error: No video source specified in the URL. Please provide a 'src' parameter (e.g., player.html?src=path/to/video.mp4).");
+            return; // Stop execution if no source
+        }
+
+        // Set title
+        videoTitleElement.textContent = videoTitle;
+        document.title = videoTitle; // Set browser tab title
+
+        // Set video source and poster
+        video.src = videoSrc;
+        if (videoPoster) {
+            video.poster = videoPoster;
+        }
+
+        // Load the video (browser often does this automatically when src is set, but explicit load() is good practice)
+        video.load();
+
+        // Initialize UI
+        updatePlayPauseIcon();
+        updateMuteIcon();
+        volumeBar.value = video.volume;
+        progressBar.value = 0;
+        timeDisplay.textContent = "00:00 / 00:00";
+
+        // Add Event Listeners
+        video.addEventListener('play', updatePlayPauseIcon);
+        video.addEventListener('pause', updatePlayPauseIcon);
+        video.addEventListener('ended', updatePlayPauseIcon);
+        video.addEventListener('timeupdate', updateProgress);
+        video.addEventListener('volumechange', updateMuteIcon);
+        video.addEventListener('loadedmetadata', updateProgress); // Initial duration
+        video.addEventListener('durationchange', updateProgress); // Duration might change
+
+        // Robust Error Handling for the specific video
+        video.addEventListener('error', (e) => {
+            console.error("Video Error:", video.error);
+            let errorMsg = `Error loading video: ${videoSrc}`;
+            switch (video.error.code) {
+                case MediaError.MEDIA_ERR_ABORTED: errorMsg += ' (Playback aborted).'; break;
+                case MediaError.MEDIA_ERR_NETWORK: errorMsg += ' (Network error).'; break;
+                case MediaError.MEDIA_ERR_DECODE: errorMsg += ' (Decoding error or unsupported feature).'; break;
+                case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: errorMsg += ' (Format not supported or server/network error).'; break;
+                default: errorMsg += ' (Unknown error).'; break;
             }
-        ]
-        // Add other Video.js options here if necessary
-    };
-
-    // **Safely Add Poster:** Only add the poster option if posterSrc is a valid, non-empty string.
-    if (posterSrc && typeof posterSrc === 'string' && posterSrc.trim() !== '') {
-        playerOptions.poster = posterSrc;
-        console.log("Applying poster image:", posterSrc);
-    } else if (posterSrc) {
-         console.warn("posterSrc parameter provided but seems invalid or empty. Ignoring.");
-    }
-
-    console.log("Final Video.js options:", JSON.stringify(playerOptions, null, 2)); // Log options for inspection
-
-    // --- 4. Initialize Video.js Player ---
-    const playerElementId = 'lecture-player';
-    const playerElement = document.getElementById(playerElementId);
-
-    if (!playerElement) {
-        displayError(`Cannot find video element with ID '${playerElementId}'. Check player.html.`);
-        return; // Stop execution
-    }
-
-    try {
-        const player = videojs(playerElementId, playerOptions);
-
-        // --- 5. Setup Player Event Listeners (Optional but Recommended) ---
-        player.ready(() => {
-            console.log("Video.js Player is Ready!");
-            // You can perform actions here once the player is fully initialized
-            // E.g., load dynamic timeline markers based on video duration: player.duration()
+            displayError(errorMsg);
         });
 
-        player.on('error', () => {
-            const error = player.error();
-            console.error("Video.js Playback Error:", error);
-            // Display a more user-friendly error in the player itself if needed
-             displayError(`Could not play video. Code: ${error.code}, Message: ${error.message}`);
-        });
+        playPauseBtn.addEventListener('click', togglePlay);
+        video.addEventListener('click', togglePlay); // Click video to play/pause
+        muteBtn.addEventListener('click', toggleMute);
+        volumeBar.addEventListener('input', handleVolumeChange);
 
-        player.on('loadedmetadata', () => {
-            console.log(`Video metadata loaded. Duration: ${player.duration()} seconds.`);
-             // Now is a good time to load timeline data if it depends on duration
-             const timelineList = document.getElementById('timeline-list');
-             loadTimelineData(videoId, timelineList); // Load timeline now we know video details
-        });
+        progressBar.addEventListener('mousedown', handleProgressMouseDown);
+        document.addEventListener('mousemove', handleProgressMouseMove); // Listen globally for drag outside bar
+        document.addEventListener('mouseup', handleProgressMouseUp); // Listen globally
 
-         // --- 6. Load Other Dynamic Tab Content ---
-         // Related videos might not depend on the player being ready
-         const relatedVideosList = document.getElementById('related-videos-list');
-         loadRelatedVideos(videoId, relatedVideosList);
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
 
-
-    } catch (error) {
-        // Catch errors during the synchronous videojs() initialization call itself
-        displayError(`Failed to initialize Video.js player. ${error.message}`);
-        console.error("Video.js Initialization Error Details:", error);
-        return; // Stop execution
+        // Listen for fullscreen changes (e.g., user pressing Esc)
+        document.addEventListener('fullscreenchange', () => updateFullscreenIcon(!!document.fullscreenElement));
+        document.addEventListener('webkitfullscreenchange', () => updateFullscreenIcon(!!document.webkitFullscreenElement));
+        document.addEventListener('mozfullscreenchange', () => updateFullscreenIcon(!!document.mozFullScreenElement));
+        document.addEventListener('MSFullscreenChange', () => updateFullscreenIcon(!!document.msFullscreenElement));
     }
 
-    // --- 7. Activate the Default Tab ---
-    // Ensure this happens after potential player errors might have hidden the tabs
-    const tabsContainer = document.querySelector('.video-info-tabs');
-    if (tabsContainer && tabsContainer.style.display !== 'none') {
-        openTab(null, 'myNotes'); // Or whichever tab should be active by default
-        console.log("Default tab 'myNotes' activated.");
-    }
+    // --- Start the Initialization ---
+    initializePlayer();
 
-}); // End DOMContentLoaded listener
+});
