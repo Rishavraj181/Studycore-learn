@@ -273,6 +273,8 @@ a.card {
 .classboard-card { background-color: #ede7f6; }
 .classboard .card-icon { color: #7e57c2; }
 
+.Test-card { background-color:#00acc1 ;}
+.Test-card .card-icon {color:#00acc1}
 .physics-card { background-color: #e0f2f7; }
 .physics-card .card-icon { color: #00acc1; }
 

@@ -1,6 +1,7 @@
 /* ======================================== */
 /* quiz.css - Complete Stylesheet         */
-/* Includes Review Mode Styling           */
+/* Includes Practice Mode Styling           */
+/* (Grey/Green/Red Palette)             */
 /* ======================================== */
 
 /* --- Basic Reset & Body --- */
@@ -69,21 +70,24 @@ body {
     border-radius: 4px;
     font-size: 0.9em;
     white-space: nowrap;
+    display: inline-flex; /* Controlled by JS */
+    align-items: center;
 }
 .timer i {
     margin-right: 5px;
 }
 
-/* NEW: Header Score Display */
+/* Score Display Header - Removed from default view for Practice Mode */
 .score-display-header {
-    background-color: #6c757d; /* Neutral grey background */
+    /* Style kept in case needed later, but should be removed from HTML or display: none */
+    background-color: #6c757d;
     color: white;
     padding: 5px 12px;
     border-radius: 4px;
     font-size: 0.9em;
     font-weight: bold;
     white-space: nowrap;
-    /* display: none; */ /* Controlled by JS */
+    display: none; /* Hidden in practice mode */
 }
 
 .quiz-title-header {
@@ -141,13 +145,22 @@ body {
     margin-bottom: 15px;
     display: flex;
     justify-content: space-between;
+    align-items: center; /* Align items vertically */
     flex-wrap: wrap; /* Wrap if needed */
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
+    gap: 10px; /* Add gap between meta items */
 }
 .q-number {
     font-weight: bold;
 }
+/* Style for time display added by JS */
+.time-spent-display {
+    font-style: italic;
+    color: #555;
+    margin-left: 15px; /* Matches JS */
+}
+
 
 .question-text {
     font-size: 1.1em;
@@ -186,21 +199,25 @@ body {
 }
 
 /* Option Selection/Answer States */
-.option-item.selected { /* User's current selection during quiz */
-    border-color: #ffc107; /* Yellow border for selected */
-    background-color: #fff9e6;
+/* Selected state BEFORE answering */
+.option-item.selected:not(.correct):not(.incorrect) {
+    border-color: #b3d7ff; /* Lighter blue for selection */
+    background-color: #e7f1ff;
 }
-.option-item.correct { /* Marks the correct answer in review/solution */
+/* Correct answer state (after answering) */
+.option-item.correct {
     border-color: #28a745; /* Green border for correct */
     background-color: #e9f7ec;
 }
-.option-item.incorrect { /* Marks user's WRONG selection in review/solution */
+/* Incorrect answer state (user's WRONG selection, after answering) */
+.option-item.incorrect.selected { /* Must be selected AND incorrect */
      border-color: #dc3545; /* Red border for incorrect */
     background-color: #f8d7da;
 }
 
 
-/* --- Review Mode Disabled Visuals --- */
+
+/* --- Practice Mode Disabled Visuals --- */
 .option-item input[type="radio"]:disabled {
     opacity: 0.7;
     cursor: not-allowed;
@@ -227,7 +244,7 @@ body {
     border: 1px dashed #adb5bd;
     border-radius: 6px;
     background-color: #f8f9fa;
-    display: none; /* Hidden by default */
+    display: none; /* Hidden by default, controlled by JS */
 }
 .solution-area.visible { /* Class potentially added by JS if needed */
     display: block;
@@ -239,6 +256,13 @@ body {
 .solution-area p {
     margin-bottom: 10px;
     font-size: 0.95em;
+}
+.solution-area img { /* Style images in solutions */
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
 }
 .view-video-solution-btn {
      background-color: #343a40;
@@ -269,6 +293,10 @@ body {
     text-decoration: underline;
 }
 
+/* ======================================== */
+/* --- START: Updated Palette Styles --- */
+/* ======================================== */
+
 /* --- Question Palette (Sidebar) --- */
 .question-palette {
     width: 300px; /* Fixed width */
@@ -289,26 +317,46 @@ body {
     align-items: center;
 }
 .palette-header h4 { margin: 0; font-size: 1em; font-weight: 600; }
-#toggle-view-mode { background: none; border: none; font-size: 1.2em; color: #6c757d; cursor: pointer; }
+/* Removed #toggle-view-mode as it wasn't in the HTML provided */
 
 
+/* --- UPDATED: Palette Legend --- */
 .palette-legend {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-around; /* Distribute space */
     padding: 10px 15px;
     font-size: 0.8em;
     color: #666;
     border-bottom: 1px solid #dee2e6;
     background-color: #fff;
     flex-wrap: wrap; /* Allow wrap */
-    gap: 10px;
+    gap: 15px; /* Increased gap for clarity */
 }
-.legend-box { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
-.legend-box.completed { background-color: #28a745; border: 1px solid #1e7e34;}
-.legend-box.pending { background-color: #fff; border: 1px solid #ced4da;}
-/* Add more legend styles if needed */
+
+.palette-legend span { /* Target the spans directly */
+    display: inline-flex;
+    align-items: center;
+}
+
+.palette-legend span::before { /* Use ::before for the color box */
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: middle;
+    border: 1px solid rgba(0,0,0,0.1); /* Subtle border */
+}
+
+/* Legend Color Mapping */
+.palette-legend .correct::before { background-color: #28a745; border-color: #1e7e34; } /* Green */
+.palette-legend .incorrect::before { background-color: #dc3545; border-color: #c82333; } /* Red */
+.palette-legend .pending::before { background-color: #f0f0f0; border-color: #dcdcdc; } /* Grey */
+.palette-legend .pending { color: #555; } /* Adjust text color for grey */
 
 
+/* --- UPDATED: Palette List and Items --- */
 .palette-list {
     list-style: none;
     padding: 15px;
@@ -321,45 +369,77 @@ body {
     align-content: flex-start; /* Align items to top */
 }
 
+/* Base item style */
 .palette-item {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 40px;
-    height: 40px;
-    border: 1px solid #ced4da;
+    width: 40px; /* Keep size */
+    height: 40px; /* Keep size */
+    line-height: 38px; /* Adjust for border */
     border-radius: 5px;
     text-decoration: none;
-    color: #495057;
     font-weight: bold;
     font-size: 0.9em;
     cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-    background-color: #fff;
+    box-sizing: border-box; /* Include border in size */
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.1s;
+    border: 1px solid transparent; /* Start with transparent border */
 }
 
 .palette-item:hover {
-    background-color: #e9ecef;
-    border-color: #adb5bd;
+    transform: scale(1.05); /* Slight grow effect */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Add shadow on hover */
 }
 
-/* Palette Item States */
-.palette-item.current { /* Current question being viewed */
-    border-color: #007bff;
-    background-color: #e7f1ff;
-    color: #0056b3;
+/* Palette Item Status States */
+.palette-item.pending { /* Unanswered/Left (Grey) */
+    background-color: #f0f0f0; /* Light Grey background */
+    color: #555;            /* Darker Grey text */
+    border-color: #dcdcdc;  /* Slightly darker grey border */
 }
-.palette-item.answered { /* Question has been answered (used in quiz and review) */
-    background-color: #28a745; /* Green background for answered */
-    border-color: #1e7e34;
-    color: #fff;
+.palette-item.pending:hover {
+    background-color: #e0e0e0;
 }
-.palette-item.answered.current { /* Current and answered */
-     /* Example: Keep green bg, add prominent border */
-     border: 2px solid #0056b3;
-     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+
+
+
+.palette-item.correct { /* Correct (Green) */
+    background-color: #28a745; /* Green */
+    border-color: #1e7e34;     /* Darker Green border */
+    color: #fff;               /* White text */
 }
-/* Add reviewed state if needed */
+.palette-item.correct:hover {
+    background-color: #218838; /* Slightly darker green on hover */
+}
+
+.palette-item.incorrect { /* Incorrect (Red) */
+    background-color: #dc3545; /* Red */
+    border-color: #c82333;     /* Darker Red border */
+    color: #fff;               /* White text */
+}
+.palette-item.incorrect:hover {
+    background-color: #c82333; /* Slightly darker red on hover */
+}
+
+/* Current Question Highlight */
+.palette-item.current {
+    /* Use a prominent border, keeps the background color from status */
+    border-width: 2px;
+    border-color: #0056b3; /* Dark Blue border */
+    box-shadow: 0 0 6px rgba(0, 86, 179, 0.6); /* Optional subtle glow */
+    /* Adjust line-height to re-center text with thicker border */
+    line-height: 36px; /* height(40) - top_border(2) - bottom_border(2) */
+}
+/* Ensure hover effect doesn't override border */
+.palette-item.current:hover {
+     border-color: #00418a; /* Slightly darker blue on hover */
+     /* Keep background hover if desired */
+}
+
+/* ====================================== */
+/* --- END: Updated Palette Styles --- */
+/* ====================================== */
 
 
 /* --- Footer --- */
@@ -422,33 +502,35 @@ body {
 }
 
 .next-button {
-    background-color: #dc3545; /* Red */
+    background-color: #007bff; /* Changed to Blue for standard navigation */
     color: #fff;
 }
 .next-button:hover:not(:disabled) {
-    background-color: #c82333;
+    background-color: #0056b3;
 }
 
+/* Submit Button - Removed from default view for Practice Mode */
 .submit-button {
-     background-color: #198754; /* Green for submit */
+     /* Style kept in case needed later, but should be removed from HTML or display: none */
+     background-color: #198754;
      color: #fff;
+     display: none; /* Hidden in practice mode */
 }
 .submit-button:hover:not(:disabled) {
      background-color: #157347;
 }
 
-/* NEW: Back to Chapter Button */
+/* Back to Chapter Button (Practice Mode) */
 .quiz-button.back-button {
-    background-color: #0d6efd; /* Primary Blue */
+    background-color: #6c757d; /* Changed to Grey to be less prominent */
     color: #fff;
-    /* Ensure it's positioned reasonably in the center group */
 }
 .quiz-button.back-button:hover:not(:disabled) {
-    background-color: #0b5ed7;
+    background-color: #5a6268;
 }
 
 
-/* --- Modal Styles (for Submit Confirmation) --- */
+/* --- Modal Styles (Kept for potential future use, but hidden) --- */
 .modal {
     position: fixed; /* Stay in place */
     z-index: 1000; /* Sit on top */
@@ -458,7 +540,7 @@ body {
     height: 100%;
     overflow: auto; /* Enable scroll if needed */
     background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
-    display: flex; /* Use flexbox for centering */
+    display: none; /* Hidden by default, remove if modal is used */
     justify-content: center;
     align-items: center;
 }
@@ -504,11 +586,15 @@ body {
         max-height: 300px; /* Limit height */
     }
     .palette-list {
-        grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); /* Adjust grid */
+        grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); /* Adjust grid slightly */
         gap: 8px;
+        padding: 10px; /* Reduce padding */
     }
      .quiz-header {
         gap: 10px; /* Reduce gap */
+    }
+    .question-area {
+        padding: 20px; /* Reduce padding */
     }
 }
 
@@ -524,7 +610,7 @@ body {
     }
     .prev-button { order: 0;}
     .next-button { order: 2;} /* Keep next button potentially on the right */
-    .submit-button { order: 2;} /* Keep submit button potentially on the right */
+    /* Submit button is hidden anyway */
 
      .quiz-header .quiz-title-header {
          order: -1; /* Move title towards start */
@@ -532,4 +618,44 @@ body {
          text-align: left;
          margin-bottom: 5px; /* Space below title if it wraps */
      }
+     .question-meta {
+         font-size: 0.85em; /* Slightly smaller meta text */
+     }
+     .question-text {
+         font-size: 1.05em; /* Slightly smaller question text */
+     }
+     .quiz-button {
+         padding: 8px 20px; /* Smaller buttons */
+         font-size: 0.95em;
+     }
+}
+
+@media (max-width: 480px) {
+     .palette-list {
+        grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); /* Further adjust grid */
+        gap: 6px;
+     }
+      .palette-item {
+         width: 35px;
+         height: 35px;
+         line-height: 33px; /* Adjust for border */
+         font-size: 0.85em;
+      }
+      .palette-item.current {
+          line-height: 31px; /* Adjust for border */
+      }
+      .palette-legend {
+          font-size: 0.75em;
+          gap: 10px;
+      }
+      .quiz-header {
+          padding: 8px 15px; /* Tighter header */
+      }
+      .question-counter, .timer {
+          font-size: 0.8em;
+          padding: 4px 8px;
+      }
+      .quiz-title-header {
+          font-size: 1em;
+      }
 }

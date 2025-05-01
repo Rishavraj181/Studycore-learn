@@ -1,12 +1,10 @@
 /**
- * quiz-engine.js - REVISED FOR REVIEW MODE & ROBUSTNESS
- * Handles quiz logic: loading, navigation, timing, answers, submission,
- * and transitions to an interactive review mode using the same UI.
+ * quiz-engine.js - REVISED FOR PRACTICE MODE (IMMEDIATE FEEDBACK) & PER-QUESTION TIMER
+ * Handles quiz logic: loading, navigation, per-question timing, immediate answers/feedback.
  */
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- DOM Element References ---
-    // Wrap element fetching in checks to prevent early errors if HTML is missing elements
     const questionContentEl = document.getElementById('question-content');
     const paletteListContainerEl = document.getElementById('palette-list-container');
     const currentQuestionNumberEl = document.getElementById('current-question-number');
@@ -15,36 +13,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     const solutionBtn = document.getElementById('solution-btn');
-    const submitBtn = document.getElementById('submit-btn');
+    // REMOVED: submitBtn and related modal elements are no longer needed for core logic
+    // const submitBtn = document.getElementById('submit-btn');
+    // const submitConfirmModal = document.getElementById('submit-confirm-modal');
+    // const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
+    // const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
+    // const closeModalButton = submitConfirmModal ? submitConfirmModal.querySelector('.close-modal-button') : null;
     const allQuestionsDataContainer = document.getElementById('all-questions-data');
-    const submitConfirmModal = document.getElementById('submit-confirm-modal');
-    const cancelSubmitBtn = document.getElementById('cancel-submit-btn');
-    const confirmSubmitBtn = document.getElementById('confirm-submit-btn');
-    const closeModalButton = submitConfirmModal ? submitConfirmModal.querySelector('.close-modal-button') : null;
     const backToChapterBtn = document.getElementById('back-to-chapter-btn');
-    const scoreDisplayHeaderEl = document.getElementById('score-display-header');
-    const finalScoreValueEl = document.getElementById('final-score-value');
-    const totalScoreValueEl = document.getElementById('total-score-value');
-    const timerContainerEl = timeDisplayEl ? timeDisplayEl.closest('.timer') : null; // Get the timer container
+    // REMOVED: Score display elements are no longer needed
+    // const scoreDisplayHeaderEl = document.getElementById('score-display-header');
+    // const finalScoreValueEl = document.getElementById('final-score-value');
+    // const totalScoreValueEl = document.getElementById('total-score-value');
+    const timerContainerEl = timeDisplayEl ? timeDisplayEl.closest('.timer') : null;
 
     // --- State Variables ---
     let questions = [];
     let currentQuestionIndex = 0;
-    let userAnswers = [];
-    let timerInterval = null; // Initialize timerInterval to null
-    let timeLeft = 1800; // Example: 30 minutes (adjust as needed)
-    let isReviewMode = false;
-    let finalScore = 0;
+    let userAnswers = []; // Stores { questionIndex, selectedOption, status ('pending', 'answered'), timeSpentSeconds }
+    let timerInterval = null;
+    let elapsedTimeCurrentQuestion = 0; // Time spent on the currently active, unanswered question
+    // REMOVED: isReviewMode, finalScore, totalQuizTimeSeconds
 
     // --- Initialization Function ---
     function initializeQuiz() {
-        console.log("Initializing Quiz..."); // Debug log
+        console.log("Initializing Practice Mode...");
 
-        // Validate essential container exists
         if (!allQuestionsDataContainer) {
             console.error("CRITICAL: Cannot find #all-questions-data container in HTML. Quiz cannot load.");
             if(questionContentEl) questionContentEl.innerHTML = "<p>Error: Question data container not found. Please check HTML structure.</p>";
-            disableAllControls(); // Disable buttons if setup fails
+            disableAllControls();
             return;
         }
 
@@ -56,46 +54,49 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        console.log(`Parsed ${questions.length} questions.`); // Debug log
+        console.log(`Parsed ${questions.length} questions.`);
 
+        // Initialize userAnswers with timeSpentSeconds
         userAnswers = questions.map((_, index) => ({
             questionIndex: index,
             selectedOption: null,
-            status: 'pending'
+            status: 'pending', // Status: 'pending' or 'answered'
+            timeSpentSeconds: 0
         }));
 
         if(totalQuestionNumberEl) totalQuestionNumberEl.textContent = questions.length;
-        if(totalScoreValueEl) totalScoreValueEl.textContent = questions.length; // For score display
+        // REMOVED: Score display setup
 
         buildPalette();
-        setupEventListeners(); // Setup listeners early
-        displayQuestion(currentQuestionIndex); // Display first question *after* setup
-        startTimer();
+        setupEventListeners();
+        displayQuestion(currentQuestionIndex); // Display first question (will also start its timer)
 
-        console.log("Quiz Initialized Successfully."); // Debug log
+        console.log("Practice Mode Initialized Successfully.");
     }
 
     // --- Disable Controls Function (Helper) ---
     function disableAllControls() {
-        [prevBtn, nextBtn, solutionBtn, submitBtn, backToChapterBtn].forEach(btn => {
+        // Include solutionBtn here as well initially
+        [prevBtn, nextBtn, solutionBtn, backToChapterBtn].forEach(btn => {
             if (btn) btn.disabled = true;
         });
         if (paletteListContainerEl) paletteListContainerEl.style.pointerEvents = 'none';
+        // Hide timer initially if desired
+        if(timerContainerEl) timerContainerEl.style.display = 'none';
     }
 
-    // --- Parse Question Data ---
+    // --- Parse Question Data --- (No changes needed)
     function parseQuestionData() {
         const questionDataElements = allQuestionsDataContainer.querySelectorAll('.question-data');
-        console.log(`Found ${questionDataElements.length} potential question data elements.`); // Debug log
+        console.log(`Found ${questionDataElements.length} potential question data elements.`);
 
-        questions = Array.from(questionDataElements).map((el, i) => { // Use index i for logging
+        questions = Array.from(questionDataElements).map((el, i) => {
             const questionIndexAttr = el.dataset.questionIndex;
             const questionMetaEl = el.querySelector('.question-meta');
             const questionTextEl = el.querySelector('.question-text');
             const optionsContainerEl = el.querySelector('.options-container');
             const solutionAreaEl = el.querySelector('.solution-area');
 
-            // Validation for each question element
             if (questionIndexAttr === undefined || questionIndexAttr === null || isNaN(parseInt(questionIndexAttr, 10))) {
                  console.warn(`Skipping question element ${i + 1}: Missing or invalid data-question-index.`); return null;
             }
@@ -108,20 +109,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             return {
                 index: questionIndex,
-                metaHTML: questionMetaEl.innerHTML,
+                metaHTML: questionMetaEl.innerHTML, // Keep original meta
                 textHTML: questionTextEl.innerHTML,
                 optionsHTML: optionsContainerEl.innerHTML,
                 solutionHTML: solutionAreaEl ? solutionAreaEl.innerHTML : '<p>No solution provided.</p>',
                 correctOption: correctOptionEl ? correctOptionEl.dataset.optionValue : null
             };
-        }).filter(q => q !== null); // Remove skipped questions
+        }).filter(q => q !== null);
 
-        questions.sort((a, b) => a.index - b.index); // Ensure correct order
+        questions.sort((a, b) => a.index - b.index);
     }
 
-    // --- Build Question Palette ---
+    // --- Build Question Palette --- (No changes needed in structure)
     function buildPalette() {
-        if (!paletteListContainerEl) {
+         if (!paletteListContainerEl) {
             console.warn("Palette container not found."); return;
         }
         paletteListContainerEl.innerHTML = ''; // Clear first
@@ -135,101 +136,115 @@ document.addEventListener('DOMContentLoaded', () => {
             li.appendChild(a);
             paletteListContainerEl.appendChild(li);
 
-            // Add click listener within the loop
             a.addEventListener('click', (e) => {
                 e.preventDefault();
-                 if (!isReviewMode && userAnswers[index].status === 'answered') {
-                     // Maybe prompt if they want to change answer? For now, allow navigation.
-                 }
                 navigateToQuestion(index);
             });
         });
-        updatePaletteStatus(); // Set initial states
+        updatePaletteStatus();
+    }
+
+    // --- Helper Function to Format Time --- (No changes needed)
+    function formatTime(totalSeconds) {
+        if (isNaN(totalSeconds) || totalSeconds < 0) {
+            return "00:00";
+        }
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
     // --- Display Specific Question ---
     function displayQuestion(index) {
         if (index < 0 || index >= questions.length || !questionContentEl) {
-             console.error(`displayQuestion called with invalid index (${index}) or missing content element.`); return;
+            console.error(`displayQuestion called with invalid index (${index}) or missing content element.`);
+            return;
         }
-        console.log(`Displaying question index: ${index}`); // Debug log
+        console.log(`Displaying question index: ${index}`);
+
+        // Stop timer for the *previous* question if it was running
+        // (This shouldn't strictly be necessary if stopTimer is called correctly on navigate/answer, but acts as a safeguard)
+        stopTimer();
 
         currentQuestionIndex = index;
         const questionData = questions[index];
+        const answerData = userAnswers[index];
 
-        // Basic check on question data structure
         if (!questionData || !questionData.metaHTML || !questionData.textHTML || !questionData.optionsHTML) {
             console.error(`Invalid question data for index ${index}.`, questionData);
             questionContentEl.innerHTML = "<p>Error: Could not load question content.</p>";
             return;
         }
 
-        // Inject HTML
+        // Inject base HTML (without dynamic time initially)
         questionContentEl.innerHTML = `
             <div class="question-meta">${questionData.metaHTML}</div>
             <div class="question-text">${questionData.textHTML}</div>
             <div class="options-container">${questionData.optionsHTML}</div>
-            <div class="solution-area">${questionData.solutionHTML}</div>
+            <div class="solution-area" style="display: none;">${questionData.solutionHTML}</div>
         `;
 
-        // Update header counter
         if(currentQuestionNumberEl) currentQuestionNumberEl.textContent = index + 1;
 
-        // Reset solution visibility/button
         const solutionAreaEl = questionContentEl.querySelector('.solution-area');
-        if (solutionAreaEl) {
-            solutionAreaEl.style.display = 'none';
-            if (solutionBtn) solutionBtn.textContent = 'Solution';
+        if (solutionBtn) solutionBtn.textContent = 'Solution'; // Reset button text
+        if (solutionAreaEl) solutionAreaEl.style.display = 'none'; // Ensure solution hidden initially
+
+        if (answerData.status === 'answered') {
+            // --- Question Already Answered ---
+            console.log(`Question ${index} already answered.`);
+            restoreSelection(); // Restore visual state (includes calling revealAnswers)
+            if (solutionBtn) solutionBtn.disabled = false; // Allow viewing solution again
+            if (timerContainerEl) timerContainerEl.style.display = 'none'; // Hide timer for answered questions
+            // Make sure options are visually disabled (revealAnswers should handle this)
+             const options = questionContentEl.querySelectorAll('.option-item');
+             options.forEach(option => {
+                  option.style.pointerEvents = 'none';
+                  const radioInput = option.querySelector('input[type="radio"]');
+                 if(radioInput) radioInput.disabled = true;
+             });
+
+
         } else {
-             console.warn(`Solution area not found for question index ${index}.`);
+            // --- New/Unanswered Question ---
+             console.log(`Displaying unanswered question ${index}. Starting timer.`);
+            attachOptionListeners(); // Attach listeners only for unanswered questions
+            restoreSelection(); // Restore selection if they navigated away and back without answering
+            if (solutionBtn) solutionBtn.disabled = true; // Disable solution until answered
+            startTimer(); // Start the timer for this question
         }
 
-        // Attach option listeners only if NOT in review mode
-        if (!isReviewMode) {
-            attachOptionListeners();
-        }
-
-        restoreSelection(); // Restore user's previous selection visual state
-
-        // Handle Review Mode Specifics
-        if (isReviewMode) {
-            revealAnswers(); // Reveal correct/incorrect and disable options
-             if (solutionBtn) solutionBtn.disabled = false; // Ensure solution button is usable
-        } else {
-             if (solutionBtn) solutionBtn.disabled = false; // Ensure enabled during quiz
-             // Ensure options are enabled (revealAnswers disables them)
-              const options = questionContentEl.querySelectorAll('.option-item');
-              options.forEach(option => {
-                 const radioInput = option.querySelector('input[type="radio"]');
-                 if(radioInput) radioInput.disabled = false;
-                 option.style.pointerEvents = 'auto';
-              });
-        }
-
-        updateNavigationButtons(); // Update footer button visibility
-        updatePaletteHighlight(); // Highlight current number in palette
+        updateNavigationButtons();
+        updatePaletteHighlight();
+        updatePaletteStatus(); // Update palette based on current state
     }
 
-    // --- Attach Option Listeners ---
-    function attachOptionListeners() {
+
+    // --- Attach Option Listeners --- (No changes needed)
+     function attachOptionListeners() {
         const options = questionContentEl.querySelectorAll('.option-item');
         if (options.length === 0) {
              console.warn("No options found to attach listeners to for question:", currentQuestionIndex);
              return;
         }
-        options.forEach(option => {
-            // Remove previous listener if any (prevent duplicates - simple way)
-            option.replaceWith(option.cloneNode(true));
-        });
-         // Re-query and add listener
-         questionContentEl.querySelectorAll('.option-item').forEach(option => {
-             option.addEventListener('click', handleOptionSelection);
+         // Ensure options are interactive
+         options.forEach(option => {
+             option.style.pointerEvents = 'auto';
+              const radioInput = option.querySelector('input[type="radio"]');
+                 if(radioInput) radioInput.disabled = false;
+
+             // Re-binding listeners to avoid duplicates if displayQuestion is called rapidly
+             const newOption = option.cloneNode(true);
+             option.parentNode.replaceChild(newOption, option);
+             newOption.addEventListener('click', handleOptionSelection);
          });
     }
 
-    // --- Handle Option Selection ---
+
+    // --- Handle Option Selection (Immediate Feedback Trigger) ---
     function handleOptionSelection(event) {
-        if (isReviewMode) return; // Don't allow changes in review mode
+        // Double check if already answered (shouldn't happen if listeners are detached/options disabled)
+        if (userAnswers[currentQuestionIndex].status === 'answered') return;
 
         const selectedLabel = event.target.closest('.option-item');
         if (!selectedLabel) return;
@@ -241,66 +256,91 @@ document.addEventListener('DOMContentLoaded', () => {
              console.warn("Clicked option label is missing data-option-value."); return;
         }
 
-        if (radioInput) { radioInput.checked = true; }
+        console.log(`Answer selected for question ${currentQuestionIndex}: ${selectedValue}`);
 
-        // Update state
+        // --- Stop Timer and Record Time ---
+        stopTimer(); // Stop the timer immediately
+        userAnswers[currentQuestionIndex].timeSpentSeconds = elapsedTimeCurrentQuestion; // Record time
+        console.log(`Time recorded for question ${currentQuestionIndex}: ${elapsedTimeCurrentQuestion}s`);
+         if (timerContainerEl) timerContainerEl.style.display = 'none'; // Hide timer after answering
+
+
+        // --- Update State ---
         userAnswers[currentQuestionIndex].selectedOption = selectedValue;
         userAnswers[currentQuestionIndex].status = 'answered';
 
-        // Update UI
-        const allOptions = questionContentEl.querySelectorAll('.option-item');
-        allOptions.forEach(opt => opt.classList.remove('selected'));
-        selectedLabel.classList.add('selected');
+        // --- Update UI ---
+        if (radioInput) { radioInput.checked = true; } // Ensure radio is checked visually
 
-        updatePaletteStatus(); // Update palette immediately
+        revealAnswers(); // Show correct/incorrect, disable options, show time
+        if (solutionBtn) solutionBtn.disabled = false; // Enable solution button now
+        updatePaletteStatus(); // Update palette with correct/incorrect status
+        // Optional: Automatically show solution after a short delay?
+        // setTimeout(() => { toggleSolution(); }, 1000);
     }
 
     // --- Restore User's Selection Visual State ---
     function restoreSelection() {
         const answerData = userAnswers[currentQuestionIndex];
+
+        // Clear any previous time display in meta before potentially adding a new one
+        const metaElement = questionContentEl.querySelector('.question-meta');
+        const existingTimeDisplay = metaElement?.querySelector('.time-spent-display');
+        if(existingTimeDisplay) existingTimeDisplay.remove();
+        const existingSeparator = Array.from(metaElement?.childNodes ?? []).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim() === '|');
+         if(existingSeparator) existingSeparator.remove();
+
+
         if (answerData && answerData.selectedOption !== null) {
             const options = questionContentEl.querySelectorAll('.option-item');
             options.forEach(option => {
-                 option.classList.remove('selected'); // Clear selection first
+                option.classList.remove('selected'); // Clear selection first
                 if (option.dataset.optionValue === answerData.selectedOption) {
                     option.classList.add('selected');
                     const radioInput = option.querySelector('input[type="radio"]');
                     if (radioInput) radioInput.checked = true;
                 }
             });
+
+            // If the question was already answered, immediately show the result state
+            if (answerData.status === 'answered') {
+                revealAnswers(); // This will mark correct/incorrect, disable options, and show time
+            }
         } else {
-             // Ensure no options are marked selected if no answer stored
-             const options = questionContentEl.querySelectorAll('.option-item');
-             options.forEach(option => option.classList.remove('selected'));
+            // Ensure no options are marked selected if no answer stored/pending
+            const options = questionContentEl.querySelectorAll('.option-item');
+            options.forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+                 // Ensure options are enabled visually if pending
+                  const radioInput = option.querySelector('input[type="radio"]');
+                  if (radioInput) radioInput.disabled = false;
+                  option.style.pointerEvents = 'auto';
+            });
         }
     }
+
 
     // --- Update Navigation Buttons Visibility ---
     function updateNavigationButtons() {
         const isFirstQuestion = currentQuestionIndex === 0;
         const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
-        if (isReviewMode) {
-            if(prevBtn) prevBtn.style.display = isFirstQuestion ? 'none' : 'inline-block';
-            if(nextBtn) nextBtn.style.display = isLastQuestion ? 'none' : 'inline-block';
-            if(submitBtn) submitBtn.style.display = 'none';
-            if(backToChapterBtn) backToChapterBtn.style.display = 'inline-block';
-            if(solutionBtn) solutionBtn.disabled = false; // Always enable in review
-        } else {
-            if(prevBtn) prevBtn.style.display = isFirstQuestion ? 'none' : 'inline-block';
-            if(nextBtn) nextBtn.style.display = isLastQuestion ? 'none' : 'inline-block';
-            if(submitBtn) submitBtn.style.display = isLastQuestion ? 'inline-block' : 'none';
-            if(backToChapterBtn) backToChapterBtn.style.display = 'none';
-            if(solutionBtn) solutionBtn.disabled = false; // Always enable during quiz
-        }
+        // Simplified: No review mode, no submit button
+        if(prevBtn) prevBtn.style.display = isFirstQuestion ? 'none' : 'inline-block';
+        if(nextBtn) nextBtn.style.display = isLastQuestion ? 'none' : 'inline-block';
+        // Submit button is assumed removed from HTML or hidden via CSS
+        if(backToChapterBtn) backToChapterBtn.style.display = 'inline-block'; // Always show back button? Or adjust as needed.
+
+        // Solution button state is handled in displayQuestion/handleOptionSelection
+        // Timer visibility is handled in displayQuestion/handleOptionSelection/stopTimer
     }
 
-    // --- Update Palette Highlighting ---
+
+    // --- Update Palette Highlighting --- (No changes needed)
     function updatePaletteHighlight() {
         if (!paletteListContainerEl) return;
         const paletteItems = paletteListContainerEl.querySelectorAll('.palette-item');
         paletteItems.forEach((item) => {
-             // Use loose comparison for dataset attribute (string) vs index (number)
             item.classList.toggle('current', item.dataset.questionIndex == currentQuestionIndex);
         });
     }
@@ -313,34 +353,37 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = parseInt(item.dataset.questionIndex, 10);
             if (isNaN(index) || !userAnswers[index]) return;
 
-            const status = userAnswers[index].status;
-            item.classList.remove('pending', 'answered', 'reviewed'); // Clear previous
+            const uAnswer = userAnswers[index];
+            const qData = questions[index];
+            item.classList.remove('pending', 'answered', 'correct', 'incorrect'); // Clear previous state classes
 
-            if (isReviewMode) {
-                // In review mode, color based on correctness if answered
-                 const qData = questions[index];
-                 const uAnswer = userAnswers[index];
-                 if (uAnswer.status === 'answered' && qData) {
-                    item.classList.add(uAnswer.selectedOption === qData.correctOption ? 'correct' : 'incorrect'); // Use correct/incorrect classes if defined in CSS for palette
-                     // Fallback to 'answered' class if no correct/incorrect palette styles
-                     item.classList.add('answered');
-                 } else {
-                    item.classList.add('pending'); // Mark unanswered as pending
-                 }
+            if (uAnswer.status === 'answered') {
+                item.classList.add('answered');
+                if (qData && uAnswer.selectedOption === qData.correctOption) {
+                    item.classList.add('correct');
+                } else {
+                    item.classList.add('incorrect');
+                }
             } else {
-                 // During quiz, just mark based on status
-                 if (status === 'answered') item.classList.add('answered');
-                 else if (status === 'reviewed') item.classList.add('reviewed'); // If review marking is implemented
-                 else item.classList.add('pending');
+                item.classList.add('pending');
             }
 
-             // Re-apply current highlight
-             item.classList.toggle('current', index === currentQuestionIndex);
+            // Re-apply current highlight regardless of status
+            item.classList.toggle('current', index === currentQuestionIndex);
         });
     }
 
     // --- Navigation Functions ---
     function navigateToQuestion(index) {
+        // Stop timer for the outgoing question *before* displaying the new one
+        // This is important if the user navigates without answering.
+        if (userAnswers[currentQuestionIndex].status === 'pending') {
+             stopTimer();
+             // Optionally record the time spent even if unanswered?
+             // userAnswers[currentQuestionIndex].timeSpentSeconds = elapsedTimeCurrentQuestion;
+             // console.log(`Navigated away from pending question ${currentQuestionIndex}, time was ${elapsedTimeCurrentQuestion}s`);
+         }
+
         if (index >= 0 && index < questions.length) {
             displayQuestion(index);
         } else {
@@ -350,25 +393,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function goToNextQuestion() { navigateToQuestion(currentQuestionIndex + 1); }
     function goToPrevQuestion() { navigateToQuestion(currentQuestionIndex - 1); }
 
-    // --- Toggle Solution Visibility ---
+    // --- Toggle Solution Visibility --- (No functional change needed)
     function toggleSolution() {
         if (!questionContentEl || !solutionBtn) return;
+         // Ensure it only works if the question has been answered
+         if (userAnswers[currentQuestionIndex].status !== 'answered') return;
+
         const solutionAreaEl = questionContentEl.querySelector('.solution-area');
         if (solutionAreaEl) {
             const isVisible = solutionAreaEl.style.display === 'block';
             solutionAreaEl.style.display = isVisible ? 'none' : 'block';
             solutionBtn.textContent = isVisible ? 'Solution' : 'Hide Solution';
-
-            // If showing solution in review mode, ensure answers are marked
-            if (isReviewMode && !isVisible) {
-                revealAnswers();
-            }
         } else {
              console.warn("Solution area not found for current question.");
         }
     }
 
-    // --- Reveal Correct/Incorrect Answers ---
+
+    // --- Reveal Correct/Incorrect Answers (and disable options) ---
     function revealAnswers() {
         if (!questionContentEl) return;
         const currentQData = questions[currentQuestionIndex];
@@ -383,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         options.forEach(option => {
             const optionValue = option.dataset.optionValue;
-            option.classList.remove('selected', 'correct', 'incorrect'); // Reset states
+            option.classList.remove('selected', 'correct', 'incorrect'); // Reset states potentially set by restoreSelection
 
             // Mark the correct answer
             if (optionValue === correctAnswer) {
@@ -391,35 +433,60 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // Mark the user's selection (correct or incorrect)
             if (optionValue === userAnswer) {
-                option.classList.add('selected'); // Always show what user picked
+                option.classList.add('selected'); // Keep showing what user picked
                 if (optionValue !== correctAnswer) {
                     option.classList.add('incorrect'); // Add incorrect style only if it wasn't the right one
                 }
             }
 
-            // Disable option interaction
+            // --- Disable option interaction ---
             const radioInput = option.querySelector('input[type="radio"]');
             if (radioInput) radioInput.disabled = true;
-            option.style.pointerEvents = 'none';
+            option.style.pointerEvents = 'none'; // Prevent clicks
         });
+
+         // --- Display Time Spent ---
+         const timeSpent = userAnswerData?.timeSpentSeconds ?? 0;
+         const formattedTimeSpent = formatTime(timeSpent);
+         const metaElement = questionContentEl.querySelector('.question-meta');
+         if (metaElement) {
+              // Remove previous time display if any exists from restoreSelection race condition
+             let existingTimeDisplay = metaElement.querySelector('.time-spent-display');
+             if(existingTimeDisplay) existingTimeDisplay.remove();
+             let existingSeparator = Array.from(metaElement.childNodes).find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim() === '|');
+             if(existingSeparator) existingSeparator.remove();
+
+
+             // Add the time display
+             let timeDisplay = document.createElement('span');
+             timeDisplay.classList.add('time-spent-display');
+             timeDisplay.style.marginLeft = '15px';
+             timeDisplay.style.fontStyle = 'italic';
+             timeDisplay.style.color = '#555'; // Example style
+
+             // Add separator "|" if meta has existing content
+             if (metaElement.textContent.trim().length > 0) {
+                 metaElement.appendChild(document.createTextNode(' | '));
+             }
+             timeDisplay.textContent = `(Time: ${formattedTimeSpent})`;
+             metaElement.appendChild(timeDisplay);
+         }
     }
 
-    // --- Timer Functions ---
+
+    // --- Timer Functions (Per Question) ---
     function startTimer() {
-        if (timerInterval !== null) clearInterval(timerInterval); // Clear existing if any
+        if (timerInterval !== null) clearInterval(timerInterval); // Clear any residual interval
         if (!timeDisplayEl || !timerContainerEl) { console.warn("Timer element(s) not found."); return; }
 
-        timerContainerEl.style.display = 'inline-flex'; // Ensure visible
-        updateTimerDisplay(); // Initial display
+        console.log("Starting timer for current question.");
+        elapsedTimeCurrentQuestion = 0; // Reset timer for this question
+        timerContainerEl.style.display = 'inline-flex'; // Make timer visible
+        updateTimerDisplay(); // Show 00:00
+
         timerInterval = setInterval(() => {
-            if (timeLeft > 0) {
-                timeLeft--;
-                updateTimerDisplay();
-            } else {
-                stopTimer();
-                alert("Time's up! Submitting the quiz.");
-                submitQuiz(true); // Auto-submit
-            }
+            elapsedTimeCurrentQuestion++;
+            updateTimerDisplay();
         }, 1000);
     }
 
@@ -427,87 +494,48 @@ document.addEventListener('DOMContentLoaded', () => {
         if (timerInterval !== null) {
             clearInterval(timerInterval);
             timerInterval = null;
-            console.log("Timer stopped."); // Debug log
+             console.log(`Timer stopped for question ${currentQuestionIndex}. Elapsed: ${elapsedTimeCurrentQuestion}s`);
+            // Timer display might be hidden by handleOptionSelection or displayQuestion later
+             // if (timerContainerEl) timerContainerEl.style.display = 'none'; // Option: hide immediately
         }
-        // Hide timer visually
-        if (timerContainerEl) timerContainerEl.style.display = 'none';
     }
 
     function updateTimerDisplay() {
         if (!timeDisplayEl) return;
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timeDisplayEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        timeDisplayEl.textContent = formatTime(elapsedTimeCurrentQuestion);
     }
 
-    // --- Submit Confirmation Modal ---
-    function showSubmitConfirmation() {
-        if (submitConfirmModal) submitConfirmModal.style.display = 'flex';
-    }
-    function hideSubmitConfirmation() {
-        if (submitConfirmModal) submitConfirmModal.style.display = 'none';
-    }
-
-    // --- Submit Quiz Logic ---
-    function submitQuiz(isAutoSubmit = false) {
-        console.log("Attempting to submit quiz..."); // Debug log
-        if (!isAutoSubmit) hideSubmitConfirmation();
-        stopTimer();
-
-        // Calculate score
-        finalScore = 0;
-        userAnswers.forEach((answer, index) => {
-            if (questions[index] && answer.selectedOption === questions[index].correctOption) {
-                finalScore++;
-            }
-        });
-        console.log(`Quiz Submitted! Final Score: ${finalScore} / ${questions.length}`);
-
-        // Display Score in Header
-        if (scoreDisplayHeaderEl && finalScoreValueEl) {
-            finalScoreValueEl.textContent = finalScore;
-            if(totalScoreValueEl) totalScoreValueEl.textContent = questions.length; // Ensure total is correct
-            scoreDisplayHeaderEl.style.display = 'inline-block';
-        } else {
-             console.warn("Score display elements not found in header.");
-        }
-
-        // Enter Review Mode
-        isReviewMode = true;
-        updatePaletteStatus(); // Update palette to show correct/incorrect based on new mode
-
-        // Navigate to first question for review
-        // DisplayQuestion will handle revealing answers and setting button states
-        navigateToQuestion(0);
-
-         // Optionally disable solution button initially in review?
-         // if (solutionBtn) solutionBtn.disabled = true; // Uncomment if needed
-    }
+    // --- REMOVED: Submit Confirmation Modal Functions ---
+    // --- REMOVED: submitQuiz Function ---
 
     // --- Setup Event Listeners ---
     function setupEventListeners() {
-        console.log("Setting up event listeners..."); // Debug log
+        console.log("Setting up practice mode event listeners...");
         if(nextBtn) nextBtn.addEventListener('click', goToNextQuestion); else console.warn("Next button not found.");
         if(prevBtn) prevBtn.addEventListener('click', goToPrevQuestion); else console.warn("Previous button not found.");
         if(solutionBtn) solutionBtn.addEventListener('click', toggleSolution); else console.warn("Solution button not found.");
-        if(submitBtn) submitBtn.addEventListener('click', showSubmitConfirmation); else console.warn("Submit button not found.");
-        if(backToChapterBtn) backToChapterBtn.addEventListener('click', goBackToChapter); // Use global function from HTML
-        else console.warn("Back to Chapter button not found.");
+        // REMOVED: submitBtn listener
+        if(backToChapterBtn) {
+            // Assuming goBackToChapter is globally defined or handle navigation here
+            backToChapterBtn.addEventListener('click', () => {
+                console.log("Navigating back to chapter...");
+                // Add actual navigation logic here, e.g.:
+                // window.location.href = '/path/to/chapter/index';
+                if (typeof goBackToChapter === 'function') {
+                    goBackToChapter();
+                } else {
+                    alert("Navigation logic for 'Back to Chapter' is not defined.");
+                }
+            });
+        } else {
+            console.warn("Back to Chapter button not found.");
+        }
 
-        // Modal listeners
-        if (closeModalButton) closeModalButton.addEventListener('click', hideSubmitConfirmation);
-        if (cancelSubmitBtn) cancelSubmitBtn.addEventListener('click', hideSubmitConfirmation);
-        if (confirmSubmitBtn) confirmSubmitBtn.addEventListener('click', () => submitQuiz(false));
-
-        window.addEventListener('click', (event) => {
-            if (event.target == submitConfirmModal) hideSubmitConfirmation();
-        });
-        console.log("Event listeners setup complete."); // Debug log
+        // REMOVED: Modal listeners
+        console.log("Event listeners setup complete.");
     }
 
     // --- Start the Quiz ---
-    // Add a small delay or ensure DOM is fully ready beyond DOMContentLoaded if needed
-    // setTimeout(initializeQuiz, 0); // Example of slight delay
-    initializeQuiz(); // Direct call is usually fine
+    initializeQuiz();
 
 }); // End DOMContentLoaded listener
