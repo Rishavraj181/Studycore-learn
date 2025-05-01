@@ -1,0 +1,200 @@
+/* --- Viewresult.css --- */
+
+/* Basic Reset & Body */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body.result-page { /* Add class to body in HTML */
+    font-family: sans-serif;
+    background-color: #f0f2f5;
+    line-height: 1.6;
+    padding-bottom: 30px; /* Space at bottom */
+}
+
+/* Header */
+.results-header {
+    background-color: #003366; /* NTA Blue */
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+.results-header h1 { font-size: 1.4em; font-weight: 500; }
+.back-link { color: #ffcc00; text-decoration: none; font-weight: bold;}
+.back-link:hover { text-decoration: underline;}
+
+/* Main Layout */
+.results-container {
+    display: flex;
+    flex-direction: column; /* Default: stack list and details */
+    gap: 20px;
+    padding: 0 20px; /* Padding on sides */
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Layout for wider screens */
+@media (min-width: 992px) {
+    .results-container {
+        flex-direction: row; /* Side-by-side layout */
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 20px; /* Add padding back */
+    }
+}
+
+
+/* Attempts List Section */
+.attempts-list-section {
+    flex: 1 1 100%; /* Take full width initially */
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    max-height: 40vh; /* Limit height on mobile */
+    overflow-y: auto;
+}
+@media (min-width: 992px) {
+    .attempts-list-section {
+        flex: 0 0 280px; /* Fixed width on desktop */
+        padding-right: 20px;
+        border-right: 1px solid #dee2e6;
+        box-shadow: none;
+        border-radius: 0;
+        background-color: transparent;
+        max-height: 85vh; /* Taller on desktop */
+        overflow-y: auto;
+    }
+}
+
+.attempts-list-section h2 {
+    color: #003366;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 1.2em;
+}
+
+#attempts-list {
+    list-style: none;
+    padding: 0;
+}
+
+#attempts-list li {
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    font-size: 0.95em;
+}
+
+#attempts-list li:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+#attempts-list li.selected-attempt {
+    background-color: #003366;
+    color: white;
+    border-color: #003366;
+    font-weight: bold;
+}
+#attempts-list li span { /* For score display */
+    display: block;
+    font-size: 0.85em;
+    color: #555;
+    margin-top: 3px;
+}
+ #attempts-list li.selected-attempt span {
+     color: #ffcc00; /* Highlight score on selected */
+ }
+  #attempts-list .no-attempts {
+     color: #6c757d;
+     font-style: italic;
+     padding: 10px;
+ }
+
+
+/* Detailed Results Section */
+.detailed-results-section {
+    flex: 1 1 100%; /* Take full width initially */
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: none; /* Hidden by default */
+}
+
+@media (min-width: 992px) {
+    .detailed-results-section {
+        flex-grow: 1; /* Take remaining space */
+        max-height: 85vh; /* Match sidebar height */
+        overflow-y: auto;
+        padding-left: 20px;
+        box-shadow: none;
+        border-radius: 0;
+        background-color: transparent;
+    }
+}
+
+
+ .detailed-results-section h2 {
+    color: #003366;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+ }
+ #attempt-timestamp { font-weight: normal; font-size: 0.9em; color: #555; display: block;}
+
+ /* No Results Message Area */
+ #no-results-message {
+    flex-grow: 1;
+    display: flex; /* Hidden by default */
+    justify-content: center;
+    align-items: center;
+    color: #6c757d;
+    font-size: 1.2em;
+    padding: 40px;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+ }
+ @media (min-width: 992px) {
+    #no-results-message { background-color: transparent; box-shadow: none; }
+ }
+
+
+/* --- Copied/Adapted Result Display Styles --- */
+.results-summary { background-color: #f8f9fa; padding: 15px; border: 1px solid #dee2e6; border-radius: 5px; margin-bottom: 20px; }
+.overall-summary p { margin-bottom: 8px; font-size: 1.1em; }
+.overall-summary strong { font-size: 1.2em; color: #003366; }
+#results-section-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+#results-section-table th, #results-section-table td { border: 1px solid #ccc; padding: 10px; text-align: center; font-size: 0.95em; }
+#results-section-table th { background-color: #e9ecef; }
+.results-detailed-review { margin-top: 20px; border-top: 2px solid #003366; padding-top: 15px; }
+.review-section-tabs { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center;}
+.review-section-tab { background-color: #e0e0e0; color: #333; border: none; padding: 8px 15px; cursor: pointer; border-radius: 4px; font-size: 0.9em; transition: background-color 0.2s, color 0.2s; }
+.review-section-tab:hover { background-color: #d0d0d0; }
+.review-section-tab.active { background-color: #003366; color: white; font-weight: bold; }
+.review-question-item { border: 1px solid #e0e0e0; border-radius: 5px; padding: 15px; margin-bottom: 15px; background-color: #fff; }
+.review-question-item .question-number { font-size: 1em; font-weight: bold; margin-bottom: 8px; color: #003366; }
+.review-question-item .question-text { margin-bottom: 10px; font-size: 1em; line-height: 1.5; }
+.review-question-item .question-text img { max-width: 100%; height: auto; }
+.review-options { margin-bottom: 10px; padding-left: 1.5em; } /* Indent options */
+.review-options div { margin-bottom: 5px; font-size: 0.95em;}
+.review-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 10px; font-size: 0.9em; padding-top: 10px; border-top: 1px dashed #ccc; }
+.review-details div { padding: 5px 0; } /* Less padding */
+.review-status { font-weight: bold; text-transform: uppercase; }
+.review-status.correct { color: #28a745; }
+.review-status.incorrect { color: #dc3545; }
+.review-status.unattempted { color: #6c757d; }
+.user-answer, .correct-answer { padding: 3px 6px; border-radius: 3px; display: inline-block; }
+.user-answer { background-color: #e9ecef; border: 1px solid #adb5bd; }
+.user-answer.incorrect-ans { background-color: #f8d7da; border-color: #f5c6cb; }
+.correct-answer { background-color: #d4edda; border: 1px solid #c3e6cb; font-weight: bold; }
+.no-review-questions { padding: 20px; text-align: center; color: #6c757d; }

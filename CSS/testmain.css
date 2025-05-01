@@ -334,27 +334,107 @@ a:hover {
     color: #555;
 }
 
-/* --- Paper Link Styling --- */
+/* --- Removed old .paper-link styling --- */
+/*
 .paper-link {
     display: block;
     padding: 10px 15px;
-    text-decoration: none;
-    color: #343a40;
+    ... more old styles ...
+}
+.paper-link:hover {
+    ... old styles ...
+}
+*/
+
+/* ====================================================== */
+/* NEW Paper Entry Styling with Buttons                 */
+/* ====================================================== */
+
+/* Styling for each paper entry row (the <li>) */
+.paper-entry {
+    display: flex;
+    justify-content: space-between; /* Pushes name left, buttons right */
+    align-items: center;
+    padding: 12px 15px;
     background-color: #f8f9fa;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    margin-left: 15px; /* Indent paper links under year/subject */
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
     border: 1px solid #e9ecef;
-    font-size: 0.9em;
-    line-height: 1.5;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    margin-left: 15px; /* Keep the indent */
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.paper-link:hover {
-    background-color: #e9ecef;
-    border-color: #dee2e6;
-    color: #0056b3;
-    text-decoration: none;
+.paper-entry:hover {
+    background-color: #eef1f3;
+    border-color: #dce3e9;
+}
+
+/* Styling for the paper name text */
+.paper-name {
+    font-size: 0.95em;
+    color: #343a40;
+    font-weight: 500;
+    margin-right: 15px; /* Add some space between name and buttons */
+    flex-grow: 1; /* Allow name to take available space if needed */
+    text-align: left;
+}
+
+/* Container for the action buttons */
+.paper-actions {
+    display: flex;
+    gap: 10px; /* Space between the buttons */
+    flex-shrink: 0; /* Prevent buttons container from shrinking */
+}
+
+/* Base button styling */
+.btn {
+    padding: 6px 12px;
+    font-size: 0.85em;
+    font-weight: 500;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.1s ease;
+    line-height: 1.4;
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Start Now button styling */
+.btn-start {
+    background-color: #28a745; /* Green */
+    color: #fff;
+    border-color: #28a745;
+}
+
+.btn-start:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+/* Previous Result button styling */
+.btn-result {
+    background-color: #007bff; /* Blue */
+    color: #fff;
+    border-color: #007bff;
+}
+
+.btn-result:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+
+}
+
+/* Optional: Style for disabled result button (if needed later via JS) */
+.btn-result:disabled {
+    background-color: #6c757d; /* Gray */
+    border-color: #6c757d;
+    color: #e9ecef;
+    cursor: not-allowed;
+    opacity: 0.7;
+    box-shadow: none;
 }
 
 /* ====================================================== */
@@ -398,6 +478,25 @@ a:hover {
 
      .paper-list { padding: 20px; }
      .paper-list h3 { font-size: 1.3em; }
+
+     /* Responsive adjustments for paper entry buttons */
+    .paper-entry {
+        flex-direction: column; /* Stack name and buttons */
+        align-items: flex-start; /* Align items to the left */
+        padding: 10px;
+    }
+    .paper-name {
+        margin-bottom: 8px; /* Space below name when stacked */
+        margin-right: 0;
+    }
+    .paper-actions {
+        width: 100%; /* Make buttons container take full width */
+        justify-content: flex-start; /* Align buttons to the start */
+    }
+    .btn {
+        padding: 7px 14px; /* Slightly larger touch target */
+        font-size: 0.9em;
+    }
 }
 
 
