@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyCore - Test Series</title> <!-- Changed Title -->
+    <!-- Link CSS -->
+    <link rel="stylesheet" href="../CSS/testmain.css"> <!-- Correct Path -->
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<header class="main-header">
+    <div class="container header-container">
+        <!-- Ensure this path is correct relative to testpage.html -->
+        <a href="../index.html" class="logo">StudyCore</a>
+        <nav class="main-nav">
+            <ul>
+                 <!-- Ensure these paths are correct relative to testpage.html -->
+                <li><a href="../Pages/JEE/JEE.html">JEE</a></li>
+                <li><a href="../Pages/NEET/NEET.html">NEET</a></li>
+                <li><a href="../Pages/Class 12/Class 12 Board.html">Class 12 Boards</a></li>
+                 <!-- Removed empty/active link here unless needed for specific page indication -->
+            </ul>
+        </nav>
+         <!-- Right side actions -->
+         <div class="header-actions">
+            <a href="#" class="refer-earn">Refer</a>
+            <i class="fas fa-bell notification-icon"></i>
+
+            <!-- User Profile Section (Shown when logged in - controlled by auth.js) -->
+            <div id="user-profile-section" class="user-profile" style="display: none;">
+                <div class="profile-icon" id="user-profile-icon">U</div>
+                <div class="user-details">
+                    <span id="username-display">USER</span>
+                </div>
+                <button id="logout-button" class="logout-button" style="display: none;">Logout</button>
+            </div>
+
+            <!-- Login LINK (Shown when logged out - controlled by auth.js) -->
+             <!-- Ensure this path is correct relative to testpage.html -->
+            <a href="../../Login/login.html" id="login-link" class="login-link" style="display: inline-block;">Login</a>
+        </div>
+    </div>
+</header>
+
+<main class="main-content">
+    <div class="container">
+        <section class="promo-banner">
+            <div class="banner-content">
+                <h1>WELCOME</h1>
+                <h2>To <strong>TEST</strong>attempting</h2>
+                <div class="banner-logo">StudyCore</div>
+            </div>
+        </section>
+
+        <!-- Exams Tabs Section -->
+        <section class="Exams-cards"> <!-- Container for the tabs -->
+            <!-- JEE MAIN Tab -->
+            <div class="subject-card-button JEEMAIN-card" data-subject="JEE MAIN">
+                <div class="card-icon"><i class="fas fa-atom"></i></div>
+                <span>JEE MAIN</span>
+            </div>
+            <!-- JEE ADVANCE Tab -->
+            <div class="subject-card-button JEEADVANCE-card" data-subject="JEE ADVANCE">
+                <div class="card-icon"><i class="fas fa-flask"></i></div>
+                <span>JEE ADVANCE</span>
+            </div>
+            <!-- WBJEE Tab -->
+            <div class="subject-card-button WBJEE-card" data-subject="WBJEE">
+                 <div class="card-icon"><i class="fas fa-calculator"></i></div>
+                 <span>WBJEE</span>
+            </div>
+            <!-- COMEDK Tab -->
+            <div class="subject-card-button COMEDK-card" data-subject="COMEDK">
+                 <div class="card-icon"><i class="fas fa-star"></i></div>
+                 <span>COMEDK</span>
+            </div>
+            <!-- NEET Tab -->
+            <div class="subject-card-button NEET-card" data-subject="NEET">
+              <div class="card-icon"><i class="fas fa-stethoscope"></i></div>
+              <span>NEET</span>
+            </div>
+             <!-- Class 12 Board Tab -->
+            <div class="subject-card-button CLASS12-card" data-subject="CLASS12">
+              <div class="card-icon"><i class="fas fa-book-open"></i></div>
+              <span>Class 12</span>
+            </div>
+        </section>
+
+        <!-- Paper Lists Section -->
+        <section class="Papers-display-area"> <!-- Container for the content lists -->
+
+            <!-- JEE MAIN Content -->
+            <div id="JEEMAIN-papers" class="paper-list"> <!-- ID must match JS generation -->
+                <h3>JEE MAIN PYP</h3>
+                  <ul>
+                    <span>2025 Papers April</span>
+                    <a href=""class="paper-link">8 April-Evening</a>
+                    <a href=""class="paper-link">7 April-Evening</a>
+                    <a href=""class="paper-link">7 April-Morning</a>
+                    <a href=""class="paper-link">4 April-Evening</a>
+                    <a href=""class="paper-link">4 April-Morning</a>
+                    <a href=""class="paper-link">3 April-Evening</a>
+                    <a href=""class="paper-link">3 April-Morning</a>
+                    <a href=""class="paper-link">2 April-Evening</a>
+                    <a href=""class="paper-link">2 April-Morning</a>
+                  </ul>
+                  <ul>
+                    <span>2025 Papers January</span>
+                    <a href=""class="paper-link">29 January-Evening</a>
+                    <a href=""class="paper-link">29 January-Morning</a>
+                    <a href=""class="paper-link">28 January-Evening</a>
+                    <a href=""class="paper-link">28 January-Morning</a>
+                    <a href=""class="paper-link">24 January-Evening</a>
+                    <a href=""class="paper-link">24 January-Morning</a>
+                    <a href=""class="paper-link">23 January-Evening</a>
+                    <a href=""class="paper-link">23 January-Morning</a>
+                    <a href=""class="paper-link">22 January-Evening</a>
+                    <a href=""class="paper-link">22 January-Morning</a>
+                  </ul>
+                   <ul>
+                    <span>2024 Papers April</span>
+                    <a href=""class="paper-link">9 April-Evening</a>
+                    <a href=""class="paper-link">9 AprilMorning</a>
+                    <a href=""class="paper-link">8 April-Evening</a>
+                    <a href=""class="paper-link">8 April-Morning</a>
+                    <a href=""class="paper-link">6 April-Evening</a>
+                    <a href=""class="paper-link">6 April-Morning</a>
+                    <a href=""class="paper-link">5 April-Evening</a>
+                    <a href=""class="paper-link">5 April-Morning</a>
+                    <a href=""class="paper-link">4 April-Evening</a>
+                    <a href=""class="paper-link">4 April-Morning</a>
+                  </ul>
+                  <ul>
+                    <span>2024 Papers January</span>
+                    <a href=""class="paper-link">29 January-Evening</a>
+                    <a href=""class="paper-link">29 January-Morning</a>
+                    <a href=""class="paper-link">28 January-Evening</a>
+                    <a href=""class="paper-link">28 January-Morning</a>
+                    <a href=""class="paper-link">24 January-Evening</a>
+                    <a href=""class="paper-link">24 January-Morning</a>
+                    <a href=""class="paper-link">23 January-Evening</a>
+                    <a href=""class="paper-link">23 January-Morning</a>
+                    <a href=""class="paper-link">22 January-Evening</a>
+                    <a href=""class="paper-link">22 January-Morning</a>
+                  </ul>
+            </div>
+
+            <!-- JEEADVANCE Content -->
+            <div id="JEEADVANCE-papers" class="paper-list">
+                <h3>JEE ADVANCE PYP</h3>
+                  <ul>
+                    <span>2025</span>
+                    <a href="#" class="paper-link">Paper 1</a>
+                    <a href="#" class="paper-link">Paper 2</a>
+                  </ul>
+                  <ul>
+                    <span>2024</span>
+                    <a href="#" class="paper-link">Paper 1</a>
+                    <a href="#" class="paper-link">Paper 2</a>
+                  </ul>
+                  <ul><span>2023</span>
+                    <a href=""class="paper-link">Paper1</a>
+                    <a href=""class="paper-link">Paper2</a>
+                  </ul>
+                  <ul><span>2022</span>
+                    <a href=""class="paper-link">Paper1</a>
+                    <a href=""class="paper-link">Paper2</a>
+                  </ul>
+                  <ul><span>2021</span>
+                    <a href=""class="paper-link">Paper1</a>
+                    <a href=""class="paper-link">Paper2</a>
+                  </ul>
+            </div>
+
+            <!-- WBJEE Content -->
+            <div id="WBJEE-papers" class="paper-list">
+                 <h3>WBJEE PYP</h3>
+                 <ul>
+                    <span>2025</span>
+                    <a href="#" class="paper-link">Paper 1 - Math</a>
+                    <a href="#" class="paper-link">Paper 2 - Physics+Chemistry</a>
+                  </ul>
+                  <ul>
+                    <span>2024</span>
+                    <a href="#" class="paper-link">Paper 1 - Math</a>
+                    <a href="#" class="paper-link">Paper 2 - Physics+Chemistry</a>
+                  </ul>
+                  <ul>
+                    <span>2023</span>
+                    <a href="#" class="paper-link">Paper 1 - Math</a>
+                    <a href="#" class="paper-link">Paper 2 - Physics+Chemistry</a>
+                  </ul>
+                  <ul>
+                    <span>2022</span>
+                    <a href="#" class="paper-link">Paper 1 - Math</a>
+                    <a href="#" class="paper-link">Paper 2 - Physics+Chemistry</a>
+                  </ul>
+                   
+            </div>
+
+            <!-- COMEDK Content -->
+            <div id="COMEDK-papers" class="paper-list">
+                <h3>COMEDK PYP</h3>
+                  <ul>
+                    <span>2025</span>
+                    <a href="#" class="paper-link">Morning</a>
+                    <a href="#" class="paper-link">Afternoon</a>
+                    <a href="#" class="paper-link">Evening</a>
+                  </ul>
+                  <ul>
+                    <span>2024</span>
+                    <a href="#" class="paper-link">Morning</a>
+                    <a href="#" class="paper-link">Afternoon</a>
+                    <a href="#" class="paper-link">Evening</a>
+                  </ul>
+                  <ul>
+                    <span>2023</span>
+                    <a href="#" class="paper-link">Morning</a>
+                    <a href="#" class="paper-link">Evening</a>
+                  </ul>
+                  <ul>
+                    <span>2022</span>
+                    <a href="#" class="paper-link">Morning</a>
+                    <a href="#" class="paper-link">Evening</a>
+                  </ul>
+            </div>
+
+            <!-- NEET Content -->
+            <div id="NEET-papers" class="paper-list">
+                <h3>NEET PYP</h3>
+                  <ul>
+                    <span>2025</span>
+                    <a href="#" class="paper-link">2025 Paper</a>
+                  </ul>
+                  <ul>
+                    <span>2024</span>
+                    <a href="#" class="paper-link">2024 Paper</a>
+                  </ul>
+                  <ul>
+                    <span>2023</span>
+                    <a href="#" class="paper-link">2024 Paper</a>
+                  </ul>
+                  <ul>
+                    <span>2022</span>
+                    <a href="#" class="paper-link">2024 Paper</a>
+                  </ul>
+            </div>
+
+            <!-- Class 12 Content -->
+            <div id="CLASS12-papers" class="paper-list">
+                <h3>Class 12 PYP / Chapters</h3>
+                  <ul>
+                    <span>2025</span>
+                    <a href="#" class="paper-link">Physics</a>
+                    <a href="#" class="paper-link">Chemistry</a>
+                    <a href="#" class="paper-link">Math</a>
+                    <a href="#" class="paper-link">English</a>
+                    <a href="#" class="paper-link">Biology</a>
+                  </ul>
+                  <ul>
+                    <span>2024</span>
+                    <a href="#" class="paper-link">Physics</a>
+                    <a href="#" class="paper-link">Chemistry</a>
+                    <a href="#" class="paper-link">Math</a>
+                    <a href="#" class="paper-link">English</a>
+                    <a href="#" class="paper-link">Biology</a>
+                  </ul>
+                   <!-- Add more years/subjects -->
+            </div>
+
+        </section> <!-- End Paper-display-area -->
+
+    </div> <!-- End container -->
+</main>
+
+<!-- Link JavaScript files -->
+<script src="../Js/testmain.js"></script> 
+
+<script src="../Js/auth.js"></script> 
+
+</body>
+</html>
