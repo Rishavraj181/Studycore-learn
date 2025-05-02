@@ -5,6 +5,44 @@
 // - TARGET_TEST_NAME (String, e.g., "JEE Main 8 April S2")
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // --- MathJax Loading ---
+    function loadMathJax() {
+        if (typeof MathJax !== 'undefined') {
+            console.log("Viewresult.js: MathJax already loaded or loading.");
+            return;
+        }
+        console.log("Viewresult.js: Configuring and loading MathJax...");
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+            },
+            startup: {
+                ready: () => {
+                    console.log('Viewresult.js: MathJax is loaded and ready.');
+                    MathJax.startup.defaultReady();
+                }
+            }
+        };
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.id = 'MathJax-script-results'; // Give a unique ID if needed
+        script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
+        script.async = true;
+        document.head.appendChild(script);
+    }
+
+    // --- Load MathJax ASAP ---
+    loadMathJax();
+
     // --- Validate required global variable ---
     if (typeof TARGET_TEST_NAME === 'undefined' || typeof TARGET_TEST_NAME !== 'string') {
         console.error("FATAL: 'TARGET_TEST_NAME' string is not defined globally in the HTML before Viewresult.js.");
@@ -34,6 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const reviewQuestionsContainer = document.getElementById('review-questions-container');
     const resultsHeaderTitle = document.querySelector('.results-header h1');
 
+    // --- Basic DOM Element Checks ---
+    if (!attemptsList || !detailedResultsArea || !noResultsMessage || !resultsSectionTableBody || !reviewSectionTabsContainer || !reviewQuestionsContainer) {
+        console.error("FATAL: One or more essential result display elements are missing from the HTML.");
+        alert("Error: Result page structure is incomplete.");
+        return;
+    }
+
     let targetResults = []; // To hold results filtered for the target test name
 
     // --- Load and Filter Attempts ---
@@ -43,11 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            // *** FIXED: Removed trailing '?' from default string ***
             const allResults = JSON.parse(localStorage.getItem('jeeMainResults') || '[]');
-            // Filter results to only include those matching the TARGET_TEST_NAME
             targetResults = allResults.filter(attempt => attempt.testName === TARGET_TEST_NAME);
 
-            attemptsList.innerHTML = ''; // Clear loading/previous message
+            attemptsList.innerHTML = '';
 
             if (targetResults.length === 0) {
                 attemptsList.innerHTML = `<li class="no-attempts">No past attempts found for ${TARGET_TEST_NAME}.</li>`;
@@ -57,12 +102,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Sort attempts by timestamp, newest first
-            targetResults.sort((a, b) => b.id - a.id);
+            targetResults.sort((a, b) => b.id - a.id); // Sort newest first
 
             targetResults.forEach((attempt, index) => {
                 const listItem = document.createElement('li');
-                listItem.dataset.attemptIndex = index; // Store index within the filtered array
+                listItem.dataset.attemptIndex = index;
                 listItem.innerHTML = `
                     ${attempt.timestamp}
                     <span>Score: ${attempt.summary?.overallScore ?? 'N/A'}</span>
@@ -76,12 +120,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             noResultsMessage.textContent = `Select an attempt from the list to view details for ${TARGET_TEST_NAME}.`;
-            noResultsMessage.style.display = 'flex'; // Show initial message
-            detailedResultsArea.style.display = 'none'; // Hide details initially
+            noResultsMessage.style.display = 'flex';
+            detailedResultsArea.style.display = 'none';
 
         } catch (error) {
             console.error("Error loading or filtering results from localStorage:", error);
-            attemptsList.innerHTML = '<li class="no-attempts">Error loading attempts.</li>';
+            attemptsList.innerHTML = '<li class="no-attempts">Error loading attempts. Check console.</li>';
             noResultsMessage.textContent = 'Could not load result data.';
             noResultsMessage.style.display = 'flex';
             detailedResultsArea.style.display = 'none';
@@ -98,15 +142,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         noResultsMessage.style.display = 'none';
-        detailedResultsArea.style.display = 'block'; // Use block instead of flex
+        detailedResultsArea.style.display = 'block';
 
         attemptTimestampEl.textContent = `Attempt Time: ${selectedAttempt.timestamp}`;
 
         const summary = selectedAttempt.summary;
         const detailedData = selectedAttempt.detailedData;
-        // Ensure sections are derived correctly, handling potential missing sections
         const sections = [...new Set(detailedData.map(q => q.section).filter(Boolean))];
-
 
         // Populate Overall Summary
         resultTotalScoreEl.textContent = summary.overallScore ?? 'N/A';
@@ -132,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
              if (tabIndex === 0) tab.classList.add('active');
             tab.textContent = sec;
             tab.dataset.section = sec;
-            // Pass the detailedData for this specific attempt to the handler
             tab.addEventListener('click', () => showDetailedReviewQuestions(sec, detailedData));
             reviewSectionTabsContainer.appendChild(tab);
         });
@@ -143,8 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
          } else {
              reviewQuestionsContainer.innerHTML = '<p class="no-review-questions">No questions data available for review.</p>';
          }
-         // Scroll detail area to top when a new attempt is selected
-         detailedResultsArea.scrollTop = 0;
+         detailedResultsArea.scrollTop = 0; // Scroll to top
     }
 
     // --- Show Questions for Selected Review Section ---
@@ -154,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tab.classList.toggle('active', tab.dataset.section === sectionName);
         });
 
-        // Filter questions for the selected section from the detailedData of the *selected attempt*
         const questionsToShow = detailedData.filter(q => q.section === sectionName);
         reviewQuestionsContainer.innerHTML = ''; // Clear previous questions
 
@@ -170,50 +209,58 @@ document.addEventListener('DOMContentLoaded', () => {
             // --- Determine Correct Answer Display ---
             let correctAnswerDisplay = q.correctAnswer ?? 'N/A';
              if (q.type === 'mcq' && Array.isArray(q.options) && q.correctAnswer != null && q.options[q.correctAnswer] !== undefined) {
-                 correctAnswerDisplay = `${q.options[q.correctAnswer]} (Option ${q.correctAnswer + 1})`;
+                 // Display the option text itself, and option number
+                 correctAnswerDisplay = `(${String.fromCharCode(65 + q.correctAnswer)}) ${q.options[q.correctAnswer]}`;
              } else if (q.type === 'integer' && q.correctAnswer != null) {
-                 correctAnswerDisplay = q.correctAnswer; // Integer answer
+                 correctAnswerDisplay = q.correctAnswer;
              }
 
              // --- Determine User Answer Display ---
-             let userAnswerDisplay = q.userAnswer ?? 'N/A';
+             let userAnswerDisplay = 'N/A';
              let userAnswerClass = 'user-answer';
-             if (q.userAnswer === null || q.resultStatus === 'unattempted') {
+             if (q.userAnswer === null || q.userAnswer === undefined || q.resultStatus === 'unattempted') {
                  userAnswerDisplay = 'Not Answered';
              } else if (q.type === 'mcq' && Array.isArray(q.options) && q.userAnswer != null && q.options[q.userAnswer] !== undefined) {
-                 userAnswerDisplay = `${q.options[q.userAnswer]} (Option ${q.userAnswer + 1})`;
+                 // Display the option text itself, and option number
+                 userAnswerDisplay = `(${String.fromCharCode(65 + q.userAnswer)}) ${q.options[q.userAnswer]}`;
                  if (q.resultStatus === 'incorrect') userAnswerClass += ' incorrect-ans';
              } else if (q.type === 'integer' && q.userAnswer != null) {
-                  userAnswerDisplay = q.userAnswer; // Integer answer
+                  userAnswerDisplay = q.userAnswer;
                   if (q.resultStatus === 'incorrect') userAnswerClass += ' incorrect-ans';
              }
 
-             const resultStatusDisplay = q.resultStatus || 'unknown';
+             const resultStatusDisplay = q.resultStatus || 'unknown'; // e.g., 'correct', 'incorrect', 'unattempted'
+             const statusClass = `review-status ${resultStatusDisplay}`; // Class for styling status
 
              // --- Construct Inner HTML with Solution Section ---
             itemDiv.innerHTML = `
                 <div class="question-number">Question ${indexInSection + 1} (ID: ${q.id || 'N/A'})</div>
                 <div class="question-text">${q.questionText || '[No Question Text Provided]'}</div>
-                ${q.type === 'mcq' && Array.isArray(q.options) ? `<div class="review-options">${q.options.map((opt, i) => `<div>${i+1}) ${opt}</div>`).join('')}</div>` : ''}
+                ${q.type === 'mcq' && Array.isArray(q.options) ? `<div class="review-options">${q.options.map((opt, i) => `<div>(${String.fromCharCode(65 + i)}) ${opt}</div>`).join('')}</div>` : ''}
                 <div class="review-details">
-                     <div>Status: <span class="review-status ${resultStatusDisplay}">${resultStatusDisplay}</span></div>
+                     <div>Status: <span class="${statusClass}">${resultStatusDisplay.charAt(0).toUpperCase() + resultStatusDisplay.slice(1)}</span></div>
                      <div>Your Answer: <span class="${userAnswerClass}">${userAnswerDisplay}</span></div>
-                     ${resultStatusDisplay === 'incorrect' || resultStatusDisplay === 'unattempted' ? `<div>Correct Answer: <span class="correct-answer">${correctAnswerDisplay}</span></div>` : ''}
+                     ${(resultStatusDisplay === 'incorrect' || resultStatusDisplay === 'unattempted') ? `<div>Correct Answer: <span class="correct-answer">${correctAnswerDisplay}</span></div>` : ''}
                      <div>Marks: ${q.marksAwarded != null ? q.marksAwarded : 'N/A'}</div>
                 </div>
-
-                <!-- **** SOLUTION DISPLAY SECTION **** -->
                 <div class="review-solution">
                     <strong>Solution:</strong>
-                    <div>${q.solution ?? 'Solution not provided.'}</div>
-                    <!-- The browser will render any HTML (img, video tags) inside q.solution here -->
+                    <div>${q.solution || 'Solution not provided.'}</div>
                 </div>
-                <!-- **** END SOLUTION DISPLAY SECTION **** -->
             `;
             reviewQuestionsContainer.appendChild(itemDiv);
         });
-        // Scroll review container to top when switching sections
-        reviewQuestionsContainer.scrollTop = 0;
+
+        // *** Trigger MathJax Typesetting AFTER adding all items ***
+        if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
+            // console.log(`Viewresult.js: Queueing MathJax typesetting for section: ${sectionName}`);
+            MathJax.typesetPromise([reviewQuestionsContainer]) // Target the main container
+                .catch((err) => console.error('Viewresult.js: MathJax typesetting error:', err));
+        } else if (typeof MathJax === 'undefined') {
+             console.warn(`Viewresult.js: MathJax is not yet available. Typesetting skipped for section: ${sectionName}`);
+        }
+
+        reviewQuestionsContainer.scrollTop = 0; // Scroll review container to top
     }
 
 
