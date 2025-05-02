@@ -1,4 +1,4 @@
-// --- Testattempt.js ---
+// --- testattempt.js ---
 
 // Ensure this script is included AFTER the specific test data variables are defined in the HTML.
 // EXPECTED GLOBAL VARIABLES defined in HTML before this script:
@@ -26,13 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
      if (typeof TEST_DURATION_MINUTES === 'undefined' || typeof TEST_DURATION_MINUTES !== 'number') {
         console.warn("'TEST_DURATION_MINUTES' is not defined globally in the HTML. Defaulting to 180 minutes.");
-        window.TEST_DURATION_MINUTES = 180; // Set default if missing
+        // Set default if missing, but relying on HTML definition is better
+        window.TEST_DURATION_MINUTES = 180;
     }
 
     // --- State Variables ---
     let currentSection = testData.length > 0 ? testData[0].section : null;
     let currentQuestionIndex = 0;
-    let timeLeft = window.TEST_DURATION_MINUTES * 60;
+    // Initialize timeLeft using the globally defined variable
+    let timeLeft = typeof TEST_DURATION_MINUTES !== 'undefined' ? TEST_DURATION_MINUTES * 60 : 180 * 60;
     let timerInterval = null;
     let testSubmitted = false;
 
@@ -59,49 +61,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const MARKING_SCHEME = {
         mcq: { correct: 4, incorrect: -1, unattempted: 0 },
         integer: { correct: 4, incorrect: -1, unattempted: 0 }
+        // Add other types if needed
     };
 
     // --- MathJax Loading ---
     function loadMathJax() {
         if (typeof MathJax !== 'undefined') {
-            console.log("MathJax already loaded or loading.");
+            // console.log("MathJax already loaded or loading.");
             return; // Avoid loading multiple times
         }
         console.log("Configuring and loading MathJax...");
-        // 1. Configure MathJax (must be done BEFORE loading the script)
         window.MathJax = {
-            tex: {
-                inlineMath: [['\\(', '\\)']],
-                displayMath: [['\\[', '\\]']],
-                processEscapes: true
-            },
-            svg: {
-                fontCache: 'global'
-            },
-            options: {
-                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-            },
+            tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']], processEscapes: true },
+            svg: { fontCache: 'global' },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] },
             startup: {
-                // This function runs automatically after MathJax is loaded and ready
                 ready: () => {
                     console.log('MathJax is loaded and ready.');
                     MathJax.startup.defaultReady();
-                    // Optionally, you could trigger an initial typeset if needed,
-                    // but the call in loadQuestion handles dynamic content.
-                    // MathJax.startup.promise.then(() => {
-                    //    console.log('MathJax initial typesetting promise resolved.');
-                    // });
                 }
             }
         };
-
-        // 2. Load the MathJax script dynamically
         const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.id = 'MathJax-script';
+        script.type = 'text/javascript'; script.id = 'MathJax-script';
         script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js';
-        script.async = true;
-        document.head.appendChild(script); // Append to head
+        script.async = true; document.head.appendChild(script);
     }
 
 
@@ -117,25 +101,29 @@ document.addEventListener('DOMContentLoaded', () => {
     function formatTime(seconds) {
         const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
         const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-        const s = (seconds % 60).toString().padStart(2, '0');
+        const s = Math.max(0, seconds % 60).toString().padStart(2, '0'); // Ensure seconds don't go negative visually
         return `${h}:${m}:${s}`;
     }
 
     function updateTimer() {
-        timerEl.textContent = formatTime(timeLeft);
+        if (timerEl) { // Check if element exists
+             timerEl.textContent = formatTime(timeLeft);
+        }
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
+            timerInterval = null; // Clear interval ID
             if (!testSubmitted) {
                  alert("Time's up! The test will be submitted automatically.");
-                 submitTest();
+                 submitTest(); // Auto-submit
             }
-        }
-        if (!testSubmitted && timeLeft > 0) {
+        } else if (!testSubmitted) { // Only decrement if time is left and not submitted
              timeLeft--;
         }
     }
 
+
     function renderSectionTabs() {
+        if (!sectionNav) return;
         sectionNav.innerHTML = '';
         sections.forEach(section => {
             const tab = document.createElement('button');
@@ -152,50 +140,79 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function switchSection(sectionName) {
         if (testSubmitted || sectionName === currentSection) return;
-        handleLeavingQuestion();
+        handleLeavingQuestion(); // Save state of current question before switching
         currentSection = sectionName;
-        currentQuestionIndex = 0;
-        renderSectionTabs();
-        renderQuestionPalette();
-        loadQuestion(currentQuestionIndex);
+        // Find the first question index in the new section
+        const firstIndexInNewSection = testData.findIndex(q => q.section === sectionName);
+        currentQuestionIndex = (firstIndexInNewSection !== -1) ? firstIndexInNewSection : 0; // Go to first question or 0 if section empty
+        renderSectionTabs(); // Update active tab style
+        renderQuestionPalette(); // Render palette for the new section
+        // Find the actual index within the filtered array for the new section
+        const questionsInNewSection = getSectionQuestions();
+        const actualIndexToLoad = questionsInNewSection.findIndex(q => q.id === testData[currentQuestionIndex]?.id);
+        loadQuestion(actualIndexToLoad >= 0 ? actualIndexToLoad : 0); // Load the first question of the new section
     }
 
+
     function handleLeavingQuestion() {
-        const questions = getSectionQuestions();
-        if (currentQuestionIndex >= 0 && currentQuestionIndex < questions.length) {
-            const currentQ = questions[currentQuestionIndex];
-            if(currentQ) {
-                currentQ.userAnswer = getSelectedAnswer();
+        // Find the global index of the current question based on section and index within section
+        const currentQuestionGlobalIndex = testData.findIndex(q => q.section === currentSection &&
+           testData.filter(t => t.section === currentSection).findIndex(qs => qs.id === q.id) === currentQuestionIndex);
+
+
+        if (currentQuestionGlobalIndex !== -1 && currentQuestionGlobalIndex < testData.length) {
+            const currentQ = testData[currentQuestionGlobalIndex];
+            if (currentQ) {
+                const answer = getSelectedAnswer(); // Get answer from UI before potentially reloading question
+                currentQ.userAnswer = answer;
+
+
+                // Update status only if it's 'not-visited' - it becomes 'not-answered'
+                // Other statuses ('answered', 'marked-review', etc.) are set explicitly by user actions
                 if (currentQ.status === 'not-visited') {
-                     // Ensure it's marked as 'not-answered' if left without interaction
-                     updatePaletteButtonByIndex(currentQuestionIndex, 'not-answered');
+                    currentQ.status = 'not-answered';
+                    // We update the button visually when the palette is re-rendered or question loaded
+                    // No need to call updatePaletteButtonByIndex here as it might update the wrong button if mid-switch
                 }
             }
         }
-    }
+     }
+
 
     function renderQuestionPalette() {
+        if (!questionPalette || !paletteSectionNameEl) return;
         questionPalette.innerHTML = '';
         paletteSectionNameEl.textContent = currentSection || 'Palette';
-        const questions = getSectionQuestions();
-        questions.forEach((q, index) => {
+        const questions = getSectionQuestions(); // Get questions for the *current* section
+        questions.forEach((q, indexInSection) => { // indexInSection is 0, 1, 2... within the current section
             const btn = document.createElement('button');
             btn.classList.add('q-btn');
-            btn.textContent = index + 1;
-            btn.dataset.index = index;
-            btn.dataset.id = q.id;
+            btn.textContent = indexInSection + 1; // Display 1-based index for the section
+            btn.dataset.indexInSection = indexInSection; // Store 0-based index within section
+            btn.dataset.id = q.id; // Store global unique ID if needed
             updatePaletteButtonClass(btn, q.status);
-            if (index === currentQuestionIndex) {
-                btn.classList.add('active-question');
+
+
+             // Highlight if it's the current question *being viewed*
+             const currentQuestionObject = getSectionQuestions()[currentQuestionIndex];
+            if (currentQuestionObject && q.id === currentQuestionObject.id) {
+                 btn.classList.add('active-question');
             }
-            btn.addEventListener('click', () => jumpToQuestion(index));
+
+
+            btn.addEventListener('click', () => jumpToQuestion(indexInSection)); // Use index within section to jump
             questionPalette.appendChild(btn);
         });
-    }
+     }
+
 
     function updatePaletteButtonClass(buttonElement, status) {
         if(!buttonElement) return;
+        // Keep active-question class if it exists, manage others
+        const isActive = buttonElement.classList.contains('active-question');
         buttonElement.className = 'q-btn'; // Reset classes except base
+        if (isActive) buttonElement.classList.add('active-question'); // Re-apply if it was active
+
         switch (status) {
             case 'answered': buttonElement.classList.add('answered'); break;
             case 'marked-review': buttonElement.classList.add('marked-review'); break;
@@ -203,201 +220,276 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'not-answered': buttonElement.classList.add('not-answered'); break;
             case 'not-visited': default: buttonElement.classList.add('not-visited'); break;
         }
-        const isActive = parseInt(buttonElement.dataset.index, 10) === currentQuestionIndex;
-         if(isActive) {
-             buttonElement.classList.add('active-question');
-         }
     }
 
-    function updatePaletteButtonByIndex(index, status) {
+    // Updates the status in testData and the visual class of the button
+    function updateQuestionStatus(indexInSection, newStatus) {
         const questions = getSectionQuestions();
-        const btn = questionPalette.querySelector(`.q-btn[data-index="${index}"]`);
-        if (btn && index >= 0 && index < questions.length) {
-            const question = questions[index];
-             if(question) {
-                question.status = status;
-                updatePaletteButtonClass(btn, status);
-             }
+        if (indexInSection >= 0 && indexInSection < questions.length) {
+            const question = questions[indexInSection];
+            if (question) {
+                question.status = newStatus;
+                const btn = questionPalette.querySelector(`.q-btn[data-index-in-section="${indexInSection}"]`);
+                if (btn) {
+                    updatePaletteButtonClass(btn, newStatus);
+                }
+            }
         }
     }
 
-    function loadQuestion(index) {
+
+    function loadQuestion(indexInSection) { // Parameter is index WITHIN the current section
         if (testSubmitted) return;
         const questions = getSectionQuestions();
-        if (!questions || index < 0 || index >= questions.length) {
-             console.error("Attempted to load invalid question index:", index, "in section:", currentSection);
-             if(questions.length > 0) index = 0; else return;
+
+
+        if (!questions || indexInSection < 0 || indexInSection >= questions.length) {
+             console.error("Attempted to load invalid question index:", indexInSection, "in section:", currentSection);
+             // Optionally default to first question if possible
+             if (questions && questions.length > 0) {
+                 indexInSection = 0;
+             } else {
+                 // Handle case where section might be empty or data error
+                 questionTextEl.innerHTML = 'Error: No questions available in this section.';
+                 optionsContainer.innerHTML = '';
+                 return;
+             }
         }
 
-        currentQuestionIndex = index;
-        const question = questions[index];
+
+        currentQuestionIndex = indexInSection; // Update the state variable
+        const question = questions[indexInSection];
+
+
         if (!question) {
-            console.error("Question object not found at index", index);
+            console.error("Question object not found at index", indexInSection, "for section", currentSection);
             return;
         }
 
+
         // Mark as 'not-answered' if first visit
         if (question.status === 'not-visited') {
-             updatePaletteButtonByIndex(index, 'not-answered');
-        }
+            updateQuestionStatus(indexInSection, 'not-answered'); // Update status and button
+        } else {
+             // Ensure palette button class reflects current status even if not 'not-visited'
+             const btn = questionPalette.querySelector(`.q-btn[data-index-in-section="${indexInSection}"]`);
+             if(btn) updatePaletteButtonClass(btn, question.status);
+         }
+
 
         // Update UI Elements
-        currentSectionNameEl.textContent = currentSection;
-        questionNumberEl.textContent = `Question No. ${index + 1}`;
-        questionTextEl.innerHTML = question.questionText || ''; // Set HTML content
+        if (currentSectionNameEl) currentSectionNameEl.textContent = currentSection;
+        if (questionNumberEl) questionNumberEl.textContent = `Question No. ${indexInSection + 1}`; // Use 1-based section index
+        if (questionTextEl) questionTextEl.innerHTML = question.questionText || 'Question text not loaded.'; // Set HTML content
+
 
         // Update palette highlighting
-        document.querySelectorAll('.q-btn.active-question').forEach(btn => btn.classList.remove('active-question'));
-        const currentPaletteBtn = questionPalette.querySelector(`.q-btn[data-index="${index}"]`);
-        if (currentPaletteBtn) {
-            currentPaletteBtn.classList.add('active-question');
+        if (questionPalette) {
+            questionPalette.querySelectorAll('.q-btn.active-question').forEach(btn => btn.classList.remove('active-question'));
+            const currentPaletteBtn = questionPalette.querySelector(`.q-btn[data-index-in-section="${indexInSection}"]`);
+            if (currentPaletteBtn) {
+                currentPaletteBtn.classList.add('active-question');
+            }
         }
 
+
         // Render options/input
-        optionsContainer.innerHTML = '';
-        if (question.type === 'mcq') {
-            (question.options || []).forEach((option, i) => {
-                const optionId = `q${question.id}_opt${i}`;
-                const div = document.createElement('div');
-                div.classList.add('option');
-                const isChecked = question.userAnswer === i;
-                // IMPORTANT: Ensure labels wrap input for better click handling
-                div.innerHTML = `
-                    <label for="${optionId}">
-                        <input type="radio" id="${optionId}" name="q${question.id}_options" value="${i}" ${isChecked ? 'checked' : ''}>
-                        ${option}
-                    </label>
-                `;
-                // Event listener on div is less reliable than label wrapping input
-                // div.addEventListener('click', () => { ... }); // Removed
-                optionsContainer.appendChild(div);
-            });
-        } else if (question.type === 'integer') {
-            const inputId = `q${question.id}_input`;
-             const input = document.createElement('input');
-             input.setAttribute('type', 'number'); // Use number for better mobile UX
-             input.setAttribute('id', inputId);
-             input.classList.add('integer-input');
-             input.placeholder = "Enter your answer";
-             input.value = (question.userAnswer !== null && question.userAnswer !== undefined) ? question.userAnswer : '';
-            optionsContainer.appendChild(input);
-        }
+        if (optionsContainer) {
+            optionsContainer.innerHTML = ''; // Clear previous options
+            if (question.type === 'mcq' && question.options) {
+                question.options.forEach((option, i) => {
+                    const optionId = `q${question.id}_opt${i}`;
+                    const div = document.createElement('div');
+                    div.classList.add('option');
+                    // Ensure userAnswer is compared correctly (it's stored as index number)
+                    const isChecked = question.userAnswer === i;
+                    div.innerHTML = `
+                        <label for="${optionId}">
+                            <input type="radio" id="${optionId}" name="q${question.id}_options" value="${i}" ${isChecked ? 'checked' : ''}>
+                            <span>${option || ''}</span>
+                        </label>
+                    `; // Added span for better structure if option is complex HTML
+                    optionsContainer.appendChild(div);
+                });
+            } else if (question.type === 'integer') {
+                const inputId = `q${question.id}_input`;
+                 const input = document.createElement('input');
+                 input.setAttribute('type', 'text'); // Use text initially, can add validation
+                 input.setAttribute('id', inputId);
+                 input.classList.add('integer-input');
+                 input.placeholder = "Enter your answer";
+                 // Handle null/undefined for initial value
+                 input.value = (question.userAnswer !== null && question.userAnswer !== undefined) ? question.userAnswer : '';
+                 optionsContainer.appendChild(input);
+            }
+         }
+
 
         // *** Trigger MathJax Typesetting ***
         if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
             // console.log("Queueing MathJax typesetting for question:", question.id);
-            MathJax.typesetPromise([questionTextEl, optionsContainer])
-                .catch((err) => console.error('MathJax typesetting error:', err));
+            // Ensure elements exist before passing them
+            const elementsToTypeset = [questionTextEl, optionsContainer].filter(el => el !== null);
+            if (elementsToTypeset.length > 0) {
+                 MathJax.typesetPromise(elementsToTypeset)
+                     .catch((err) => console.error('MathJax typesetting error:', err));
+             }
         } else if (typeof MathJax === 'undefined') {
-            // This might happen if loadQuestion is called before MathJax script is fully parsed.
             console.warn("MathJax is not yet available. Typesetting skipped for question:", question.id);
         }
     }
 
+
     function getSelectedAnswer() {
-        const question = getSectionQuestions()[currentQuestionIndex];
-        if (!question) return null;
+        const questions = getSectionQuestions();
+        if (!questions || currentQuestionIndex >= questions.length) return null;
+        const question = questions[currentQuestionIndex];
+        if (!question || !optionsContainer) return null;
+
 
         if (question.type === 'mcq') {
             const selectedRadio = optionsContainer.querySelector(`input[name="q${question.id}_options"]:checked`);
+            // Return the integer index, or null if nothing selected
             return selectedRadio ? parseInt(selectedRadio.value, 10) : null;
         } else if (question.type === 'integer') {
              const input = optionsContainer.querySelector('.integer-input');
-             // Treat empty string as null, otherwise return the value (keep as string for now)
+             // Return the trimmed string value, or null if empty/whitespace only
              return input && input.value.trim() !== '' ? input.value.trim() : null;
          }
          return null;
      }
 
-    function saveAndNext() {
+
+    // --- Button Action Handlers ---
+
+
+     function saveAndNext() {
         if (testSubmitted) return;
-        const question = getSectionQuestions()[currentQuestionIndex];
-        if (!question) return;
+        const questions = getSectionQuestions();
+        if (!questions || currentQuestionIndex >= questions.length) return;
+
+
+        const question = questions[currentQuestionIndex];
         const selectedAnswer = getSelectedAnswer();
-        question.userAnswer = selectedAnswer;
+        question.userAnswer = selectedAnswer; // Store the answer
+
 
         let newStatus;
         if (selectedAnswer !== null) {
-            // If answered, it's 'answered' unless it was already marked for review (then keep it 'answered-marked-review')
-            newStatus = (question.status === 'marked-review' || question.status === 'answered-marked-review') ? 'answered-marked-review' : 'answered';
+            // Answered: If it was 'marked-review' or 'answered-marked-review', keep the mark aspect, otherwise just 'answered'.
+            newStatus = (question.status === 'marked-review' || question.status === 'answered-marked-review')
+                      ? 'answered-marked-review'
+                      : 'answered';
         } else {
-            // If no answer, it's 'not-answered' unless it was marked for review (then keep it 'marked-review')
-            newStatus = (question.status === 'marked-review' || question.status === 'answered-marked-review') ? 'marked-review' : 'not-answered';
+            // Not answered: If it was 'marked-review' or 'answered-marked-review', keep 'marked-review', otherwise 'not-answered'.
+             newStatus = (question.status === 'marked-review' || question.status === 'answered-marked-review')
+                       ? 'marked-review'
+                       : 'not-answered';
         }
 
-        updatePaletteButtonByIndex(currentQuestionIndex, newStatus);
+
+        updateQuestionStatus(currentQuestionIndex, newStatus); // Update data and palette button
         moveToNextQuestion();
     }
+
 
     function markForReviewAndNext() {
         if (testSubmitted) return;
-        const question = getSectionQuestions()[currentQuestionIndex];
-        if (!question) return;
-        const selectedAnswer = getSelectedAnswer();
-        question.userAnswer = selectedAnswer; // Save answer even if marking
+        const questions = getSectionQuestions();
+        if (!questions || currentQuestionIndex >= questions.length) return;
 
+
+        const question = questions[currentQuestionIndex];
+        const selectedAnswer = getSelectedAnswer();
+        question.userAnswer = selectedAnswer; // Store the answer even if marking
+
+
+        // Determine the new status based on whether an answer was provided
         const newStatus = (selectedAnswer !== null) ? 'answered-marked-review' : 'marked-review';
-        updatePaletteButtonByIndex(currentQuestionIndex, newStatus);
+
+
+        updateQuestionStatus(currentQuestionIndex, newStatus); // Update data and palette button
         moveToNextQuestion();
     }
 
+
     function clearResponse() {
         if (testSubmitted) return;
-        const question = getSectionQuestions()[currentQuestionIndex];
-        if (!question) return;
-        question.userAnswer = null;
+        const questions = getSectionQuestions();
+        if (!questions || currentQuestionIndex >= questions.length) return;
 
-        // If it was marked for review, keep it marked, otherwise it becomes 'not-answered'
+
+        const question = questions[currentQuestionIndex];
+        question.userAnswer = null; // Clear the stored answer
+
+
+        // Decide the new status: If it was marked (with or without answer), revert to just 'marked-review'.
+        // Otherwise, it becomes 'not-answered'.
         const newStatus = (question.status === 'marked-review' || question.status === 'answered-marked-review')
                           ? 'marked-review'
                           : 'not-answered';
-        updatePaletteButtonByIndex(currentQuestionIndex, newStatus);
 
-        // Clear the UI input
-        if (question.type === 'mcq') {
+
+        updateQuestionStatus(currentQuestionIndex, newStatus); // Update data and palette button
+
+
+        // Clear the UI input display
+        if (question.type === 'mcq' && optionsContainer) {
             optionsContainer.querySelectorAll(`input[name="q${question.id}_options"]`).forEach(radio => radio.checked = false);
-        } else if (question.type === 'integer') {
+        } else if (question.type === 'integer' && optionsContainer) {
             const input = optionsContainer.querySelector('.integer-input');
             if (input) input.value = '';
         }
     }
 
 
+
+
     function moveToNextQuestion() {
          const questions = getSectionQuestions();
-        if (currentQuestionIndex < questions.length - 1) {
-            loadQuestion(currentQuestionIndex + 1);
-        } else {
-            const currentSectionGlobalIndex = sections.indexOf(currentSection);
-            if (currentSectionGlobalIndex < sections.length - 1) {
+         if (currentQuestionIndex < questions.length - 1) {
+             // Move to the next question within the current section
+             loadQuestion(currentQuestionIndex + 1);
+         } else {
+             // End of current section, try moving to the next section
+             const currentSectionGlobalIndex = sections.indexOf(currentSection);
+             if (currentSectionGlobalIndex < sections.length - 1) {
+                 // Switch to the first question of the next section
                  switchSection(sections[currentSectionGlobalIndex + 1]);
-            } else {
+             } else {
+                 // End of the last section
                  alert("You have reached the end of the last section.");
-                 // Optionally, loop back to the start or just stay here
-                 // loadQuestion(currentQuestionIndex); // Stay on last question
-            }
-        }
-    }
+                 // Optionally stay on the last question or loop back
+                 // For now, just stay - loadQuestion was implicitly called by switchSection if it happened
+             }
+         }
+     }
 
-    function jumpToQuestion(index) {
+
+    function jumpToQuestion(indexInSection) { // Parameter is index WITHIN the current section
         if (testSubmitted) return;
         const questions = getSectionQuestions();
-        if (index >= 0 && index < questions.length && index !== currentQuestionIndex) {
-             handleLeavingQuestion();
-             loadQuestion(index);
+        if (indexInSection >= 0 && indexInSection < questions.length && indexInSection !== currentQuestionIndex) {
+             handleLeavingQuestion(); // Save state of the question we are leaving
+             loadQuestion(indexInSection); // Load the clicked question
         }
     }
 
-    function showSummary() {
-         if (testSubmitted) return;
-         handleLeavingQuestion(); // Capture current answer state
 
-        summaryTableBody.innerHTML = '';
+    function showSummary() {
+         if (testSubmitted || !summaryOverlay || !summaryTableBody) return;
+         handleLeavingQuestion(); // Capture current answer state before showing summary
+
+
+        summaryTableBody.innerHTML = ''; // Clear previous summary
         let totals = { total: testData.length, answered: 0, notAnswered: 0, markedReview: 0, answeredMarkedReview: 0, notVisited: 0 };
+
 
         sections.forEach(section => {
             const questionsInSection = testData.filter(q => q.section === section);
             const counts = { total: questionsInSection.length, answered: 0, notAnswered: 0, markedReview: 0, answeredMarkedReview: 0, notVisited: 0 };
+
+
             questionsInSection.forEach(q => {
                 switch(q.status) {
                     case 'answered': counts.answered++; break;
@@ -405,107 +497,161 @@ document.addEventListener('DOMContentLoaded', () => {
                     case 'marked-review': counts.markedReview++; break;
                     case 'answered-marked-review': counts.answeredMarkedReview++; break;
                     case 'not-visited': counts.notVisited++; break;
+                     default: counts.notVisited++; // Count unknown status as not visited
                 }
             });
+
+
+             // Add row for this section
              const row = summaryTableBody.insertRow();
              row.innerHTML = `<td>${section}</td><td>${counts.total}</td><td>${counts.answered}</td><td>${counts.notAnswered}</td><td>${counts.markedReview}</td><td>${counts.answeredMarkedReview}</td><td>${counts.notVisited}</td>`;
+
+
+             // Accumulate totals
              totals.answered += counts.answered;
              totals.notAnswered += counts.notAnswered;
              totals.markedReview += counts.markedReview;
              totals.answeredMarkedReview += counts.answeredMarkedReview;
              totals.notVisited += counts.notVisited;
         });
+
+
+         // Add total row
          const totalRow = summaryTableBody.insertRow();
          totalRow.style.fontWeight = 'bold';
          totalRow.innerHTML = `<td>Total</td><td>${totals.total}</td><td>${totals.answered}</td><td>${totals.notAnswered}</td><td>${totals.markedReview}</td><td>${totals.answeredMarkedReview}</td><td>${totals.notVisited}</td>`;
 
-        summaryOverlay.style.display = 'flex';
+
+        summaryOverlay.style.display = 'flex'; // Show the summary overlay
     }
 
-    // --- Result Calculation (moved inside submitTest to avoid running unnecessarily) ---
 
+    // --- Result Calculation & Submission ---
     function submitTest() {
         if (testSubmitted) return;
         testSubmitted = true;
-        clearInterval(timerInterval);
-        timerEl.textContent = formatTime(0);
-        summaryOverlay.style.display = 'none';
+        if (timerInterval) {
+             clearInterval(timerInterval);
+             timerInterval = null;
+        }
+        if (timerEl) timerEl.textContent = formatTime(0); // Display 00:00:00
+        if (summaryOverlay) summaryOverlay.style.display = 'none'; // Hide summary if open
 
-        // Disable UI permanently
-        [saveNextBtn, markReviewBtn, clearResponseBtn, submitTestBtn, confirmSubmitBtn, cancelSubmitBtn]
-            .forEach(btn => btn && (btn.disabled = true));
-        sectionNav.querySelectorAll('button').forEach(btn => btn.disabled = true);
-        questionPalette.querySelectorAll('button').forEach(btn => btn.disabled = true);
-        optionsContainer.querySelectorAll('input, button, label').forEach(el => { // Disable labels too
-            el.disabled = true;
-            el.style.pointerEvents = 'none';
+
+        // Disable UI elements to prevent further interaction
+         const elementsToDisable = [
+            saveNextBtn, markReviewBtn, clearResponseBtn, submitTestBtn, confirmSubmitBtn, cancelSubmitBtn,
+            ...(sectionNav ? Array.from(sectionNav.querySelectorAll('button')) : []),
+            ...(questionPalette ? Array.from(questionPalette.querySelectorAll('button')) : []),
+            ...(optionsContainer ? Array.from(optionsContainer.querySelectorAll('input, button, label')) : [])
+        ];
+        elementsToDisable.forEach(el => {
+            if (el) {
+                 el.disabled = true;
+                 // Also prevent clicks visually
+                 if (el.tagName === 'LABEL') {
+                     el.style.cursor = 'default';
+                 }
+            }
          });
-        optionsContainer.style.pointerEvents = 'none';
+         if(optionsContainer) {
+             optionsContainer.style.pointerEvents = 'none'; // Prevent interactions within options area
+             optionsContainer.style.opacity = '0.7'; // Visually indicate disabled state
+         }
 
 
         console.log("Test Submitted. Calculating and saving results...");
 
-        handleLeavingQuestion(); // Final capture
 
-        // --- Calculate Results NOW ---
+        handleLeavingQuestion(); // Ensure the very last state is captured
+
+
+        // --- Calculate Results ---
         let overallScore = 0;
         let overallCorrect = 0;
         let overallIncorrect = 0;
         let overallUnattempted = 0;
         const uniqueSections = [...new Set(testData.map(q => q.section))];
         const sectionStats = {};
-        const processedTestData = JSON.parse(JSON.stringify(testData)); // Use current state
+        // Create a deep copy to avoid modifying the original testData if needed elsewhere later
+        const processedTestData = JSON.parse(JSON.stringify(testData));
+
 
         uniqueSections.forEach(sec => {
             sectionStats[sec] = { score: 0, correct: 0, incorrect: 0, unattempted: 0, total: 0 };
         });
 
+
         processedTestData.forEach(q => {
             const scheme = MARKING_SCHEME[q.type] || { correct: 0, incorrect: 0, unattempted: 0 };
             let marksAwarded = 0;
-            let resultStatus = 'unattempted';
-            sectionStats[q.section].total++;
-
-            // Determine if attempted based on non-null answer AND not just visited
-            let attempted = (q.userAnswer !== null && q.userAnswer !== undefined && q.userAnswer !== '' && q.status !== 'not-visited' && q.status !== 'not-answered');
-
-            if (q.status === 'answered' || q.status === 'answered-marked-review') {
-                 attempted = true; // Explicitly count these as attempted
+            let resultStatus = 'unattempted'; // Default status
+            if (sectionStats[q.section]) { // Ensure section exists
+                sectionStats[q.section].total++;
+            } else {
+                 console.warn(`Section "${q.section}" not found in stats for question ID ${q.id}`);
             }
+
+
+            // Determine if the question was actually attempted
+            // Attempted = Answered OR Answered & Marked for Review
+            let attempted = (q.status === 'answered' || q.status === 'answered-marked-review');
+
+
+             // Additional check: ensure userAnswer is not null/empty for integer questions if marked as attempted
+             if (q.type === 'integer' && attempted && (q.userAnswer === null || q.userAnswer === undefined || String(q.userAnswer).trim() === '')) {
+                  attempted = false; // Treat as unattempted if integer answer is missing despite status
+             }
 
 
             if (attempted) {
-                // Convert to numbers for comparison ONLY if integer type
                 let userAnswerCompared = q.userAnswer;
                 let correctAnswerCompared = q.correctAnswer;
-                 if (q.type === 'integer') {
-                     // Use parseFloat for flexibility, handle potential errors
-                     userAnswerCompared = parseFloat(q.userAnswer);
-                     correctAnswerCompared = parseFloat(q.correctAnswer);
-                     // Handle NaN cases if parsing fails
-                     if (isNaN(userAnswerCompared)) attempted = false; // Invalid input is unattempted
-                 } else if (q.type === 'mcq') {
-                     userAnswerCompared = parseInt(q.userAnswer, 10); // Ensure integer for MCQ index
+
+
+                // Convert integer types for accurate comparison
+                if (q.type === 'integer') {
+                    // Use parseFloat for flexibility, handle potential errors carefully
+                    const userNum = parseFloat(userAnswerCompared);
+                    const correctNum = parseFloat(correctAnswerCompared);
+                    if (!isNaN(userNum) && !isNaN(correctNum) && userNum === correctNum) {
+                        marksAwarded = scheme.correct; resultStatus = 'correct'; overallCorrect++; sectionStats[q.section].correct++;
+                    } else if (!isNaN(userNum)){ // Attempted with a number, but incorrect
+                        marksAwarded = scheme.incorrect; resultStatus = 'incorrect'; overallIncorrect++; sectionStats[q.section].incorrect++;
+                    } else {
+                         // If userAnswer couldn't be parsed as a number, treat as incorrect/unattempted
+                         attempted = false; // Reclassify as unattempted
+                    }
+                } else if (q.type === 'mcq') {
+                     // MCQ answers are typically indices (integers)
+                     userAnswerCompared = parseInt(userAnswerCompared, 10);
+                     correctAnswerCompared = parseInt(correctAnswerCompared, 10);
+                     if (!isNaN(userAnswerCompared) && userAnswerCompared === correctAnswerCompared) {
+                        marksAwarded = scheme.correct; resultStatus = 'correct'; overallCorrect++; sectionStats[q.section].correct++;
+                     } else { // Incorrect MCQ choice
+                        marksAwarded = scheme.incorrect; resultStatus = 'incorrect'; overallIncorrect++; sectionStats[q.section].incorrect++;
+                     }
+                 } else {
+                      // Handle other potential question types if necessary
                  }
-
-
-                 if (attempted && userAnswerCompared === correctAnswerCompared) {
-                    marksAwarded = scheme.correct; resultStatus = 'correct'; overallCorrect++; sectionStats[q.section].correct++;
-                } else if (attempted) { // If attempted but not correct
-                    marksAwarded = scheme.incorrect; resultStatus = 'incorrect'; overallIncorrect++; sectionStats[q.section].incorrect++;
-                }
             }
 
+
+             // If not attempted (includes 'not-visited', 'not-answered', 'marked-review', or reclassified invalid integer attempts)
              if (!attempted) {
                 marksAwarded = scheme.unattempted; resultStatus = 'unattempted'; overallUnattempted++; sectionStats[q.section].unattempted++;
-                q.userAnswer = null; // Standardize unattempted answer to null
+                q.userAnswer = null; // Standardize unattempted answer representation
             }
 
+
             q.marksAwarded = marksAwarded;
-            q.resultStatus = resultStatus; // 'correct', 'incorrect', 'unattempted'
+            q.resultStatus = resultStatus; // Add status ('correct', 'incorrect', 'unattempted')
             overallScore += marksAwarded;
-            sectionStats[q.section].score += marksAwarded;
+             if (sectionStats[q.section]) {
+                sectionStats[q.section].score += marksAwarded;
+             }
         });
+
 
         const finalResults = {
              summary: { overallScore, overallCorrect, overallIncorrect, overallUnattempted, totalQuestions: processedTestData.length, sectionStats },
@@ -514,69 +660,123 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- End Calculation ---
 
 
-        // Prepare the entry for localStorage
+        // --- Save to localStorage ---
         const resultEntry = {
-            id: Date.now(),
+            id: Date.now(), // Unique ID for this test attempt
             timestamp: new Date().toLocaleString(),
             testName: CURRENT_TEST_NAME,
             resultPageUrl: RESULT_PAGE_URL,
             summary: finalResults.summary,
-            detailedData: finalResults.detailedData
+            detailedData: finalResults.detailedData // Include detailed results
         };
 
+
         try {
-            const existingResults = JSON.parse(localStorage.getItem('jeeMainResults') || '[]');
+            // **FIXED LINE BELOW**
+            const existingResults = JSON.parse(localStorage.getItem('jeeMainResults') || '[]'); // Default to empty array string
             existingResults.push(resultEntry);
             localStorage.setItem('jeeMainResults', JSON.stringify(existingResults));
             console.log("Results saved to localStorage successfully.");
 
+
+            // Redirect only AFTER successful save
             console.log(`Redirecting to results page: ${RESULT_PAGE_URL}`);
-            window.location.href = RESULT_PAGE_URL;
+            if (RESULT_PAGE_URL) {
+                window.location.href = RESULT_PAGE_URL;
+            } else {
+                 console.warn("RESULT_PAGE_URL is not defined, staying on current page.");
+                 alert("Test submitted successfully. Results saved locally. (No redirect configured)");
+            }
+
 
         } catch (error) {
             console.error("Failed to save results to localStorage:", error);
-            alert("An error occurred while saving your results. Your test is submitted, but results might not be saved.");
-            // Optionally still redirect
-             // window.location.href = RESULT_PAGE_URL;
+            // Log the specific error for debugging
+             console.error("Error name:", error.name);
+             console.error("Error message:", error.message);
+             if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+                 alert("Could not save results: LocalStorage quota exceeded. Please clear some space.");
+             } else {
+                 alert("An error occurred while saving your results. Your test is submitted, but results might not be saved in your browser history.");
+             }
+            // Decide if you still want to redirect even if saving failed
+             // if (RESULT_PAGE_URL) {
+             //     window.location.href = RESULT_PAGE_URL;
+             // }
         }
     }
 
 
-    // --- Event Listeners ---
+
+
+    // --- Event Listeners Setup ---
+    // Use optional chaining (?) in case elements don't exist in specific HTML files
     saveNextBtn?.addEventListener('click', saveAndNext);
     markReviewBtn?.addEventListener('click', markForReviewAndNext);
     clearResponseBtn?.addEventListener('click', clearResponse);
     submitTestBtn?.addEventListener('click', showSummary);
     confirmSubmitBtn?.addEventListener('click', submitTest);
-    cancelSubmitBtn?.addEventListener('click', () => { summaryOverlay.style.display = 'none'; });
+    cancelSubmitBtn?.addEventListener('click', () => {
+        if (summaryOverlay) summaryOverlay.style.display = 'none';
+    });
+
 
     // --- Initialization ---
     function initTest() {
         console.log(`Initializing test: ${CURRENT_TEST_NAME}`);
 
+
         // Load MathJax FIRST
-        loadMathJax(); // <--- Call the function to load MathJax
+        loadMathJax(); // Call the function to load MathJax
+
 
         if (testTitleElement) {
             testTitleElement.textContent = CURRENT_TEST_NAME;
+        } else {
+             console.warn("Test title element not found.");
         }
+
+
         if (!currentSection && sections.length > 0) {
             currentSection = sections[0];
         }
+
+
         if (!currentSection) {
-            console.error("No sections found in testData. Cannot initialize.");
+            console.error("No sections found in testData or initial section couldn't be set. Cannot initialize test.");
             alert("Error: Test data appears to be empty or invalid.");
-            return;
+            // Display error message in the question area
+            if(questionTextEl) questionTextEl.innerHTML = "Error: Test data could not be loaded.";
+            if(optionsContainer) optionsContainer.innerHTML = "";
+            return; // Stop initialization
         }
+
 
         renderSectionTabs();
         renderQuestionPalette();
-        loadQuestion(currentQuestionIndex); // Load the first question
-        timerInterval = setInterval(updateTimer, 1000);
-        summaryOverlay.style.display = 'none';
+
+
+        // Load the first question (index 0 within the first section)
+        loadQuestion(0);
+
+
+        // Start the timer ONLY if timeLeft is positive
+        if (timeLeft > 0) {
+             if (timerInterval) clearInterval(timerInterval); // Clear any existing interval first
+             timerInterval = setInterval(updateTimer, 1000);
+             updateTimer(); // Initial display update
+        } else if(timerEl) {
+             timerEl.textContent = formatTime(0); // Show 00:00:00 if duration is 0 or less
+        }
+
+
+        if (summaryOverlay) summaryOverlay.style.display = 'none'; // Ensure summary is hidden initially
         console.log("Test initialized.");
     }
 
+
+    // Start the test initialization process
     initTest();
+
 
 });
