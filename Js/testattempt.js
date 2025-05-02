@@ -525,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const existingResults = JSON.parse(localStorage.getItem('jeeMainResults') || '[]?');
+            const existingResults = JSON.parse(localStorage.getItem('jeeMainResults') || '[]');
             existingResults.push(resultEntry);
             localStorage.setItem('jeeMainResults', JSON.stringify(existingResults));
             console.log("Results saved to localStorage successfully.");
