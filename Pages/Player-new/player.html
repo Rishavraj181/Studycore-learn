@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    <link rel="stylesheet" href="player.css">
+</head>
+<body class="dark-mode"> <!-- Start in dark mode by default -->
+
+    <header class="player-header">
+        <a href="javascript:history.back()" class="back-button">←</a>
+        <h1 id="video-title-header">Loading Title...</h1>
+        <div class="menu-container">
+            <div class="menu-icon" id="menu-icon">☰</div>
+            <div class="dropdown-menu" id="dropdown-menu">
+                 <button id="dark-light-toggle">Light Mode</button>
+                 <a href="#" id="old-player-link" class="menu-link-button">Old Player</a>
+                 <!-- Add more menu items here if needed -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Error Message Area -->
+    <div id="error-message-area"></div>
+
+    <main class="player-main">
+        <div class="video-section">
+            <div class="video-container">
+                <!-- YouTube Player Will Be Embedded Here -->
+                <div id="youtube-player-placeholder">Loading Player...</div>
+                <div id="youtube-player"></div>
+            </div>
+             <!-- Controls overlay removed -->
+        </div>
+
+        <div class="info-section">
+            <div class="tabs">
+                <button class="tab-button active" data-tab="study-material">Study Material</button>
+                <button class="tab-button" data-tab="my-notes">My Notes</button>
+                <button class="tab-button" data-tab="ratings">Ratings</button>
+                <button class="tab-button" data-tab="timeline">Timeline</button>
+                <button class="tab-button" data-tab="related-videos">Related Videos</button>
+            </div>
+
+            <div class="tab-content">
+                <div id="study-material" class="tab-pane active">
+                    <h2>Study Material</h2>
+                    <ul id="study-material-list">
+                        <li>Loading...</li>
+                    </ul>
+                </div>
+                <div id="my-notes" class="tab-pane">
+                    <h2>My Notes</h2>
+                    <textarea placeholder="Write your notes here..."></textarea>
+                </div>
+                <div id="ratings" class="tab-pane">
+                    <h2>Ratings</h2>
+                    <p>Rating system coming soon.</p>
+                </div>
+                <div id="timeline" class="tab-pane">
+                    <h2>Timeline</h2>
+                    <ul id="timeline-list">
+                         <li>Loading...</li>
+                    </ul>
+                </div>
+                <div id="related-videos" class="tab-pane">
+                    <h2>Related Videos</h2>
+                    <ul id="related-videos-list">
+                         <li>Loading...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- IMPORTANT: Load YouTube API First -->
+    <script>
+      var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // This global function is required by the YouTube API.
+        // It will be called automatically when the API script is loaded and ready.
+        function onYouTubeIframeAPIReady() {
+            console.log("YT API Ready Callback Fired");
+            // Ensure initializePlayer is defined before calling
+            if (typeof initializePlayer === 'function') {
+                 initializePlayer();
+            } else {
+                // Fallback if player.js hasn't loaded yet (unlikely with script at end)
+                console.warn("initializePlayer not found immediately, waiting for DOMContentLoaded");
+                document.addEventListener('DOMContentLoaded', () => {
+                     if (typeof initializePlayer === 'function') {
+                        initializePlayer();
+                     } else {
+                         console.error("FATAL: initializePlayer function still not found after DOMContentLoaded!");
+                         const errEl = document.getElementById('error-message');
+                         if(errEl) errEl.textContent = "Error loading player script. Cannot initialize player.";
+                     }
+                });
+            }
+        }
+    </script>
+    <!-- Custom Player Script -->
+    <script src="player.js"></script>
+</body>
+</html>
