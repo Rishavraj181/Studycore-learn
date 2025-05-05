@@ -71,15 +71,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const reviewSectionTabsContainer = document.getElementById('review-section-tabs');
     const reviewQuestionsContainer = document.getElementById('review-questions-container');
     const resultsHeaderTitle = document.querySelector('.results-header h1');
+    const printButton = document.getElementById('print-results-button'); // <-- Get the print button
 
     // --- Basic DOM Element Checks ---
-    if (!attemptsList || !detailedResultsArea || !noResultsMessage || !resultsSectionTableBody || !reviewSectionTabsContainer || !reviewQuestionsContainer) {
-        console.error("FATAL: One or more essential result display elements are missing from the HTML.");
+    // Added check for printButton
+    if (!attemptsList || !detailedResultsArea || !noResultsMessage || !resultsSectionTableBody || !reviewSectionTabsContainer || !reviewQuestionsContainer || !printButton) {
+        console.error("FATAL: One or more essential result display elements (including print button) are missing from the HTML.");
         alert("Error: Result page structure is incomplete.");
         return;
     }
 
     let targetResults = []; // To hold results filtered for the target test name
+    let currentDetailedData = []; // To store the data of the currently displayed attempt
 
     // --- Load and Filter Attempts ---
     function loadAndFilterAttempts() {
@@ -88,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // *** FIXED: Removed trailing '?' from default string ***
             const allResults = JSON.parse(localStorage.getItem('jeeMainResults') || '[]');
             targetResults = allResults.filter(attempt => attempt.testName === TARGET_TEST_NAME);
 
@@ -99,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 noResultsMessage.textContent = `Select an attempt from the list (if available) to view details for ${TARGET_TEST_NAME}.`;
                 noResultsMessage.style.display = 'flex';
                 detailedResultsArea.style.display = 'none';
+                printButton.style.display = 'none'; // Hide print button if no results
                 return;
             }
 
@@ -122,6 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
             noResultsMessage.textContent = `Select an attempt from the list to view details for ${TARGET_TEST_NAME}.`;
             noResultsMessage.style.display = 'flex';
             detailedResultsArea.style.display = 'none';
+            printButton.style.display = 'none'; // Hide print button initially
+
 
         } catch (error) {
             console.error("Error loading or filtering results from localStorage:", error);
@@ -129,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
             noResultsMessage.textContent = 'Could not load result data.';
             noResultsMessage.style.display = 'flex';
             detailedResultsArea.style.display = 'none';
+            printButton.style.display = 'none'; // Hide print button on error
         }
     }
 
@@ -138,17 +144,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!selectedAttempt || !selectedAttempt.summary || !selectedAttempt.detailedData) {
             console.error("Selected attempt data is missing or incomplete.", selectedAttempt);
              alert("Could not load details for this attempt.");
+            detailedResultsArea.style.display = 'none'; // Hide details area
+            printButton.style.display = 'none';     // Hide print button
+            noResultsMessage.style.display = 'flex'; // Show placeholder message
+            noResultsMessage.textContent = 'Error loading details for this attempt.';
             return;
         }
 
         noResultsMessage.style.display = 'none';
         detailedResultsArea.style.display = 'block';
+        printButton.style.display = 'inline-block'; // <-- Show the print button
 
         attemptTimestampEl.textContent = `Attempt Time: ${selectedAttempt.timestamp}`;
 
         const summary = selectedAttempt.summary;
-        const detailedData = selectedAttempt.detailedData;
-        const sections = [...new Set(detailedData.map(q => q.section).filter(Boolean))];
+        currentDetailedData = selectedAttempt.detailedData; // Store data for potential full print
+        const sections = [...new Set(currentDetailedData.map(q => q.section).filter(Boolean))];
 
         // Populate Overall Summary
         resultTotalScoreEl.textContent = summary.overallScore ?? 'N/A';
@@ -174,13 +185,22 @@ document.addEventListener('DOMContentLoaded', () => {
              if (tabIndex === 0) tab.classList.add('active');
             tab.textContent = sec;
             tab.dataset.section = sec;
-            tab.addEventListener('click', () => showDetailedReviewQuestions(sec, detailedData));
+            // *** IMPORTANT: Modified click listener to allow printing all questions later ***
+            tab.addEventListener('click', (e) => {
+                const clickedTab = e.target;
+                 // Update active tab style
+                reviewSectionTabsContainer.querySelectorAll('.review-section-tab').forEach(t => {
+                    t.classList.toggle('active', t === clickedTab);
+                });
+                // Show questions for this section only for screen view
+                showDetailedReviewQuestions(clickedTab.dataset.section, currentDetailedData, true);
+            });
             reviewSectionTabsContainer.appendChild(tab);
         });
 
-        // Initially display the detailed review for the first section
+        // Initially display the detailed review for the first section for screen view
          if (sections.length > 0) {
-            showDetailedReviewQuestions(sections[0], detailedData);
+            showDetailedReviewQuestions(sections[0], currentDetailedData, true); // Show only first section initially
          } else {
              reviewQuestionsContainer.innerHTML = '<p class="no-review-questions">No questions data available for review.</p>';
          }
@@ -188,28 +208,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Show Questions for Selected Review Section ---
-    function showDetailedReviewQuestions(sectionName, detailedData) {
-        // Update active tab style
-        reviewSectionTabsContainer.querySelectorAll('.review-section-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.section === sectionName);
-        });
+    // Added 'onlyThisSection' flag
+    function showDetailedReviewQuestions(sectionName, detailedData, onlyThisSection = false) {
 
-        const questionsToShow = detailedData.filter(q => q.section === sectionName);
+        // Find the questions to show
+        const questionsToShow = onlyThisSection
+            ? detailedData.filter(q => q.section === sectionName)
+            : detailedData; // If not onlyThisSection, get all questions
+
         reviewQuestionsContainer.innerHTML = ''; // Clear previous questions
 
         if (questionsToShow.length === 0) {
-            reviewQuestionsContainer.innerHTML = `<p class="no-review-questions">No questions found in the '${sectionName}' section for this attempt.</p>`;
+            reviewQuestionsContainer.innerHTML = `<p class="no-review-questions">No questions found ${onlyThisSection ? `in the '${sectionName}' section` : ''} for this attempt.</p>`;
             return;
          }
 
-        questionsToShow.forEach((q, indexInSection) => {
+        // Keep track of section changes if showing all questions
+        let currentSection = null;
+
+        questionsToShow.forEach((q, index) => { // Use overall index if showing all
+            // If showing all questions, add a section header when the section changes
+            if (!onlyThisSection && q.section !== currentSection) {
+                currentSection = q.section;
+                const sectionHeader = document.createElement('h4');
+                sectionHeader.textContent = `Section: ${currentSection}`;
+                sectionHeader.style.marginTop = '20px';
+                sectionHeader.style.paddingTop = '10px';
+                sectionHeader.style.borderTop = '1px solid #ccc';
+                sectionHeader.classList.add('print-section-header'); // Add class for potential print styling
+                reviewQuestionsContainer.appendChild(sectionHeader);
+            }
+
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('review-question-item');
+             // Add section identifier for potential filtering/styling
+            itemDiv.dataset.section = q.section;
 
             // --- Determine Correct Answer Display ---
             let correctAnswerDisplay = q.correctAnswer ?? 'N/A';
              if (q.type === 'mcq' && Array.isArray(q.options) && q.correctAnswer != null && q.options[q.correctAnswer] !== undefined) {
-                 // Display the option text itself, and option number
                  correctAnswerDisplay = `(${String.fromCharCode(65 + q.correctAnswer)}) ${q.options[q.correctAnswer]}`;
              } else if (q.type === 'integer' && q.correctAnswer != null) {
                  correctAnswerDisplay = q.correctAnswer;
@@ -221,7 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
              if (q.userAnswer === null || q.userAnswer === undefined || q.resultStatus === 'unattempted') {
                  userAnswerDisplay = 'Not Answered';
              } else if (q.type === 'mcq' && Array.isArray(q.options) && q.userAnswer != null && q.options[q.userAnswer] !== undefined) {
-                 // Display the option text itself, and option number
                  userAnswerDisplay = `(${String.fromCharCode(65 + q.userAnswer)}) ${q.options[q.userAnswer]}`;
                  if (q.resultStatus === 'incorrect') userAnswerClass += ' incorrect-ans';
              } else if (q.type === 'integer' && q.userAnswer != null) {
@@ -232,9 +268,13 @@ document.addEventListener('DOMContentLoaded', () => {
              const resultStatusDisplay = q.resultStatus || 'unknown'; // e.g., 'correct', 'incorrect', 'unattempted'
              const statusClass = `review-status ${resultStatusDisplay}`; // Class for styling status
 
+             // Find the original question number within its section if needed (can be complex)
+             // For simplicity, just use the index in the displayed list
+             const displayQuestionNumber = index + 1;
+
              // --- Construct Inner HTML with Solution Section ---
             itemDiv.innerHTML = `
-                <div class="question-number">Question ${indexInSection + 1} (ID: ${q.id || 'N/A'})</div>
+                <div class="question-number">Question ${displayQuestionNumber} (ID: ${q.id || 'N/A'}) ${onlyThisSection ? '' : `[${q.section}]`}</div>
                 <div class="question-text">${q.questionText || '[No Question Text Provided]'}</div>
                 ${q.type === 'mcq' && Array.isArray(q.options) ? `<div class="review-options">${q.options.map((opt, i) => `<div>(${String.fromCharCode(65 + i)}) ${opt}</div>`).join('')}</div>` : ''}
                 <div class="review-details">
@@ -253,15 +293,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // *** Trigger MathJax Typesetting AFTER adding all items ***
         if (typeof MathJax !== 'undefined' && MathJax.typesetPromise) {
-            // console.log(`Viewresult.js: Queueing MathJax typesetting for section: ${sectionName}`);
             MathJax.typesetPromise([reviewQuestionsContainer]) // Target the main container
                 .catch((err) => console.error('Viewresult.js: MathJax typesetting error:', err));
         } else if (typeof MathJax === 'undefined') {
              console.warn(`Viewresult.js: MathJax is not yet available. Typesetting skipped for section: ${sectionName}`);
         }
 
-        reviewQuestionsContainer.scrollTop = 0; // Scroll review container to top
+        // Scroll only if viewing a single section interactively
+        if (onlyThisSection) {
+            reviewQuestionsContainer.scrollTop = 0; // Scroll review container to top
+        }
     }
+
+    // --- Add Print Button Event Listener ---
+    printButton.addEventListener('click', () => {
+        console.log("Print button clicked.");
+
+        // ** Crucial Step for Printing ALL Questions **
+        // Temporarily render all questions into the container before printing.
+        // We re-use the showDetailedReviewQuestions function but tell it NOT to filter by section.
+        // This ensures all question content is in the DOM for the print CSS to handle.
+        console.log("Rendering all questions for printing...");
+        showDetailedReviewQuestions(null, currentDetailedData, false); // Pass null section, false for onlyThisSection
+
+        // Optionally wait a very short moment for MathJax rendering if it's extremely complex,
+        // but usually the browser print preview handles it.
+        // setTimeout(() => {
+            console.log("Calling window.print()...");
+            window.print(); // Trigger the browser's print dialog
+
+            // ** Optional: Restore View After Printing **
+            // After the print dialog closes (or is cancelled), restore the view
+            // to show only the previously selected section's questions.
+            // This might require finding the active tab again.
+            setTimeout(() => { // Use a timeout to ensure print dialog is likely closed
+                const activeTab = reviewSectionTabsContainer.querySelector('.review-section-tab.active');
+                if (activeTab) {
+                    console.log(`Restoring view to section: ${activeTab.dataset.section}`);
+                    showDetailedReviewQuestions(activeTab.dataset.section, currentDetailedData, true);
+                } else {
+                    // If no tab was active (e.g., only one section), show the first one
+                    const firstTab = reviewSectionTabsContainer.querySelector('.review-section-tab');
+                    if (firstTab) {
+                        console.log(`Restoring view to first section: ${firstTab.dataset.section}`);
+                        showDetailedReviewQuestions(firstTab.dataset.section, currentDetailedData, true);
+                    }
+                }
+            }, 500); // Adjust delay if needed
+
+        // }, 100); // Short delay example
+
+    });
 
 
     // --- Initial Load ---

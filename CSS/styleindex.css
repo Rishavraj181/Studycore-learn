@@ -13,6 +13,7 @@ body {
     color: #333;
     /* Reverted background */
     background-color: #f4f4f4;
+    padding-bottom: 60px; /* Adjust based on footer height */
 }
 
 .container {
@@ -292,6 +293,43 @@ a.card {
 .card-icon i {
     color: #555;
 }
+ /*Footer */
+ .main-footer {
+    background-color: #fff;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+    position: fixed; 
+    bottom: 0;
+    width: 100%; 
+ }
+ .footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+ }
+ .footer-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap; /* Allow links to wrap on smaller screens */
+    justify-content: center; /* Center links horizontally */
+    gap: 15px 25px; /* Row and Column gaps between list items */
+}
+
+.footer-container a {
+    text-decoration: none;
+    color: #555; /* Subtler link color */
+    font-size: 0.9em;
+    transition: color 0.2s ease;
+}
+
+.footer-container a:hover {
+    color: #d90000; /* Use logo color on hover */
+    text-decoration: underline;
+}
+
 
 /* Font Awesome Import (Ensure it's linked in HTML or uncommented here) */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
