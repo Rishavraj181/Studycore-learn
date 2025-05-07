@@ -184,8 +184,8 @@ body.light-mode {
 .video-section {
     background-color: #000; /* Black background behind player */
     position: relative; /* Needed for potential future absolute elements */
-    max-width: 50%;   /* Limit width to 85% of the available space */
-    max-height: 50%; /* Limit height to 85% of the available space */
+    max-width: 85%;   /* Limit width to 85% of the available space */
+    max-height: 85%; /* Limit height to 85% of the available space */
     margin-left: auto;  /* Center the section horizontally */
     margin-right: auto; /* Center the section horizontally */
 }

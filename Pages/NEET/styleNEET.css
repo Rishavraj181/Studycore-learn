@@ -1,3 +1,6 @@
+/* --- styles.css - Improved Responsiveness for Mobile --- */
+
+/* Basic Reset & Body Styles */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -9,18 +12,22 @@ body {
     line-height: 1.6;
     color: #333;
     background-color: #f8f9fa;
-    padding-bottom: 60px;
+    /* Adjusted padding-bottom to ensure content is above the fixed footer */
+    padding-bottom: 80px; /* Increased padding to account for footer height */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    width: 100%; /* Ensure container takes full width on small screens */
 }
 
+/* Header Styles */
 .main-header {
     background-color: #fff;
-    padding: 10px 0;
+    padding: 15px 0; /* Increased vertical padding */
     border-bottom: 1px solid #eee;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -29,6 +36,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap; /* Allow header items to wrap on smaller screens */
+    gap: 15px; /* Gap between wrapped items */
 }
 
 .logo {
@@ -36,25 +45,26 @@ body {
     font-weight: bold;
     color: #d90000;
     text-decoration: none;
+    flex-shrink: 0; /* Prevent logo from shrinking */
 }
 
+/* --- Navigation --- */
 .main-nav {
     margin-left: 30px;
     margin-right: auto;
+    flex-grow: 1; /* Allow nav to take available space */
+    /* Added margin-top for wrapped state */
+    margin-top: 0;
 }
 
 .main-nav ul {
     list-style: none;
     display: flex;
     align-items: center;
-}
-
-.main-nav li {
-    margin-right: 20px;
-}
-
-.main-nav li:last-child {
-    margin-right: 0;
+    padding: 0; /* Ensure no default padding */
+    margin: 0; /* Ensure no default margin */
+    flex-wrap: wrap; /* Allow nav links to wrap */
+    gap: 10px 20px; /* Vertical and horizontal gap for wrapped links */
 }
 
 .main-nav a {
@@ -62,14 +72,16 @@ body {
     color: #555;
     padding: 5px 0px;
     font-size: 0.95em;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease, border-bottom-color 0.3s ease; /* Added border transition */
     display: inline-flex;
     align-items: center;
     gap: 5px;
+    border-bottom: 2px solid transparent; /* Added transparent border for smooth transition */
 }
 
 .main-nav a:hover {
     color: #000;
+    border-bottom-color: #000; /* Add border on hover */
 }
 
 .main-nav a.active {
@@ -78,37 +90,44 @@ body {
     border-bottom: 2px solid #d90000;
 }
 
+/* --- Header Right-Side Actions --- */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Adjust spacing */
+    flex-shrink: 0; /* Prevent actions from shrinking */
+    /* Added margin-top for wrapped state */
+    margin-top: 0;
+}
+
 .refer-earn {
     text-decoration: none;
     color: #555;
     font-size: 0.9em;
-    margin-left: 20px;
+    white-space: nowrap; /* Prevent wrapping */
 }
 
 .notification-icon {
     font-size: 1.2em;
     color: #777;
     cursor: pointer;
-    margin-left: 20px;
+    flex-shrink: 0; /* Prevent icon from shrinking */
 }
 
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
+/* Style for the Login LINK */
 .login-link {
     padding: 6px 15px;
-    border: 1px solid #007bff;
-    background-color: #e7f1ff;
-    color: #0056b3;
+    border: 1px solid #007bff; /* Blue border */
+    background-color: #e7f1ff; /* Light blue background */
+    color: #0056b3; /* Blue text */
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9em;
     font-weight: 500;
-    text-decoration: none;
+    text-decoration: none; /* Remove underline */
     transition: background-color 0.2s, color 0.2s;
+    white-space: nowrap; /* Prevent wrapping */
+    flex-shrink: 0; /* Prevent link from shrinking */
 }
 
 .login-link:hover {
@@ -116,40 +135,24 @@ body {
     color: #003f80;
 }
 
+/* Style for the Logout Button */
 .logout-button {
     padding: 6px 15px;
-    border: 1px solid #f5c6cb;
-    background-color: #f8d7da;
-    color: #721c24;
+    border: 1px solid #f5c6cb; /* Light red border */
+    background-color: #f8d7da; /* Lighter red background */
+    color: #721c24; /* Darker red text */
     border-radius: 5px;
     cursor: pointer;
     font-size: 0.9em;
     font-weight: 500;
     transition: background-color 0.2s;
-    margin-left: 10px;
+    margin-left: 5px; /* Slightly less space from username */
+    white-space: nowrap; /* Prevent wrapping */
+    flex-shrink: 0; /* Prevent button from shrinking */
 }
 
 .logout-button:hover {
     background-color: #f1b0b7;
-}
-
-.main-content {
-    padding: 30px 0;
-}
-
-.promo-banner {
-    background-color: #fff0dd;
-    border-radius: 15px;
-    padding: 50px 40px;
-    text-align: center;
-    position: relative;
-    color: #333;
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 40px;
 }
 
 .profile-icon {
@@ -163,6 +166,46 @@ body {
     align-items: center;
     font-weight: bold;
     font-size: 1.1em;
+    flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+.user-details {
+    display: flex; /* Use flexbox for username and logout button */
+    align-items: center;
+    gap: 5px; /* Gap between username and logout button */
+    flex-wrap: wrap; /* Allow username/logout to wrap */
+    flex-shrink: 0; /* Prevent user details from shrinking */
+}
+
+.user-details span {
+    display: inline-block; /* Changed to inline-block */
+    font-weight: bold;
+    font-size: 0.9em;
+    white-space: nowrap; /* Prevent username wrapping */
+}
+
+/* Main Content Styles */
+.main-content {
+    padding: 30px 0;
+}
+
+/* Promo Banner Styles */
+.promo-banner {
+    background-color: #fff0dd;
+    background-size: cover;
+    background-position: center;
+    border-radius: 15px;
+    padding: 50px 40px;
+    text-align: center;
+    position: relative;
+    color: #333;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 40px;
+    overflow: hidden; /* Hide anything outside the rounded corners */
 }
 
 .banner-content h1 {
@@ -192,6 +235,7 @@ body {
     color: #d90000;
 }
 
+/* Subject Cards (Buttons) Styles */
 .subject-cards {
     display: flex;
     justify-content: flex-start;
@@ -199,6 +243,7 @@ body {
     margin-bottom: 40px;
     border-bottom: 1px solid #dee2e6;
     padding-bottom: 15px;
+    flex-wrap: wrap; /* Allow subject cards to wrap */
 }
 
 .subject-card-button {
@@ -214,80 +259,71 @@ body {
     background-color: #f8f9fa;
     min-height: 50px;
     justify-content: center;
+    text-decoration: none; /* Ensure it looks like a button, not a link */
 }
 
 .subject-card-button .card-icon {
     font-size: 1.3em;
     margin-right: 8px;
     color: #6c757d;
+    flex-shrink: 0; /* Prevent icon from shrinking */
 }
 
 .subject-card-button span {
     font-size: 0.95em;
     font-weight: 500;
     color: #495057;
+    white-space: nowrap; /* Prevent text wrapping within button */
 }
 
-.physics-card {
-    background-color: #e7f5ff;
-}
+/* Specific Subject Card Colors */
+.physics-card { background-color: #e7f5ff; }
+.physics-card .card-icon { color: #4dabf7; }
+.physics-card span { color: #1c7ed6; }
 
-.physics-card .card-icon {
-    color: #4dabf7;
-}
+.chemistry-card { background-color: #fff0f6; }
+.chemistry-card .card-icon { color: #f783ac; }
+.chemistry-card span { color: #d6336c; }
 
-.physics-card span {
-    color: #1c7ed6;
-}
+.math-card { background-color: #f3f0ff; }
+.math-card .card-icon { color: #9775fa; }
+.math-card span { color: #7048e8; }
 
-.chemistry-card {
-    background-color: #fff0f6;
-}
+/* Added styles for other potential subjects based on previous code */
+.biology-card { background-color: #f4fce3; } /* Using the color from the new CSS */
+.biology-card .card-icon { color: #94d82d; } /* Using the color from the new CSS */
+.biology-card span { color: #66a80f; } /* Using the color from the new CSS */
 
-.chemistry-card .card-icon {
-    color: #f783ac;
-}
+.english-card { background-color: #fff3e0; } /* Example color */
+.english-card .card-icon { color: #ffb300; } /* Example color */
+.english-card span { color: #f57c00; } /* Example color */
 
-.chemistry-card span {
-    color: #d6336c;
-}
+.Test-card { background-color: #e1f5fe; } /* Example color */
+.Test-card .card-icon { color: #29b6f6; } /* Example color */
+.Test-card span { color: #0288d1; } /* Example color */
 
-.biology-card {
-    background-color: #f4fce3;
-}
 
-.biology-card .card-icon {
-    color: #94d82d;
-}
-
-.biology-card span {
-    color: #66a80f;
-}
-
+/* Subject Card Button Hover and Active States */
 .subject-card-button:not(.active):hover {
     background-color: #e9ecef;
     transform: none;
     box-shadow: none;
+    border-color: #dee2e6; /* Add border color on hover */
 }
 
 .subject-card-button.active {
-    background-color: #e7f5ff;
-    border-color: #4dabf7;
-    box-shadow: 0 2px 5px rgba(77, 171, 247, 0.2);
+    /* Background color is handled by specific subject classes */
+    border-color: #4dabf7; /* Default active border color */
+    box-shadow: 0 2px 5px rgba(77, 171, 247, 0.2); /* Default active shadow */
     transform: none;
 }
 
-.subject-card-button.active .card-icon,
-.subject-card-button.active span {
-    color: #1c7ed6;
-}
-
+/* Specific Active Card Styles (Override defaults) */
 .physics-card.active {
     background-color: #e7f5ff;
     border-color: #4dabf7;
     box-shadow: 0 2px 5px rgba(77, 171, 247, 0.2);
 }
-
 .physics-card.active .card-icon,
 .physics-card.active span {
     color: #1c7ed6;
@@ -298,23 +334,42 @@ body {
     border-color: #f783ac;
     box-shadow: 0 2px 5px rgba(247, 131, 172, 0.2);
 }
-
 .chemistry-card.active .card-icon,
 .chemistry-card.active span {
     color: #d6336c;
 }
 
-.biology-card.active {
-    background-color: #f4fce3;
-    border-color: #94d82d;
-    box-shadow: 0 2px 5px rgba(148, 216, 45, 0.2);
+.math-card.active {
+    background-color: #f3f0ff;
+    border-color: #9775fa;
+    box-shadow: 0 2px 5px rgba(151, 117, 250, 0.2);
+}
+.math-card.active .card-icon,
+.math-card.active span {
+    color: #7048e8;
 }
 
+/* Added active styles for other potential subjects */
+.biology-card.active {
+    background-color: #f4fce3; /* Using the color from the new CSS */
+    border-color: #94d82d; /* Using the color from the new CSS */
+    box-shadow: 0 2px 5px rgba(148, 216, 45, 0.2); /* Using the color from the new CSS */
+}
 .biology-card.active .card-icon,
 .biology-card.active span {
-    color: #66a80f;
+    color: #66a80f; /* Using the color from the new CSS */
 }
 
+.english-card.active { background-color: #fff3e0; border-color: #ffb300; box-shadow: 0 2px 5px rgba(255, 179, 0, 0.2); }
+.english-card.active .card-icon,
+.english-card.active span { color: #f57c00; }
+
+.Test-card.active { background-color: #e1f5fe; border-color: #29b6f6; box-shadow: 0 2px 5px rgba(41, 182, 246, 0.2); }
+.Test-card.active .card-icon,
+.Test-card.active span { color: #0288d1; }
+
+
+/* Chapters Display Area Styles */
 .chapters-display-area {
     margin-top: 30px;
     padding-top: 0;
@@ -335,40 +390,30 @@ body {
     color: #343a40;
     margin-bottom: 25px;
     padding-bottom: 10px;
-    border-bottom: 3px solid #4dabf7;
+    border-bottom: 3px solid #4dabf7; /* Default border color */
     display: inline-block;
 }
 
-.chapter-list.physics-list-active h3 {
-    border-bottom-color: #4dabf7;
-}
+/* Specific Chapter List Header Border Colors (Override default) */
+.chapter-list.physics-list-active h3 { border-bottom-color: #4dabf7; }
+.chapter-list.chemistry-list-active h3 { border-bottom-color: #f783ac; }
+.chapter-list.math-list-active h3 { border-bottom-color: #9775fa; }
+.chapter-list.biology-list-active h3 { border-bottom-color: #94d82d; }
+.chapter-list.english-list-active h3 { border-bottom-color: #ffc078; }
+.chapter-list.test-list-active h3 { border-bottom-color: #29b6f6; } /* Added Test list active color */
 
-.chapter-list.chemistry-list-active h3 {
-    border-bottom-color: #f783ac;
-}
-
-.chapter-list.math-list-active h3 {
-    border-bottom-color: #9775fa;
-}
-
-.chapter-list.biology-list-active h3 {
-    border-bottom-color: #94d82d;
-}
-
-.chapter-list.english-list-active h3 {
-    border-bottom-color: #ffc078;
-}
 
 .chapter-list ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    /* Using column layout for larger screens */
     column-count: 2;
     column-gap: 35px;
 }
 
 .chapter-list li {
-    break-inside: avoid-column;
+    break-inside: avoid-column; /* Prevent list items from breaking across columns */
     padding-bottom: 0;
 }
 
@@ -393,6 +438,7 @@ body {
     transform: none;
 }
 
+/* Footer */
 .main-footer {
     background-color: #fff;
     padding: 20px 0;
@@ -401,12 +447,15 @@ body {
     position: fixed;
     bottom: 0;
     width: 100%;
+    z-index: 10; /* Ensure footer is above content */
 }
 
 .footer-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap; /* Allow footer content to wrap */
+    gap: 10px 20px; /* Gap for wrapped items */
 }
 
 .footer-container ul {
@@ -414,31 +463,390 @@ body {
     padding: 0;
     margin: 0;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px 25px;
+    flex-wrap: wrap; /* Allow links to wrap on smaller screens */
+    justify-content: center; /* Center links horizontally */
+    gap: 10px 20px; /* Row and Column gaps between list items */
+    flex-grow: 1; /* Allow ul to take available space */
 }
 
 .footer-container a {
     text-decoration: none;
-    color: #555;
+    color: #555; /* Subtler link color */
     font-size: 0.9em;
     transition: color 0.2s ease;
+    white-space: nowrap; /* Prevent links from wrapping */
 }
 
 .footer-container a:hover {
-    color: #d90000;
+    color: #d90000; /* Use logo color on hover */
     text-decoration: underline;
 }
 
+.footer-text {
+    font-size: 0.9em;
+    color: #777;
+    flex-shrink: 0; /* Prevent text from shrinking */
+    text-align: center; /* Center text when wrapped */
+    width: 100%; /* Take full width when wrapped */
+    margin-top: 10px; /* Add space above when wrapped */
+}
+
+/* Keyframes Animation */
 @keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(15px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
+
+/* Media Queries for Responsiveness */
+
+/* Tablet and smaller */
+@media (max-width: 992px) {
+    .container {
+        padding: 0 15px; /* Slightly less padding on tablets */
+    }
+
+    .main-nav {
+        margin-left: 15px; /* Adjusted margin */
+    }
+
+    .main-nav ul {
+        gap: 8px 15px; /* Adjusted gap */
+    }
+
+    .header-actions {
+        gap: 10px; /* Adjusted gap */
+    }
+
+    .promo-banner {
+        padding: 40px 30px; /* Adjusted padding */
+        min-height: 180px; /* Adjusted min-height */
+        margin-bottom: 30px; /* Adjusted margin */
+    }
+
+    .banner-content h1 {
+        font-size: 2.5em; /* Adjusted font size */
+    }
+
+    .banner-content h2 {
+        font-size: 1.3em; /* Adjusted font size */
+    }
+
+    .banner-logo {
+        font-size: 1.1em; /* Adjusted font size */
+        top: 15px;
+        right: 20px;
+    }
+
+    .subject-cards {
+        gap: 10px; /* Adjusted gap */
+        margin-bottom: 30px; /* Adjusted margin */
+        padding-bottom: 10px; /* Adjusted padding */
+    }
+
+    .subject-card-button {
+        padding: 10px 20px; /* Adjusted padding */
+        min-height: 45px; /* Adjusted min-height */
+    }
+
+    .subject-card-button .card-icon {
+        font-size: 1.2em; /* Adjusted font size */
+        margin-right: 6px; /* Adjusted margin */
+    }
+
+    .subject-card-button span {
+        font-size: 0.9em; /* Adjusted font size */
+    }
+
+    .chapters-display-area {
+        margin-top: 20px; /* Adjusted margin */
+    }
+
+    .chapter-list {
+        padding: 25px 30px; /* Adjusted padding */
+        margin-bottom: 25px; /* Adjusted margin */
+    }
+
+    .chapter-list h3 {
+        font-size: 1.3em; /* Adjusted font size */
+        margin-bottom: 20px; /* Adjusted margin */
+        padding-bottom: 8px; /* Adjusted padding */
+    }
+
+    .chapter-list ul {
+        column-gap: 25px; /* Adjusted column gap */
+    }
+
+    .chapter-link {
+        padding: 10px 12px; /* Adjusted padding */
+        margin-bottom: 8px; /* Adjusted margin */
+        font-size: 0.85em; /* Adjusted font size */
+    }
+
+
+    .footer-container ul {
+        gap: 8px 15px; /* Adjusted gap */
+    }
+}
+
+/* Mobile phones */
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 100px; /* More padding for smaller footer on mobile */
+    }
+
+    .main-header {
+        padding: 10px 0; /* Reduced padding */
+    }
+
+    .header-container {
+        flex-direction: column; /* Stack header items vertically */
+        align-items: flex-start; /* Align items to the start */
+        gap: 10px; /* Adjusted gap */
+    }
+
+    .logo {
+        width: 100%; /* Logo takes full width */
+        text-align: center; /* Center logo */
+    }
+
+    .main-nav {
+        margin-left: 0; /* Remove left margin */
+        margin-right: 0; /* Remove auto margin */
+        width: 100%; /* Nav takes full width */
+        margin-top: 5px; /* Space above nav */
+    }
+
+    .main-nav ul {
+        justify-content: center; /* Center nav links */
+        gap: 8px 10px; /* Adjusted gap */
+    }
+
+    .header-actions {
+        width: 100%; /* Actions take full width */
+        justify-content: space-around; /* Distribute space between actions */
+        gap: 0; /* Remove gap as space-around is used */
+        margin-top: 5px; /* Space above actions */
+    }
+
+    .refer-earn,
+    .notification-icon,
+    .login-link,
+    .profile-icon,
+    .user-details {
+        flex-grow: 1; /* Allow action items to grow */
+        justify-content: center; /* Center action items */
+    }
+
+    .user-details {
+         gap: 3px; /* Reduced gap in user details */
+         flex-direction: column; /* Stack username and logout */
+         align-items: center; /* Center stacked items */
+    }
+
+    .logout-button {
+        margin-left: 0; /* Remove left margin */
+        margin-top: 3px; /* Add space above button */
+    }
+
+    .main-content {
+        padding: 20px 0; /* Reduced padding */
+    }
+
+    .promo-banner {
+        padding: 30px 20px; /* Reduced padding */
+        min-height: 150px; /* Reduced min-height */
+        margin-bottom: 20px; /* Reduced margin */
+    }
+
+    .banner-content h1 {
+        font-size: 2em; /* Adjusted font size */
+    }
+
+    .banner-content h2 {
+        font-size: 1.2em; /* Adjusted font size */
+    }
+
+    .banner-logo {
+        font-size: 1em; /* Adjusted font size */
+        top: 10px;
+        right: 10px;
+    }
+
+    .subject-cards {
+        gap: 8px; /* Reduced gap */
+        margin-bottom: 20px; /* Adjusted margin */
+        padding-bottom: 8px; /* Adjusted padding */
+        justify-content: center; /* Center buttons on mobile */
+    }
+
+    .subject-card-button {
+        padding: 8px 15px; /* Reduced padding */
+        min-height: 40px; /* Reduced min-height */
+        font-size: 0.85em; /* Reduced font size */
+        flex-basis: auto; /* Allow buttons to size based on content */
+        width: auto; /* Auto width */
+    }
+
+    .subject-card-button .card-icon {
+        font-size: 1.1em; /* Adjusted font size */
+        margin-right: 5px; /* Adjusted margin */
+    }
+
+    .subject-card-button span {
+        font-size: 0.85em; /* Adjusted font size */
+    }
+
+
+    .chapters-display-area {
+        margin-top: 15px; /* Adjusted margin */
+    }
+
+    .chapter-list {
+        padding: 20px 25px; /* Reduced padding */
+        margin-bottom: 20px; /* Reduced margin */
+    }
+
+    .chapter-list h3 {
+        font-size: 1.2em; /* Reduced font size */
+        margin-bottom: 15px; /* Reduced margin */
+        padding-bottom: 6px; /* Reduced padding */
+    }
+
+    .chapter-list ul {
+        column-count: 1; /* Stack chapters in a single column on mobile */
+        column-gap: 0; /* Remove column gap */
+    }
+
+    .chapter-link {
+        padding: 10px 12px; /* Adjusted padding */
+        margin-bottom: 8px; /* Adjusted margin */
+        font-size: 0.85em; /* Adjusted font size */
+    }
+
+
+     .main-footer {
+        padding: 15px 0; /* Reduced footer padding */
+     }
+
+     .footer-container {
+        flex-direction: column; /* Stack footer items vertically */
+        gap: 10px; /* Adjusted gap */
+     }
+
+     .footer-container ul {
+        gap: 5px 10px; /* Adjusted gap */
+     }
+
+     .footer-text {
+        margin-top: 5px; /* Adjusted margin */
+     }
+}
+
+/* Very small phones */
+@media (max-width: 400px) {
+    body {
+        padding-bottom: 150px; /* More padding for smaller footer on very small phones */
+    }
+    .container {
+        padding: 0 10px; /* Further reduced padding */
+    }
+
+    .main-nav ul {
+        gap: 5px 8px; /* Further reduced gap */
+    }
+
+    .promo-banner {
+        padding: 20px 15px; /* Further reduced padding */
+        min-height: 120px; /* Further reduced min-height */
+        margin-bottom: 15px; /* Further reduced margin */
+    }
+
+    .banner-content h1 {
+        font-size: 1.6em; /* Further adjusted font size */
+    }
+
+    .banner-content h2 {
+        font-size: 1em; /* Further adjusted font size */
+    }
+
+    .banner-logo {
+        font-size: 0.9em; /* Further adjusted font size */
+        top: 8px;
+        right: 8px;
+    }
+
+    .subject-cards {
+        gap: 5px; /* Further reduced gap */
+        margin-bottom: 15px; /* Further reduced margin */
+        padding-bottom: 5px; /* Further reduced padding */
+    }
+
+    .subject-card-button {
+        padding: 6px 10px; /* Further reduced padding */
+        min-height: 35px; /* Further reduced min-height */
+        font-size: 0.8em; /* Further reduced font size */
+    }
+
+    .subject-card-button .card-icon {
+        font-size: 1em; /* Further adjusted font size */
+        margin-right: 4px; /* Further adjusted margin */
+    }
+
+    .subject-card-button span {
+        font-size: 0.8em; /* Further adjusted font size */
+    }
+
+
+    .chapters-display-area {
+        margin-top: 10px; /* Further adjusted margin */
+    }
+
+    .chapter-list {
+        padding: 15px 20px; /* Further reduced padding */
+        margin-bottom: 15px; /* Further reduced margin */
+    }
+
+    .chapter-list h3 {
+        font-size: 1.1em; /* Further reduced font size */
+        margin-bottom: 10px; /* Further reduced margin */
+        padding-bottom: 5px; /* Further reduced padding */
+    }
+
+    .chapter-list ul {
+        column-count: 1; /* Stack chapters in a single column on mobile */
+        column-gap: 0; /* Remove column gap */
+    }
+
+    .chapter-link {
+        padding: 8px 10px; /* Further reduced padding */
+        margin-bottom: 6px; /* Further reduced margin */
+        font-size: 0.8em; /* Further reduced font size */
+    }
+
+     .main-footer {
+        padding: 10px 0; /* Further reduced footer padding */
+     }
+
+     .footer-container ul {
+        gap: 3px 8px; /* Further reduced gap */
+     }
+
+     .footer-container a {
+        font-size: 0.8em; /* Further reduced font size */
+     }
+
+     .footer-text {
+        font-size: 0.8em; /* Further reduced font size */
+     }
+}
+
+
+/* Font Awesome Import (Ensure it's linked in HTML or uncommented here) */
+/* If you are not linking Font Awesome in your HTML <head>, uncomment the line below */
+/* @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'); */
