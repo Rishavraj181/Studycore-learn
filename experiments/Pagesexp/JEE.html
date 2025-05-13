@@ -20,7 +20,18 @@
                 <a href="NEET.html">NEET</a>
                 <a href="class12.html">Class 12 Boards</a>
                 <a href="https://studycoretest.infinityfreeapp.com" target="_blank">Test Series</a>
-                <a href="#" class="login-btn">Login</a>
+<!-- Authentication Section -->
+        <div class="auth-section">
+            <!-- Shown when user is LOGGED OUT -->
+            <a href="../../Login/login.html" class="login-btn" id="login-link">Login</a>
+
+            <!-- Shown when user is LOGGED IN -->
+            <div id="user-profile-section" style="display: none;"> <!-- Initially hidden -->
+                <span id="user-profile-icon" class="profile-icon"></span> <!-- For initial/icon -->
+                <span id="username-display" class="username"></span>
+                <button id="logout-button" class="logout-btn">Logout</button> <!-- Or use an <a> styled as button -->
+            </div>
+        </div>
             </nav>
         </div>
     </header>
@@ -62,7 +73,7 @@
                 <div class="container">
                     <h2 class="section-title">JEE Physics Chapters</h2>
                     <ul class="chapter-list-styled">
-                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Units and Measurement</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="jee-chapters/physics/unit-dimention-newui.html">Units and Measurement</a></li>
                         <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Kinematics</a></li>
                         <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Laws of Motion</a></li>
                         <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Work, Energy and Power</a></li>
@@ -110,5 +121,6 @@
         </div>
     </footer>
     <script src="stream.js"></script>
+    <script src="../../Js/auth.js"></script>
 </body>
 </html>

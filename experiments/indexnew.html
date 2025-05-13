@@ -13,10 +13,21 @@
     <header>
         <div class="container">
             <div class="logo">StudyCore</div>
-             <a href="old_index.html" class="back-to-old-ui-link">Back to Old UI</a>
+             <a href="../index.html" class="back-to-old-ui-link">Back to Old UI</a>
 
             <nav>
-                <a href="#" class="login-btn">Login</a>
+                <!-- Authentication Section -->
+        <div class="auth-section">
+            <!-- Shown when user is LOGGED OUT -->
+            <a href="../Login/login.html" class="login-btn" id="login-link">Login</a>
+
+            <!-- Shown when user is LOGGED IN -->
+            <div id="user-profile-section" style="display: none;"> <!-- Initially hidden -->
+                <span id="user-profile-icon" class="profile-icon"></span> <!-- For initial/icon -->
+                <span id="username-display" class="username"></span>
+                <button id="logout-button" class="logout-btn">Logout</button> <!-- Or use an <a> styled as button -->
+            </div>
+        </div>
             </nav>
         </div>
     </header>
@@ -80,6 +91,8 @@
             <p class="copyright">© 2025 StudyCore. All rights reserved.</p>
         </div>
     </footer>
+    <script src="../../Js/auth.js"></script>
+
 
 </body>
 </html>

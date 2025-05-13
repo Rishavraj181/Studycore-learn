@@ -1,0 +1,433 @@
+/* ===================================================== */
+/* CSS for Chapter Detail Pages (stylechapter.css)       */
+/* Integrated with New UI Variables & Styles             */
+/* ===================================================== */
+
+/*
+   NOTE: This file assumes you are also linking:
+   1. indexnew.css (for CSS variables, base styles, header, footer)
+   2. subject-page.css (for some common page structures if applicable)
+   The basic resets and body styles below might be redundant if indexnew.css
+   is properly linked and handles them. We'll keep them for now for completeness
+   but comment out parts that are likely covered.
+*/
+
+/* --- Basic Resets & Body --- */
+/* * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+} */ /* Likely in indexnew.css */
+
+body {
+    font-family: 'Poppins', sans-serif; /* USE NEW UI FONT */
+    line-height: 1.6;
+    color: var(--text-color);           /* USE VARIABLE */
+    background-color: var(--light-bg-color); /* USE VARIABLE */
+    overflow-x: hidden;
+}
+
+/* --- Container --- */
+/* .container { ... } */ /* Should be defined in indexnew.css */
+
+a {
+    text-decoration: none;
+    color: var(--accent-color);       /* USE VARIABLE */
+}
+a:hover {
+    text-decoration: none; /* Often preferred over underline */
+    color: var(--primary-color);    /* USE VARIABLE */
+}
+
+/* --- Main Chapter Page Content Area --- */
+.chapter-page-content { /* Renamed from .main-content for specificity */
+    padding: 2em 0 3em 0; /* Use em for scalable padding */
+}
+
+/* --- Chapter Header (Back Button + Title) --- */
+.chapter-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1em;
+    margin-bottom: 1.5em;
+    border-bottom: 1px solid var(--border-color, #eee); /* USE VARIABLE */
+    flex-wrap: wrap;
+    gap: 0.75em;
+}
+
+.back-button {
+    font-size: 1.2em; /* Slightly smaller, adjust as needed */
+    color: var(--text-light-color); /* USE VARIABLE */
+    text-decoration: none;
+    margin-right: 1em;
+    padding: 0.3em 0.6em;
+    display: inline-flex; /* For icon and text alignment */
+    align-items: center;
+    gap: 0.4em;
+    border-radius: 4px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+.back-button i {
+    font-size: 0.9em; /* Make icon proportional */
+}
+.back-button:hover {
+    color: var(--primary-color);
+    background-color: rgba(var(--rgb-primary-color, 0,90,156), 0.1); /* Light primary bg tint */
+}
+
+.page-title { /* Using class from our new HTML structure */
+    font-size: 2em; /* Adjust to match other page titles in new UI */
+    color: var(--text-color);
+    font-weight: 600; /* Consistent with .section-title */
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* --- Chapter Tab Navigation --- */
+.chapter-tab-nav {
+    margin-bottom: 2em;
+    border-bottom: 2px solid var(--border-color, #eee); /* Thicker bottom border */
+    overflow-x: auto;
+    background-color: var(--card-bg-color); /* USE VARIABLE */
+    border-radius: 8px 8px 0 0; /* Keep rounded top */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    -webkit-overflow-scrolling: touch;
+}
+
+.chapter-tab-nav ul {
+    list-style: none;
+    display: flex;
+    /* justify-content: center; */ /* Let it start from left for scrollable tabs */
+    gap: 0; /* Remove gap, manage with padding on 'a' */
+    padding: 0 0.5em; /* Padding inside the nav bar */
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* .chapter-tab-nav li { flex-shrink: 0; } */ /* Not strictly needed with nowrap on ul */
+
+.chapter-tab-nav li a.tab-link { /* Class from new HTML */
+    text-decoration: none;
+    color: var(--text-light-color); /* USE VARIABLE for inactive tabs */
+    padding: 0.8em 1.2em; /* Adjust padding for tab size */
+    font-size: 1em;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    display: block;
+    position: relative; /* For potential pseudo-elements */
+}
+
+.chapter-tab-nav li a.tab-link:hover {
+    color: var(--primary-color); /* USE VARIABLE */
+}
+
+.chapter-tab-nav li a.tab-link.active {
+    color: var(--primary-color); /* USE VARIABLE */
+    font-weight: 600; /* Slightly bolder for active */
+    border-bottom-color: var(--primary-color); /* USE VARIABLE */
+}
+
+/* --- Tab Content General Styling --- */
+.tab-panel { /* Class from new HTML */
+    display: none;
+    /* margin-top: 0; */ /* Removed, spacing handled by parent or tab-nav margin */
+    padding: 1.5em;
+    background-color: var(--card-bg-color); /* USE VARIABLE */
+    border-radius: 0 0 8px 8px; /* Match tab nav rounding if tabs have bg */
+    /* box-shadow: 0 1px 3px rgba(0,0,0,0.05); */ /* Can omit if page has light bg */
+    /* border: 1px solid var(--border-color, #eee); */ /* Can omit */
+    /* border-top: none; */
+    animation: fadeIn 0.4s ease-out;
+}
+.tab-panel.active {
+    display: block;
+}
+
+@keyframes fadeIn { /* Keep this, it's good */
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Common Content List & Card Structure (New Classes from HTML) --- */
+.content-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25em; /* Consistent gap for list items */
+}
+
+.content-card {
+    background-color: var(--white-color); /* Usually card-bg-color, or white if page is light-bg */
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 10px; /* Match new UI card radius */
+    padding: 1.25em; /* Consistent padding */
+    display: flex;
+    align-items: center; /* Default alignment */
+    gap: 1.25em;
+    flex-wrap: wrap;
+    transition: box-shadow 0.3s ease;
+}
+.content-card:hover {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* Subtle hover shadow */
+}
+
+.content-card-thumbnail {
+    flex-shrink: 0;
+}
+.content-card-thumbnail img { /* Applied to img tag directly from HTML */
+    width: 80px; /* Adjust size */
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px; /* Match card radius or slightly less */
+    display: block;
+    /* border: 1px solid var(--border-color, #eee); */ /* Can omit if image is good */
+}
+
+.content-card-details {
+    flex-grow: 1;
+    min-width: 0; /* Allow details to shrink for flex */
+}
+.content-card-details h3, .content-card-details h4 { /* Target both h3 and h4 */
+    font-size: 1.15em; /* Consistent heading size in card */
+    margin-bottom: 0.3em;
+    color: var(--text-color);
+    font-weight: 600;
+}
+.content-card-details .meta-info { /* Class from new HTML */
+    font-size: 0.875em;
+    color: var(--text-light-color);
+    display: block;
+    margin-bottom: 0.3em;
+}
+.content-card-details .meta-info.instructor-name { /* Specific for instructor */
+    font-weight: 500;
+}
+
+.content-card-details .meta-info span { /* For lecture date/time spans */
+    display: inline-block; /* Or flex if they need to align in a row */
+    margin-right: 1em;
+}
+.content-card-details .meta-info i {
+    margin-right: 0.3em;
+    color: var(--text-light-color); /* Icon color */
+}
+
+.content-card-actions {
+    margin-left: auto; /* Pushes actions to the right if space allows */
+    padding-left: 1em; /* Space if it wraps */
+    flex-shrink: 0;
+    display: flex; /* For multiple buttons */
+    gap: 0.75em;
+}
+
+/* --- NEW UI Button Styles (Apply these to a.button) --- */
+.button {
+    display: inline-block;
+    padding: 0.6em 1.2em;
+    border-radius: 25px; /* Pill shape from new UI */
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    white-space: nowrap;
+    font-size: 0.9em;
+    text-align: center;
+    border: 1px solid transparent;
+}
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.button-primary {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border-color: var(--primary-color);
+}
+.button-primary:hover {
+    background-color: var(--primary-hover-color);
+    border-color: var(--primary-hover-color);
+    color: var(--white-color);
+}
+
+.button-secondary { /* For "Legacy" or less important actions */
+    background-color: var(--text-light-color); /* Or a grey */
+    color: var(--white-color);
+    border-color: var(--text-light-color);
+}
+.button-secondary:hover {
+    background-color: var(--text-color); /* Darker grey */
+    border-color: var(--text-color);
+    color: var(--white-color);
+}
+/* Alternative for Legacy: use --danger-color */
+/* .button-legacy {
+    background-color: var(--danger-color);
+    color: var(--white-color);
+    border-color: var(--danger-color);
+}
+.button-legacy:hover {
+    background-color: #c9302c; /* Darker danger */
+/* border-color: #c9302c;
+/* color: var(--white-color);
+/* } */
+
+
+.button-outline {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+.button-outline:hover {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+.button-outline i { /* For icons in outline buttons */
+    margin-left: 0.3em;
+    font-size: 0.9em;
+}
+
+
+/* Specific Card Type Adjustments (e.g., lecture-card, exercise-card) */
+/* .lecture-card {} */ /* Most styles covered by .content-card */
+
+.exercise-card .content-card-details {
+    flex-grow: 1; /* Ensure it takes space */
+}
+/* .exercise-card .button {} */ /* Already styled */
+
+/* --- Notes List & Card Styling --- */
+.notes-list.content-list { /* Ensure notes list also uses content-list gap */
+    flex-direction: row; /* Override column for notes to wrap */
+    flex-wrap: wrap;
+}
+
+.note-card.content-card { /* Specific styling for note cards, extends content-card */
+    background-color: var(--light-bg-color); /* Slightly different bg for notes */
+    flex: 1 1 300px; /* Grow/shrink, target base width */
+    min-width: 250px; /* Min width before wrapping */
+    align-items: center; /* Default for content-card */
+    cursor: pointer; /* Make the whole card clickable */
+}
+.note-card.content-card:hover {
+    background-color: var(--border-color, #e9ecef); /* Hover for notes */
+    /* transform: translateY(-2px); */ /* Already in .content-card:hover */
+    /* box-shadow: ...; */ /* Already in .content-card:hover */
+}
+
+.note-card .content-card-icon.fa-file-pdf { /* Class from new HTML */
+    font-size: 1.8em;
+    color: var(--danger-color); /* Or your brand's PDF color */
+    flex-shrink: 0;
+}
+.note-card .content-card-details span { /* Note title text */
+    flex-grow: 1;
+    font-size: 1em;
+    font-weight: 500;
+    color: var(--text-color);
+}
+.note-card .content-card-action-icon { /* For view/download icon on note card */
+    font-size: 1.2em;
+    color: var(--text-light-color);
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.note-card:hover .content-card-action-icon {
+    color: var(--primary-color);
+}
+
+
+/* --- Styles for Inline PDF Viewer --- */
+.viewer-separator {
+    margin: 2em 0;
+    border: 0;
+    border-top: 1px solid var(--border-color, #eee);
+}
+
+.pdf-display-area {
+    margin-top: 1.5em;
+    padding: 1em; /* Reduced padding */
+    border: 1px solid var(--border-color, #ccc);
+    background-color: var(--card-bg-color); /* Match card background */
+    min-height: 75vh; /* Taller for better viewing */
+    display: flex;
+    flex-direction: column;
+    /* box-shadow: 0 2px 8px rgba(0,0,0,0.07); */ /* Optional, less shadow if inside a card-like tab panel */
+    border-radius: 8px; /* Rounded corners */
+}
+
+.pdf-title {
+    margin-bottom: 1em;
+    padding-bottom: 0.75em;
+    text-align: center;
+    color: var(--text-color);
+    font-size: 1.2em;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.pdf-embed-container {
+    display: flex;
+    flex-grow: 1;
+    background-color: #525659; /* Standard PDF viewer dark background */
+    border-radius: 0 0 6px 6px; /* Rounded bottom corners if .pdf-display-area is rounded */
+    overflow: hidden; /* Ensure iframe respects border-radius */
+}
+
+.pdf-embed-container iframe {
+    display: block;
+    width: 100%;
+    flex-grow: 1;
+    border: none;
+}
+
+.pdf-embed-container p { /* Placeholder text */
+    text-align: center;
+    color: #fff; /* Light text on dark background */
+    margin: auto; /* Center in flex container */
+    font-style: italic;
+    padding: 2em;
+}
+
+/* --- Placeholder Text for Empty Tabs --- */
+.tab-panel > .empty-state > p, /* Target p inside .empty-state */
+.tab-panel > p:first-child:last-child { /* Target lone p if no .empty-state */
+    padding: 2em;
+    text-align: center;
+    color: var(--text-light-color);
+    font-style: italic;
+    font-size: 1em;
+}
+
+
+
+/* ====================================================== */
+/* Responsive Adjustments (Keep your existing ones, they are good!) */
+/* Minor tweaks below to use variables or match new HTML classes if needed */
+/* ====================================================== */
+
+@media (max-width: 992px) {
+    .page-title { font-size: 1.8em; }
+    .content-card-thumbnail img { width: 70px; height: 70px; }
+    /* ... other adjustments from your original responsive CSS ... */
+}
+
+@media (max-width: 768px) {
+    .chapter-page-content { padding: 1.5em 0 2em 0; }
+    .chapter-header { flex-direction: column; align-items: flex-start; }
+    .page-title { font-size: 1.6em; width: 100%; }
+    .chapter-tab-nav ul { justify-content: flex-start; }
+    .content-card, .lecture-card, .exercise-card { flex-direction: column; align-items: flex-start; }
+    .content-card-actions { margin-left: 0; width: 100%; }
+    .notes-list.content-list { flex-direction: column; } /* Stack notes on mobile */
+    .note-card.content-card { flex-basis: auto; width: 100%; }
+    /* ... other adjustments from your original responsive CSS ... */
+}
+
+@media (max-width: 480px) {
+    .page-title { font-size: 1.4em; }
+    .chapter-tab-nav li a.tab-link { padding: 0.6em 0.8em; font-size: 0.85em; }
+    .content-card-thumbnail img { width: 60px; height: 60px; }
+    .button { font-size: 0.85em; padding: 0.5em 1em; }
+    /* ... other adjustments from your original responsive CSS ... */
+}

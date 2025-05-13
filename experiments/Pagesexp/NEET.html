@@ -20,7 +20,18 @@
                 <a href="NEET.html" class="active">NEET</a>
                 <a href="class12.html">Class 12 Boards</a>
                 <a href="https://studycoretest.infinityfreeapp.com" target="_blank">Test Series</a>
-                <a href="#" class="login-btn">Login</a>
+                <!-- Authentication Section -->
+        <div class="auth-section">
+            <!-- Shown when user is LOGGED OUT -->
+            <a href="../../Login/login.html" class="login-btn" id="login-link">Login</a>
+
+            <!-- Shown when user is LOGGED IN -->
+            <div id="user-profile-section" style="display: none;"> <!-- Initially hidden -->
+                <span id="user-profile-icon" class="profile-icon"></span> <!-- For initial/icon -->
+                <span id="username-display" class="username"></span>
+                <button id="logout-button" class="logout-btn">Logout</button> <!-- Or use an <a> styled as button -->
+            </div>
+        </div>
             </nav>
         </div>
     </header>
@@ -110,5 +121,7 @@
         </div>
     </footer>
     <script src="stream.js"></script>
+    <script src="../../Js/auth.js"></script>
+
 </body>
 </html>
