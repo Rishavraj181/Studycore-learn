@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEE Resources - StudyCore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../indexnew.css">
+    <link rel="stylesheet" href="Stream.css">
+</head>
+<body class="jee-page"> <!-- Added class for context in JS if needed -->
+    <header>
+        <div class="container">
+            <div class="logo">StudyCore</div>
+            <nav class="main-nav">
+                <a href="../indexnew.html">Home</a>
+                <a href="../../index.html">OLD UI</a>
+                <a href="JEE.html" class="active">JEE</a>
+                <a href="NEET.html">NEET</a>
+                <a href="class12.html">Class 12 Boards</a>
+                <a href="https://studycoretest.infinityfreeapp.com" target="_blank">Test Series</a>
+                <a href="#" class="login-btn">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-hero">
+            <div class="container">
+                <h1 class="animate-pop-in">JEE Preparation Hub</h1>
+                <p class="animate-fade-in-delay">Select a subject to explore chapters and resources for your JEE exam.</p>
+            </div>
+        </section>
+
+        <section class="subject-selection-section">
+            <div class="container">
+                <h2 class="section-title">Choose JEE Subject</h2>
+                <div class="subject-cards-grid">
+                    <div class="subject-card" data-subject="physics" data-target="jee-physics-chapters">
+                        <div class="card-icon"><i class="fas fa-atom"></i></div>
+                        <h3>Physics</h3>
+                        <p>Fundamental concepts and problem-solving for JEE Physics.</p>
+                    </div>
+                    <div class="subject-card" data-subject="chemistry" data-target="jee-chemistry-chapters">
+                        <div class="card-icon"><i class="fas fa-flask"></i></div>
+                        <h3>Chemistry</h3>
+                        <p>Organic, Inorganic, and Physical Chemistry for JEE.</p>
+                    </div>
+                    <div class="subject-card" data-subject="math" data-target="jee-math-chapters">
+                        <div class="card-icon"><i class="fas fa-calculator"></i></div>
+                        <h3>Mathematics</h3>
+                        <p>Calculus, Algebra, and Coordinate Geometry for JEE.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div id="chapter-display-container">
+            <!-- JEE Physics Chapters -->
+            <section id="jee-physics-chapters" class="chapter-display-section" style="display: none;">
+                <div class="container">
+                    <h2 class="section-title">JEE Physics Chapters</h2>
+                    <ul class="chapter-list-styled">
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Units and Measurement</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Kinematics</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Laws of Motion</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Work, Energy and Power</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Rotational Motion</a></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- JEE Chemistry Chapters -->
+            <section id="jee-chemistry-chapters" class="chapter-display-section" style="display: none;">
+                <div class="container">
+                    <h2 class="section-title">JEE Chemistry Chapters</h2>
+                    <ul class="chapter-list-styled">
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Basic Concepts of Chemistry</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Structure of Atom</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Chemical Bonding</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Thermodynamics</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Equilibrium</a></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- JEE Math Chapters -->
+            <section id="jee-math-chapters" class="chapter-display-section" style="display: none;">
+                <div class="container">
+                    <h2 class="section-title">JEE Mathematics Chapters</h2>
+                    <ul class="chapter-list-styled">
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Sets, Relations & Functions</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Complex Numbers</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Matrices & Determinants</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Permutations & Combinations</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Limits, Continuity & Differentiability</a></li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">Contact</a> <a href="#">About Us</a> <a href="#">Feedback</a> <a href="#">FAQ</a> <a href="#">Privacy Policy</a> <a href="#">Terms of Service</a>
+            </div>
+            <p class="copyright">© 2024 StudyCore. All rights reserved.</p>
+        </div>
+    </footer>
+    <script src="stream.js"></script>
+</body>
+</html>

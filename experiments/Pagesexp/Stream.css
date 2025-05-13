@@ -1,0 +1,172 @@
+/* subject-page.css - Styles for JEE, NEET, Class 12 pages */
+
+/* Page Specific Hero */
+.page-hero {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    padding: 3.5em 0;
+    text-align: center;
+}
+
+.page-hero h1 {
+    font-size: 2.6em;
+    margin-bottom: 0.2em;
+    color: var(--white-color); /* Ensure hero h1 is white */
+}
+.page-hero h1::after { /* Remove underline for hero title */
+    display: none;
+}
+
+.page-hero p {
+    font-size: 1.15em;
+    font-weight: 300;
+    max-width: 600px;
+    margin: 0 auto;
+    color: rgba(255,255,255,0.9);
+}
+
+/* Subject Selection Section */
+.subject-selection-section {
+    padding: 3em 0 2em;
+}
+
+.subject-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1.8em;
+}
+
+.subject-card {
+    background-color: var(--card-bg-color);
+    padding: 2em 1.5em;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.subject-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.subject-card.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 8px 25px rgba(var(--rgb-primary-color, 0, 90, 156), 0.2); /* Using RGB var for shadow */
+    transform: translateY(-5px);
+}
+/* Define --rgb-primary-color if you want to use it above for transparency with primary color */
+:root {
+    --rgb-primary-color: 0, 90, 156; /* Corresponds to #005A9C */
+}
+
+
+.subject-card .card-icon {
+    font-size: 2.5em; /* Placeholder size, adjust if using real icons */
+    color: var(--primary-color);
+    margin-bottom: 0.7em;
+}
+.subject-card .card-icon i { /* Ensure icon color is applied */
+    color: inherit;
+}
+
+.subject-card h3 {
+    font-size: 1.4em;
+    color: var(--text-color);
+    margin-bottom: 0.5em;
+}
+
+.subject-card p {
+    font-size: 0.9em;
+    color: var(--text-light-color);
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+
+/* Chapter Display Section */
+.chapter-display-section {
+    padding-bottom: 3em;
+    /* Initially hidden by style="display: none;" in HTML */
+    /* CSS animations for visibility */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    background-color: var(--light-bg-color); /* Or a slightly different shade like #e9ecef */
+}
+
+.chapter-display-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.chapter-display-section .section-title {
+    font-size: 1.8em; /* Smaller title for chapter lists */
+    margin-top: 1em; /* Space above chapter list title */
+}
+
+.chapter-list-styled {
+    list-style: none;
+    padding: 0;
+    margin-top: 1em;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.chapter-list-styled li {
+    background-color: var(--white-color);
+    padding: 0.9em 1.2em;
+    margin-bottom: 0.7em;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.chapter-list-styled li:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.09);
+}
+
+.chapter-list-styled li a {
+    color: var(--text-color);
+    font-weight: 500;
+    flex-grow: 1;
+    margin-left: 0.5em; /* Space after icon */
+}
+.chapter-list-styled li a:hover {
+    color: var(--primary-color);
+}
+
+.chapter-list-styled li .chapter-icon {
+    color: var(--accent-color);
+    font-size: 1.1em; /* Adjust icon size if needed */
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .subject-cards-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+@media (max-width: 767.98px) {
+    .page-hero h1 {
+        font-size: 2.2em;
+    }
+    .page-hero p {
+        font-size: 1.05em;
+    }
+    .subject-cards-grid {
+        grid-template-columns: 1fr; /* Stack cards on smaller screens */
+    }
+    .chapter-list-styled {
+        max-width: 95%;
+    }
+}
