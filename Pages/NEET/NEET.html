@@ -3,186 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEET - StudyCore</title> <!-- Updated Title -->
-    <!-- Link Main Stylesheet -->
-    <link rel="stylesheet" href="styleNEET.css"> <!-- Adjust path if root CSS -->
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <title>NEET Resources - StudyCore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../../CSS/indexnew.css">
+    <link rel="stylesheet" href="../../CSS/Stream.css">
 </head>
-<body>
+<body class="neet-page">
+    <header>
+        <div class="container">
+            <div class="logo">StudyCore</div>
+            <nav class="main-nav">
+                <a href="../../indexnew.html">Home</a>
+                <a href="../JEE/JEE.html">JEE</a>
+                <a href="NEET.html" class="active">NEET</a>
+                <a href="../Class 12/class12.html">Class 12 Boards</a>
+                <a href="https://studycoretest.infinityfreeapp.com" target="_blank">Test Series</a>
+                <!-- Authentication Section -->
+        <div class="auth-section">
+            <!-- Shown when user is LOGGED OUT -->
+            <a href="../../Login/login.html" class="login-btn" id="login-link">Login</a>
 
-<header class="main-header">
-    <div class="container header-container">
-        <a href="../../index.html" class="logo">StudyCore</a>
-        <nav class="main-nav">
-            <ul>
-                <li><a href="../JEE/JEE.html">JEE</a></li>
-                <li><a href="NEET.html" class="active">NEET</a></li>
-                <li><a href="../Class 12/Class 12 Board.html">Class 12 Boards</a></li>
-                <li><a href="../../Test/testhome.html">Test</li></a>
-            </ul>
-        </nav>
-        <!-- Right side actions -->
-        <div class="header-actions">
-            <a href="#" class="refer-earn">Refer</a>
-            <i class="fas fa-bell notification-icon"></i>
+            <!-- Shown when user is LOGGED IN -->
+            <div id="user-profile-section" style="display: none;"> <!-- Initially hidden -->
+                <span id="user-profile-icon" class="profile-icon"></span> <!-- For initial/icon -->
+                <span id="username-display" class="username"></span>
+                <button id="logout-button" class="logout-btn">Logout</button> <!-- Or use an <a> styled as button -->
+            </div>
+        </div>
+            </nav>
+        </div>
+    </header>
 
-            <!-- User Profile Section (Shown when logged in) -->
-            <div id="user-profile-section" class="user-profile" style="display: none;"> <!-- Hide by default -->
-                <div class="profile-icon" id="user-profile-icon">U</div>
-                <div class="user-details">
-                    <span id="username-display">USER</span> <!-- ID to display username -->
+    <main>
+        <section class="page-hero">
+            <div class="container">
+                <h1 class="animate-pop-in">NEET Preparation Hub</h1>
+                <p class="animate-fade-in-delay">Select a subject for NEET UG - Physics, Chemistry, and Biology.</p>
+            </div>
+        </section>
+
+        <section class="subject-selection-section">
+            <div class="container">
+                <h2 class="section-title">Choose NEET Subject</h2>
+                <div class="subject-cards-grid">
+                    <div class="subject-card" data-subject="physics" data-target="neet-physics-chapters">
+                        <div class="card-icon"><i class="fas fa-atom"></i></div>
+                        <h3>Physics</h3>
+                        <p>Core concepts and applications for NEET Physics section.</p>
+                    </div>
+                    <div class="subject-card" data-subject="chemistry" data-target="neet-chemistry-chapters">
+                        <div class="card-icon"><i class="fas fa-flask"></i></div>
+                        <h3>Chemistry</h3>
+                        <p>Essential topics in Chemistry for NEET aspirants.</p>
+                    </div>
+                    <div class="subject-card" data-subject="biology" data-target="neet-biology-chapters">
+                        <div class="card-icon"><i class="fas fa-dna"></i></div> <!-- Or fa-leaf -->
+                        <h3>Biology</h3>
+                        <p>Botany and Zoology syllabus for NEET Biology.</p>
+                    </div>
                 </div>
-                <button id="logout-button" class="logout-button" style="display: none;">Logout</button> <!-- Hide logout by default too -->
-            </div>
-
-            <!-- Login LINK (Shown when logged out) -->
-            <!-- *** Changed to an <a> tag *** -->
-            <a href="../../Login/login.html" id="login-link" class="login-link" style="display: inline-block;">Login</a> <!-- Show by default -->
-             <!-- *** Adjust href path if Login.html is not in root *** -->
-
-    </div>
-    <!-- Removed extra closing div -->
-</header>
-
-<main class="main-content">
-    <div class="container">
-        <section class="promo-banner">
-            <div class="banner-content">
-                <h1>WELCOME</h1>
-                <h2>To <strong>NEET</strong> Resource hub</h2>
-                <div class="banner-logo">StudyCore</div>
             </div>
         </section>
 
-        <!-- Subject Cards Section -->
-        <section class="subject-cards">
-            <!-- Changed to DIVs with data attributes -->
-            <div class="card physics-card subject-card-button" data-subject="physics">
-                <div class="card-icon"><i class="fas fa-atom"></i></div>
-                <span>Physics</span>
-            </div>
-            <div class="card chemistry-card subject-card-button" data-subject="chemistry">
-                <!-- Using beaker icon for chemistry -->
-                <div class="card-icon"><i class="fas fa-flask"></i></div>
-                <span>Chemistry</span>
-            </div>
-             <div class="card biology-card subject-card-button" data-subject="biology">
-                 <!-- Using calculator icon for math -->
-                <div class="card-icon"><i class="fas fa-calculator"></i></div>
-                <span>Biology</span>
-            </div>
-        </section>
-
-        <!-- Chapter Lists Section (Hidden by default) -->
-        <section class="chapters-display-area">
-
-            <!-- Physics Chapters Container -->
-            <div id="physics-chapters" class="chapter-list" style="display: none;">
-                <h3>Physics Chapters</h3>
-                <ul>
-                    <a href=""class="chapter-link">Electrostatics-1</a>
-                    <a href=""class="chapter-link">Electrostatics-2</a>
-                    <a href=""class="chapter-link">Current Electricity</a>
-                    <a href=""class="chapter-link">Capacitor</a>
-                    <a href=""class="chapter-link">Gravitation</a>
-                    <a href=""class="chapter-link">Magnetic Effect of Electric Current</a>
-                    <a href=""class="chapter-link">EMI</a>
-                    <a href=""class="chapter-link">AC</a>
-                    <a href=""class="chapter-link">EM Waves</a>
-                    <a href=""class="chapter-link">Modern Physics 1</a>
-                    <a href=""class="chapter-link">Modern Physics 2</a>
-                    <a href=""class="chapter-link">Ray Optics</a>
-                    <a href=""class="chapter-link">String and Sound Waves</a>
-                    <a href="../NEET/PhysicsChapters/Wave-optics.html" class="chapter-link"><span>Wave Optics</span></a>
-                    <a href=""class="chapter-link">Errors </a>
-                    <a href=""class="chapter-link">Semiconductor</a>
-                    <a href="../NEET/PhysicsChapters/units-dimention-basic-math.html" class="chapter-link"> Units & Dimensions and Basic Maths</a>
-                    <a href=""class="chapter-link">Kinematics</a>
-                    <a href=""class="chapter-link">NLM and Friction</a>
-                    <a href=""class="chapter-link">Circular Motion</a>
-                    <a href=""class="chapter-link">Work Power and Energy</a>
-                    <a href=""class="chapter-link">Center of Mass</a>
-                    <a href=""class="chapter-link">Rotation</a>
-                    <a href=""class="chapter-link">Heat(Elasticity,Thrermal Expansion,calorimetry,Heat Transfer)</a>
-                    <a href=""class="chapter-link">KTG and Thermodynamic</a>
-                    <a href="" class="chapter-link"> Fluid Mechanics</a>
-
-                </ul>
-            </div>
-
-            <!-- Chemistry Chapters Container -->
-            <div id="chemistry-chapters" class="chapter-list" style="display: none;">
-                <h3>Physical Chapters</h3>
-                 <ul>
-                    <li><a href="ChemistryChapters/mole-concept.html" class="chapter-link">Mole Concept</a></li>
-                    <a href=""class="chapter-link">Concentration Terms</a>
-                    <a href=""class="chapter-link">Redox Reaction</a>
-                    <li><a href="ChemistryChapters/atomic-structure.html" class="chapter-link">Atomic Structure</a></li>
-                    <a href=""class="chapter-link">Thermodynamics and Thermochemistry</a>
-                    <a href=""class="chapter-link">Chemical Equlibrium</a>
-                    <a href=""class="chapter-link">Ionic Equlibrium</a>
-                    <a href=""class="chapter-link">Electrochemistry</a>
-                    <a href=""class="chapter-link">Chemical Kinetics</a>
-                    <a href=""class="chapter-link">Liquid Solution</a>
-                    <a href=""class="chapter-link">Solid State</a>
-                    <a href=""class="chapter-link">Ideal and Real Gas</a>
-                    <a href=""class="chapter-link">Surface Chemistry</a>
+        <div id="chapter-display-container">
+            <!-- NEET Physics Chapters -->
+            <section id="neet-physics-chapters" class="chapter-display-section" style="display: none;">
+                <div class="container">
+                    <h2 class="section-title">NEET Physics Chapters</h2>
+                    <ul class="chapter-list-styled">
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Physical World & Measurement</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Kinematics</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Laws of Motion</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Gravitation</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Properties of Bulk Matter</a></li>
                     </ul>
-                <h3>Inorganic Chemistry</h3>
-                <ul>
-                    <li><a href="ChemistryChapters/periodic-table.html" class="chapter-link">Periodic Table</a></li>
-                    <li><a href="ChemistryChapters/chemical-bonding.html" class="chapter-link">Chemical Bonding</a></li>
-                    <a href=""class="chapter-link">S-Block</a>
-                    <a href=""class="chapter-link">P-Block</a>
-                    <a href=""class="chapter-link">D&F Block</a>
-                    <a href=""class="chapter-link">Cordination Chemistry</a>
-                    <a href=""class="chapter-link">Meallurgy</a>
-                    <a href=""class="chapter-link">Salt Analysis</a>
-                </ul>
-                <h3>Organic Chemestry</h3>
-                    <a href=""class="chapter-link">IUPAC</a>
-                    <a href=""class="chapter-link">GOC</a>
-                    <a href=""class="chapter-link">Isomerism</a>
-                    <a href=""class="chapter-link">Hydrocarbon</a>
-                    <!-- Add all other chemistry chapter links -->
-                </ul>
+                </div>
+            </section>
+
+            <!-- NEET Chemistry Chapters -->
+            <section id="neet-chemistry-chapters" class="chapter-display-section" style="display: none;">
+                <div class="container">
+                    <h2 class="section-title">NEET Chemistry Chapters</h2>
+                    <ul class="chapter-list-styled">
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Basic Concepts of Chemistry</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Structure of Atom</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Classification of Elements</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Chemical Bonding</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Organic Chemistry - Basic Principles</a></li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- NEET Biology Chapters -->
+            <section id="neet-biology-chapters" class="chapter-display-section" style="display: none;">
+                <div class="container">
+                    <h2 class="section-title">NEET Biology Chapters</h2>
+                    <ul class="chapter-list-styled">
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Diversity in Living World</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Structural Organisation in Animals & Plants</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Cell Structure and Function</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Plant Physiology</a></li>
+                        <li><i class="fas fa-book-open chapter-icon"></i><a href="#">Human Physiology</a></li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">Contact</a> <a href="#">About Us</a> <a href="#">Feedback</a> <a href="#">FAQ</a> <a href="#">Privacy Policy</a> <a href="#">Terms of Service</a>
             </div>
-
-            <!-- Biology Chapters Container -->
-            <div id="biology-chapters" class="chapter-list" style="display:none;">
-                <h3>Biology Chapters</h3>
-                <ul> <!-- ADD THIS UL TAG -->
-                    <li><a href="" class="chapter-link">Reproduction in Organisms</a></li>
-                    <li><a href="" class="chapter-link">Sexual Reproduction in Flowering Plants</a></li>
-                    <li><a href="" class="chapter-link">Human Reproduction</a></li>
-                    <li><a href="" class="chapter-link">Reproductive Health</a></li>
-                    <li><a href="" class="chapter-link">Principles of Inheritance and Variation</a></li>
-                    <!-- Wrap EACH link in <li> and keep inside <ul> -->
-                    <!-- Add all other Biology chapter links wrapped in <li> -->
-                </ul> <!-- CLOSE THE UL TAG -->
-            </div>
-        </section> <!-- End chapters-display-area -->
-
-    </div> <!-- End container -->
-</main>
-<footer class="main-footer"> 
-    <div class="container footer-container">
-
-                <a href="https://forms.gle/uhAapccqZT93yALe8" target="_blank">Contact</a>
-                <a href="../about.html" target="_blank">About</a>
-                <a href="https://forms.gle/UJPgEunqS2VGD7mUA" target="_blank">Feedback</a>
-                <a href="Pages/FAQ.html" target="_blank">FAQ</a>
-                <a href="../privacy_policy.html" target="_blank">Privacy Policy</a>
-                <a href="../terms_of_service.html" target="_blank">Terms of Service</a>
-    </div>
- </footer>
-
-<!-- Link the JavaScript file -->
-<!-- Assumes Js folder is in root, adjust path if needed -->
-<script src="../../Js/javaindex.js"></script>
-<script src="../../Js/auth.js"></script>
+            <p class="copyright">© 2024 StudyCore. All rights reserved.</p>
+        </div>
+    </footer>
+    <script src="../../Js/stream.js"></script>
+    <script src="../../Js/auth.js"></script>
 
 </body>
 </html>

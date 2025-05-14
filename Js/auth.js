@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Redirect to the main index page after "login"
                     // *** Adjust this path if Login.html is not in the root ***
-                    window.location.href = '../index.html';
+                    window.location.href = '../indexnew.html';
                 } else {
                     alert("Please fill in both Name and Email.");
                 }
