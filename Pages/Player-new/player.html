@@ -3,107 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Player</title>
+    <title>Lecture Player</title>
     <link rel="stylesheet" href="player.css">
 </head>
-<body class="dark-mode"> <!-- Start in dark mode by default -->
+<body>
+    <div class="player-container">
+        <header class="player-header">
+            <h1 id="videoTitle">Loading title...</h1>
+            <button id="hamburgerBtn" class="hamburger-button" aria-label="Open menu">
+                <img src="assets/hamburger-icon.svg" alt="Menu">
+            </button>
+        </header>
 
-    <header class="player-header">
-        <a href="javascript:history.back()" class="back-button">←</a>
-        <h1 id="video-title-header">Loading Title...</h1>
-        <div class="menu-container">
-            <div class="menu-icon" id="menu-icon">☰</div>
-            <div class="dropdown-menu" id="dropdown-menu">
-                 <button id="dark-light-toggle">Light Mode</button>
-                 <a href="#" id="old-player-link" class="menu-link-button">Old Player</a>
-                 <!-- Add more menu items here if needed -->
-            </div>
-        </div>
-    </header>
-
-    <!-- Error Message Area -->
-    <div id="error-message-area"></div>
-
-    <main class="player-main">
-        <div class="video-section">
-            <div class="video-container">
-                <!-- YouTube Player Will Be Embedded Here -->
-                <div id="youtube-player-placeholder">Loading Player...</div>
-                <div id="youtube-player"></div>
-            </div>
-             <!-- Controls overlay removed -->
+        <div class="video-area">
+            <iframe id="youtubePlayer" width="100%" height="100%"
+                src="" <!-- Will be set by JS -->
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share ; fullscreen"
+                allowfullscreen></iframe>
         </div>
 
-        <div class="info-section">
-            <div class="tabs">
-                <button class="tab-button active" data-tab="study-material">Study Material</button>
-                <button class="tab-button" data-tab="my-notes">My Notes</button>
-                <button class="tab-button" data-tab="ratings">Ratings</button>
-                <button class="tab-button" data-tab="timeline">Timeline</button>
-                <button class="tab-button" data-tab="related-videos">Related Videos</button>
-            </div>
+        <nav class="tabs">
+            <button class="tab-button active" data-tab="studyMaterialTab">Study Material</button>
+            <button class="tab-button" data-tab="myNotesTab">My Notes</button>
+            <button class="tab-button" data-tab="ratingsTab">Ratings</button>
+            <button class="tab-button" data-tab="timelineTab">Timeline</button>
+            <button class="tab-button" data-tab="relatedVideosTab">Related Videos</button>
+        </nav>
 
-            <div class="tab-content">
-                <div id="study-material" class="tab-pane active">
-                    <h2>Study Material</h2>
-                    <ul id="study-material-list">
-                        <li>Loading...</li>
-                    </ul>
+        <div class="tab-content">
+            <div id="studyMaterialTab" class="tab-pane active">
+                <p>Loading study material...</p>
+            </div>
+            <div id="myNotesTab" class="tab-pane">
+                <h2>My Notes</h2>
+                <textarea id="notesTextarea" placeholder="Type your notes here for this video..."></textarea>
+                <button id="saveNotesBtn">Save Notes</button>
+                <p id="notesStatus"></p>
+            </div>
+            <div id="ratingsTab" class="tab-pane">
+                <h2>Rate this Video</h2>
+                <div class="star-rating">
+                    <span class="star" data-value="1">★</span>
+                    <span class="star" data-value="2">★</span>
+                    <span class="star" data-value="3">★</span>
+                    <span class="star" data-value="4">★</span>
+                    <span class="star" data-value="5">★</span>
                 </div>
-                <div id="my-notes" class="tab-pane">
-                    <h2>My Notes</h2>
-                    <textarea placeholder="Write your notes here..."></textarea>
+                <p id="currentRating">Your rating: Not rated</p>
+            </div>
+            <div id="timelineTab" class="tab-pane">
+                <h2>Video Timeline</h2>
+                <ul id="videoTimelineList">
+                    <p>Loading timeline...</p>
+                </ul>
+            </div>
+            <div id="relatedVideosTab" class="tab-pane">
+                <p>Loading related videos...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="sideMenu" class="side-menu">
+        <button id="closeMenuBtn" class="close-menu-button">×</button>
+        <ul>
+            <li><button id="darkModeToggle">Toggle Dark Mode</button></li>
+            <li><button id="calculatorBtn">Calculator</button></li>
+            <li><button id="doubtsBtn">Ask Doubts</button></li>
+        </ul>
+    </div>
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <!-- Calculator Modal -->
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content calculator-modal-content">
+            <span class="close-modal-btn" data-modal-id="calculatorModal">×</span>
+            <div class="calculator">
+                <div class="calculator-display">
+                    <div id="calcExpression" class="calculator-expression"></div>
+                    <div id="calcCurrentInput" class="calculator-current-input">0</div>
                 </div>
-                <div id="ratings" class="tab-pane">
-                    <h2>Ratings</h2>
-                    <p>Rating system coming soon.</p>
-                </div>
-                <div id="timeline" class="tab-pane">
-                    <h2>Timeline</h2>
-                    <ul id="timeline-list">
-                         <li>Loading...</li>
-                    </ul>
-                </div>
-                <div id="related-videos" class="tab-pane">
-                    <h2>Related Videos</h2>
-                    <ul id="related-videos-list">
-                         <li>Loading...</li>
-                    </ul>
+                <div class="calculator-buttons">
+                    <button class="calc-btn function" data-action="clear">AC</button>
+                    <button class="calc-btn function" data-action="toggle-sign">+/-</button>
+                    <button class="calc-btn function" data-action="backspace">DEL</button>
+                    <button class="calc-btn operator" data-operator="/">÷</button>
+
+                    <button class="calc-btn number" data-number="7">7</button>
+                    <button class="calc-btn number" data-number="8">8</button>
+                    <button class="calc-btn number" data-number="9">9</button>
+                    <button class="calc-btn operator" data-operator="*">×</button>
+
+                    <button class="calc-btn number" data-number="4">4</button>
+                    <button class="calc-btn number" data-number="5">5</button>
+                    <button class="calc-btn number" data-number="6">6</button>
+                    <button class="calc-btn operator" data-operator="-">−</button>
+
+                    <button class="calc-btn number" data-number="1">1</button>
+                    <button class="calc-btn number" data-number="2">2</button>
+                    <button class="calc-btn number" data-number="3">3</button>
+                    <button class="calc-btn operator" data-operator="+">+</button>
+
+                    <button class="calc-btn number zero" data-number="0">0</button>
+                    <button class="calc-btn number" data-action="decimal">.</button>
+                    <button class="calc-btn equals" data-action="equals">=</button>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <!-- IMPORTANT: Load YouTube API First -->
-    <script>
-      var tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        // This global function is required by the YouTube API.
-        // It will be called automatically when the API script is loaded and ready.
-        function onYouTubeIframeAPIReady() {
-            console.log("YT API Ready Callback Fired");
-            // Ensure initializePlayer is defined before calling
-            if (typeof initializePlayer === 'function') {
-                 initializePlayer();
-            } else {
-                // Fallback if player.js hasn't loaded yet (unlikely with script at end)
-                console.warn("initializePlayer not found immediately, waiting for DOMContentLoaded");
-                document.addEventListener('DOMContentLoaded', () => {
-                     if (typeof initializePlayer === 'function') {
-                        initializePlayer();
-                     } else {
-                         console.error("FATAL: initializePlayer function still not found after DOMContentLoaded!");
-                         const errEl = document.getElementById('error-message');
-                         if(errEl) errEl.textContent = "Error loading player script. Cannot initialize player.";
-                     }
-                });
-            }
-        }
-    </script>
-    <!-- Custom Player Script -->
+    <!-- Doubts Modal -->
+    <div id="doubtsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal-btn" data-modal-id="doubtsModal">×</span>
+            <h2>Ask a Doubt</h2>
+            <form id="doubtForm">
+                <label for="doubtName">Your Name:</label>
+                <input type="text" id="doubtName" name="doubtName" required>
+
+                <label for="doubtEmail">Your Email:</label>
+                <input type="email" id="doubtEmail" name="doubtEmail" required>
+
+                <label for="doubtQuestion">Your Question:</label>
+                <textarea id="doubtQuestion" name="doubtQuestion" rows="4" required></textarea>
+
+                <label for="doubtFile">Attach File (optional):</label>
+                <input type="file" id="doubtFile" name="doubtFile">
+                <small>Note: You'll need to manually attach this file if your email client opens.</small>
+
+
+                <button type="submit">Submit Doubt</button>
+            </form>
+            <p id="doubtStatus"></p>
+        </div>
+    </div>
+
     <script src="player.js"></script>
 </body>
 </html>

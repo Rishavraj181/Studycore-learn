@@ -1,355 +1,283 @@
-// --- Global Variables ---
-let player; // YouTube Player object
-let currentVideoData = null; // To store data for the current video
-let youtubeId = null; // Store video ID globally within the script scope
-let videoTitle = 'Video Player'; // Default title
+document.addEventListener('DOMContentLoaded', () => {
+    // --- Element Selection ---
+    const youtubePlayer = document.getElementById('youtubePlayer');
+    const videoTitleElement = document.getElementById('videoTitle');
+    const studyMaterialTab = document.getElementById('studyMaterialTab');
+    const relatedVideosTab = document.getElementById('relatedVideosTab');
+    const videoTimelineList = document.getElementById('videoTimelineList');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sideMenu = document.getElementById('sideMenu');
+    const closeMenuBtn = document.getElementById('closeMenuBtn');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const calculatorBtn = document.getElementById('calculatorBtn');
+    const doubtsBtn = document.getElementById('doubtsBtn');
+    const notesTextarea = document.getElementById('notesTextarea');
+    const saveNotesBtn = document.getElementById('saveNotesBtn');
+    const notesStatus = document.getElementById('notesStatus');
+    const starRatingContainer = document.querySelector('.star-rating');
+    const stars = document.querySelectorAll('.star-rating .star');
+    const currentRatingDisplay = document.getElementById('currentRating');
+    const calculatorModal = document.getElementById('calculatorModal');
+    const doubtsModal = document.getElementById('doubtsModal');
+    const closeModalBtns = document.querySelectorAll('.close-modal-btn');
+    const doubtForm = document.getElementById('doubtForm');
+    const doubtStatus = document.getElementById('doubtStatus');
+    const doubtFile = document.getElementById('doubtFile');
+    const calcCurrentInputDisplay = document.getElementById('calcCurrentInput');
+    const calcExpressionDisplay = document.getElementById('calcExpression');
+    const calculatorButtons = document.querySelector('.calculator-buttons');
 
-// --- DOM Elements ---
-const videoTitleHeader = document.getElementById('video-title-header');
-const studyMaterialList = document.getElementById('study-material-list');
-const timelineList = document.getElementById('timeline-list');
-const relatedVideosList = document.getElementById('related-videos-list');
-const tabsContainer = document.querySelector('.tabs');
-const tabPanes = document.querySelectorAll('.tab-pane');
-const tabButtons = document.querySelectorAll('.tab-button');
-const darkLightToggle = document.getElementById('dark-light-toggle');
-const oldPlayerLink = document.getElementById('old-player-link'); // Changed to link
-const playerPlaceholder = document.getElementById('youtube-player-placeholder');
-const menuIcon = document.getElementById('menu-icon');
-const dropdownMenu = document.getElementById('dropdown-menu');
-const errorMessageArea = document.getElementById('error-message-area');
+    // --- State Variables ---
+    let currentVideoData = null;
+    let currentYoutubeId = '';
+    let calculatorState = {
+        currentInput: '0',
+        expression: '',
+        operator: null,
+        previousValue: null,
+        shouldResetInput: false,
+    };
 
+    // --- Initialization ---
+    function initPlayer() {
+        const params = new URLSearchParams(window.location.search);
+        currentYoutubeId = params.get('youtubeId');
+        const titleFromUrl = params.get('title') || 'Lecture Video';
 
-// --- Utility Functions ---
-function getQueryParams() {
-    const params = {};
-    const queryString = window.location.search.substring(1);
-    const regex = /([^&=]+)=([^&]*)/g;
-    let m;
-    while (m = regex.exec(queryString)) {
-        params[decodeURIComponent(m[1])] = decodeURIComponent(m[2].replace(/\+/g, ' ')); // Handle '+' for spaces
-    }
-    return params;
-}
-
-function formatTime(totalSeconds) {
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = Math.floor(totalSeconds % 60);
-    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-}
-
-function showErrorMessage(message, isCritical = false) {
-    console.error("Error Display:", message);
-    errorMessageArea.textContent = message;
-    errorMessageArea.classList.add('show');
-
-    // Clear loading states in tabs when showing an error
-    studyMaterialList.innerHTML = '<li>Error loading data.</li>';
-    timelineList.innerHTML = '<li>Error loading data.</li>';
-    relatedVideosList.innerHTML = '<li>Error loading data.</li>';
-
-    // If it's a critical error (e.g., no video ID), hide the player placeholder too
-    if (isCritical && playerPlaceholder) {
-        playerPlaceholder.textContent = 'Video cannot be loaded.';
-        playerPlaceholder.style.display = 'flex'; // Ensure it's visible
-         // Hide the iframe container if it exists
-         const playerDiv = document.getElementById('youtube-player');
-         if(playerDiv) playerDiv.style.display = 'none';
-    }
-}
-
-function hideErrorMessage() {
-     errorMessageArea.textContent = '';
-     errorMessageArea.classList.remove('show');
-}
-
-// --- Theme Management ---
-function applyTheme(theme) {
-    const isDark = theme === 'dark';
-    document.body.classList.toggle('dark-mode', isDark);
-    document.body.classList.toggle('light-mode', !isDark);
-    darkLightToggle.textContent = isDark ? 'Light Mode' : 'Dark Mode';
-    localStorage.setItem('theme', theme);
-}
-
-// --- Tab Content Population ---
-function populateStudyMaterials(materials) {
-    studyMaterialList.innerHTML = ''; // Clear loading/previous
-    if (!materials || materials.length === 0) {
-        studyMaterialList.innerHTML = '<li>No study materials available.</li>';
-        return;
-    }
-    materials.forEach(item => {
-        const li = document.createElement('li');
-        const titleSpan = document.createElement('span');
-        titleSpan.textContent = item.title;
-
-        const viewLink = document.createElement('a');
-        viewLink.href = item.url;
-        viewLink.textContent = 'View';
-        viewLink.classList.add('view-button');
-        if (item.external) {
-            viewLink.target = '_blank';
-            viewLink.rel = 'noopener noreferrer';
+        if (!currentYoutubeId) {
+            videoTitleElement.textContent = 'Error: Video ID not provided.';
+            studyMaterialTab.innerHTML = '<p>No video selected.</p>';
+            relatedVideosTab.innerHTML = '<p>No video selected.</p>';
+            videoTimelineList.innerHTML = '<p>No video selected.</p>';
+            return;
         }
 
-        li.appendChild(titleSpan);
-        li.appendChild(viewLink);
-        studyMaterialList.appendChild(li);
-    });
-}
+        videoTitleElement.textContent = decodeURIComponent(titleFromUrl);
+        const currentOrigin = `${window.location.protocol}//${window.location.host}`;
+        youtubePlayer.src = `https://www.youtube.com/embed/${currentYoutubeId}?autoplay=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(currentOrigin)}`;
 
-function populateTimeline(timeline) {
-    timelineList.innerHTML = ''; // Clear loading/previous
-     if (!timeline || timeline.length === 0) {
-        timelineList.innerHTML = '<li>No timeline available.</li>';
-        return;
-    }
-    timeline.forEach(item => {
-        const li = document.createElement('li');
-        li.dataset.time = item.time;
-
-        const timeSpan = document.createElement('span');
-        timeSpan.classList.add('time-stamp');
-        timeSpan.textContent = formatTime(item.time);
-
-        const titleSpan = document.createElement('span');
-        titleSpan.classList.add('time-title');
-        titleSpan.textContent = item.title;
-
-        li.appendChild(timeSpan);
-        li.appendChild(titleSpan);
-
-        li.addEventListener('click', () => {
-            if (player && typeof player.seekTo === 'function') {
-                player.seekTo(item.time, true);
-                 // Optional highlight removed for simplicity, can be added back
-            } else {
-                console.warn("Player not ready or seekTo not available.");
-            }
-        });
-        timelineList.appendChild(li);
-    });
-}
-
-function populateRelatedVideos(related) {
-    relatedVideosList.innerHTML = ''; // Clear loading/previous
-     if (!related || related.length === 0) {
-        relatedVideosList.innerHTML = '<li>No related videos available.</li>';
-        return;
-    }
-    related.forEach(item => {
-        const li = document.createElement('li');
-        const link = document.createElement('a');
-        const title = (item.baseTitle || 'Related_Video').replace(/ /g, '_'); // Ensure title is URL-safe
-        link.href = `player.html?youtubeId=${item.youtubeId}&title=${title}`;
-        link.textContent = item.title;
-        li.appendChild(link);
-        relatedVideosList.appendChild(li);
-    });
-}
-
-function populateTabs(data) {
-    populateStudyMaterials(data?.studyMaterials); // Use optional chaining
-    populateTimeline(data?.timeline);
-    populateRelatedVideos(data?.relatedVideos);
-}
-
-// --- Data Fetching ---
-async function fetchVideoData() {
-    if (!youtubeId) return; // Don't fetch if no ID
-
-    // Clear previous errors before fetching
-    hideErrorMessage();
-    // Show loading state initially
-    studyMaterialList.innerHTML = '<li>Loading...</li>';
-    timelineList.innerHTML = '<li>Loading...</li>';
-    relatedVideosList.innerHTML = '<li>Loading...</li>';
-
-
-    try {
-        console.log("Fetching data from video_data.json");
-        const response = await fetch('video_data.json');
-         console.log("Fetch response status:", response.status);
-        if (!response.ok) {
-            // Be specific about the error
-            if(response.status === 404) {
-                 throw new Error(`video_data.json not found (404). Make sure it's in the same folder.`);
-            } else {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-        }
-        const jsonData = await response.json();
-        console.log("Successfully parsed Video_data.json");
-
-        currentVideoData = jsonData?.videos?.[youtubeId];
-
-        if (currentVideoData) {
-            console.log("Data found for video ID:", youtubeId);
-            populateTabs(currentVideoData);
-        } else {
-            console.warn(`No specific data found in JSON for video ID: ${youtubeId}`);
-            showErrorMessage("Additional video data (study materials, etc.) not found for this ID.");
-             // Still clear loading states even if specific data isn't found
-             populateTabs({}); // Populate with empty data
-        }
-    } catch (error) {
-        console.error('Error fetching or parsing Video_data.json:', error);
-        // Show the specific error message caught
-        showErrorMessage(`Error loading additional video data: ${error.message}`);
-    }
-}
-
-// --- YouTube Player API ---
-// This function is called automatically by the YouTube IFrame API script
-window.onYouTubeIframeAPIReady = function() {
-    console.log("YouTube IFrame API Ready.");
-    if (youtubeId) {
-         console.log("Initializing YouTube player for ID:", youtubeId);
-         try {
-            playerPlaceholder.style.display = 'none'; // Hide placeholder
-            player = new YT.Player('youtube-player', {
-                height: '100%', // Let CSS handle sizing
-                width: '100%',
-                videoId: youtubeId,
-                playerVars: {
-                    'playsinline': 1, // Good for mobile
-                    'autoplay': 0,    // Don't autoplay by default
-                    'modestbranding': 1, // Less YouTube branding
-                    'rel': 0 // Don't show related videos at the end (we have our own tab)
-                },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onError': onPlayerError
+        fetch('video_data.json')
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                currentVideoData = data.find(video => video.youtubeId === currentYoutubeId);
+                if (currentVideoData) {
+                    if (titleFromUrl === 'Lecture Video' && currentVideoData.title) {
+                        videoTitleElement.textContent = currentVideoData.title;
+                    }
+                    loadStudyMaterial(currentVideoData.studyMaterial);
+                    loadRelatedVideos(currentVideoData.relatedVideos);
+                    loadTimeline(currentVideoData.timeline);
+                    loadNotes();
+                    loadRating();
+                } else {
+                    console.warn("No data found for this video");
+                    studyMaterialTab.innerHTML = '<p>Study material not found for this video.</p>';
+                    relatedVideosTab.innerHTML = '<p>Related videos not found.</p>';
+                    videoTimelineList.innerHTML = '<p>Timeline not found for this video.</p>';
                 }
+            })
+            .catch(error => {
+                console.error('Error loading video data:', error);
+                studyMaterialTab.innerHTML = `<p>Error loading study material: ${error.message}</p>`;
+                relatedVideosTab.innerHTML = `<p>Error loading related videos: ${error.message}</p>`;
+                videoTimelineList.innerHTML = `<p>Error loading timeline: ${error.message}</p>`;
             });
-            console.log("YT.Player object created (async). Waiting for onReady event.");
-        } catch (e) {
-             console.error("Error creating YT.Player:", e);
-             showErrorMessage("Failed to initialize the YouTube player.", true);
+
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('light-mode');
+            darkModeToggle.textContent = 'Toggle Dark Mode';
+        } else {
+            document.body.classList.remove('light-mode');
+            darkModeToggle.textContent = 'Toggle Light Mode';
         }
-
-    } else {
-        console.error("onYouTubeIframeAPIReady called, but no youtubeId is set.");
-        showErrorMessage("Cannot load video: No Video ID provided in the URL.", true);
-    }
-};
-
-function onPlayerReady(event) {
-    // Player is ready to be used
-    console.log("Player Ready. State:", event.target.getPlayerState());
-     // You could potentially autoplay here if desired:
-     // event.target.playVideo();
-}
-
-function onPlayerError(event) {
-    // Handle player errors (e.g., video unavailable, embedding disabled)
-    console.error("YouTube Player Error:", event.data);
-    let errorText = "An error occurred with the YouTube player.";
-    switch (event.data) {
-        case 2: errorText = "Player Error: Invalid video ID."; break;
-        case 5: errorText = "Player Error: HTML5 Player issue."; break;
-        case 100: errorText = "Player Error: Video not found or private."; break;
-        case 101:
-        case 150: errorText = "Player Error: Embedding disabled by the video owner."; break;
-    }
-     showErrorMessage(errorText, true); // Show error, mark as critical
-}
-
-
-// --- Event Listeners ---
-function setupEventListeners() {
-    // Tab Switching
-    tabsContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('tab-button')) {
-            const targetTab = e.target.dataset.tab;
-
-            tabButtons.forEach(button => button.classList.toggle('active', button.dataset.tab === targetTab));
-            tabPanes.forEach(pane => pane.classList.toggle('active', pane.id === targetTab));
-        }
-    });
-
-    // Dark/Light Mode Toggle
-    darkLightToggle.addEventListener('click', () => {
-        const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-        applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
-        dropdownMenu.classList.remove('show'); // Close menu after selection
-    });
-
-    // Hamburger Menu Toggle
-    menuIcon.addEventListener('click', (e) => {
-        e.stopPropagation(); // Prevent click from immediately closing menu
-        dropdownMenu.classList.toggle('show');
-    });
-
-    // Close dropdown if clicking outside
-    document.addEventListener('click', (e) => {
-        if (!menuIcon.contains(e.target) && !dropdownMenu.contains(e.target)) {
-            dropdownMenu.classList.remove('show');
-        }
-    });
-
-     // Note: Timeline item clicks are handled when items are created in populateTimeline
-}
-
-// --- Initialization ---
-function initializePage() {
-    console.log("Initializing page...");
-    // 1. Get URL parameters
-    const queryParams = getQueryParams();
-    youtubeId = queryParams.youtubeId; // Assign to global variable
-    videoTitle = queryParams.title ? queryParams.title.replace(/_/g, ' ') : 'Video Player';
-
-     console.log("Parsed URL Params:", { youtubeId, videoTitle });
-
-    // 2. Update page title and header
-    videoTitleHeader.textContent = videoTitle;
-    document.title = videoTitle;
-
-    // 3. Set dynamic Old Player link (do this early)
-    if (youtubeId) {
-        oldPlayerLink.href = `Playerold.html?youtubeId=${youtubeId}`;
-         console.log("Set Old Player link href:", oldPlayerLink.href);
-    } else {
-         oldPlayerLink.href = '#'; // No ID, link is disabled essentially
-         oldPlayerLink.style.pointerEvents = 'none'; // Disable clicking
-         oldPlayerLink.style.opacity = '0.6';
-         console.warn("Old Player link disabled: No youtubeId.");
+        resetCalculator();
     }
 
-
-    // 4. Apply saved theme or default
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme);
-     console.log("Applied theme:", savedTheme);
-
-    // 5. Setup event listeners
-    setupEventListeners();
-     console.log("Event listeners set up.");
-
-    // 6. Fetch additional video data (happens async)
-    fetchVideoData(); // This will run after basic setup
-
-     // 7. The YouTube API will call `onYouTubeIframeAPIReady` automatically
-     // Make sure the API script is loaded *before* this script in the HTML.
-     console.log("Page initialization complete. Waiting for YouTube API callback...");
-
-
-     // Add a check if the API ready function doesn't fire after a delay
-     setTimeout(() => {
-        if (!player && youtubeId && !errorMessageArea.classList.contains('show')) {
-            // If player hasn't initialized after a few seconds, and no other error shown
-            console.warn("YouTube API ready function may not have fired correctly.");
-            // We can't show an error specific to the API not loading easily,
-            // but ensure the placeholder reflects the state.
-            if (playerPlaceholder.textContent === 'Loading Player...') {
-                 playerPlaceholder.textContent = 'Player loading stalled. Check console.';
-                 playerPlaceholder.style.display = 'flex';
+    // --- Content Loading ---
+    function loadStudyMaterial(materials) {
+        if (!materials || materials.length === 0) {
+            studyMaterialTab.innerHTML = '<p>No study material available for this video.</p>';
+            return;
+        }
+        const ul = document.createElement('ul');
+        materials.forEach(item => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = item.url;
+            a.textContent = item.name;
+            if (item.type === "PDF" || item.type === "Link" || item.external === true) {
+                a.target = "_blank";
             }
+            li.appendChild(a);
+            if (item.type) {
+                const typeSpan = document.createElement('span');
+                typeSpan.className = 'material-type';
+                typeSpan.textContent = `(${item.type})`;
+                li.appendChild(typeSpan);
+            }
+            ul.appendChild(li);
+        });
+        studyMaterialTab.innerHTML = '';
+        studyMaterialTab.appendChild(ul);
+    }
+
+    function loadRelatedVideos(videos) {
+        if (!videos || videos.length === 0) {
+            relatedVideosTab.innerHTML = '<p>No related videos available.</p>';
+            return;
         }
-     }, 5000); // Check after 5 seconds
+        const ul = document.createElement('ul');
+        videos.forEach(video => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = video.targetUrl;
+            a.textContent = video.title;
+            li.appendChild(a);
+            ul.appendChild(li);
+        });
+        relatedVideosTab.innerHTML = '';
+        relatedVideosTab.appendChild(ul);
+    }
 
-}
+    // --- Timeline & Seeking ---
+    function loadTimeline(timelineItems) {
+        if (!timelineItems || timelineItems.length === 0) {
+            videoTimelineList.innerHTML = '<li>No timeline available for this video.</li>';
+            return;
+        }
+        videoTimelineList.innerHTML = '';
+        timelineItems.forEach(item => {
+            const li = document.createElement('li');
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'timeline-time';
+            timeSpan.textContent = item.time;
+            const descSpan = document.createElement('span');
+            descSpan.textContent = item.description;
+            li.appendChild(timeSpan);
+            li.appendChild(descSpan);
+            li.addEventListener('click', () => seekVideoToTimestamp(item.time));
+            videoTimelineList.appendChild(li);
+        });
+    }
 
-// --- Run Initialization on DOMContentLoaded ---
-document.addEventListener('DOMContentLoaded', initializePage);
+    function timeToSeconds(timeStr) {
+        const parts = timeStr.split(':').map(Number);
+        let seconds = 0;
+        if (parts.length === 3) seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+        else if (parts.length === 2) seconds = parts[0] * 60 + parts[1];
+        else if (parts.length === 1) seconds = parts[0];
+        return seconds;
+    }
+
+    function seekVideoToTimestamp(time) {
+        const seconds = timeToSeconds(time);
+        if (youtubePlayer.contentWindow) {
+            youtubePlayer.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [seconds, true] }), '*');
+            youtubePlayer.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'playVideo', args: [] }), '*');
+        } else {
+            console.warn("Cannot communicate with iframe to seek.");
+        }
+    }
+
+    // --- Tab Functionality ---
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById(button.dataset.tab).classList.add('active');
+        });
+    });
+
+    // --- Hamburger Menu ---
+    function toggleMenu() { sideMenu.classList.toggle('open'); menuOverlay.classList.toggle('active'); }
+    hamburgerBtn.addEventListener('click', toggleMenu);
+    closeMenuBtn.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', toggleMenu);
+
+    // --- Modal Management ---
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('show');
+            if (sideMenu.classList.contains('open')) toggleMenu();
+        }
+    }
+
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.classList.remove('show');
+    }
+
+    closeModalBtns.forEach(btn => btn.addEventListener('click', () => closeModal(btn.dataset.modalId)));
+    window.addEventListener('click', (event) => {
+        if (event.target.classList.contains('modal') && event.target.classList.contains('show')) {
+            event.target.classList.remove('show');
+        }
+    });
+
+    // --- Menu Options ---
+    darkModeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        if (document.body.classList.contains('light-mode')) {
+            localStorage.setItem('darkMode', 'enabled');
+            darkModeToggle.textContent = 'Toggle Dark Mode';
+        } else {
+            localStorage.setItem('darkMode', 'disabled');
+            darkModeToggle.textContent = 'Toggle Light Mode';
+        }
+    });
+    calculatorBtn.addEventListener('click', () => openModal('calculatorModal'));
+    doubtsBtn.addEventListener('click', () => { openModal('doubtsModal'); doubtStatus.textContent = ''; doubtForm.reset(); });
+
+    // --- Calculator Logic ---
+    function updateCalculatorDisplay() { calcCurrentInputDisplay.textContent = calculatorState.currentInput; calcExpressionDisplay.textContent = calculatorState.expression; }
+    function resetCalculator() { calculatorState = { currentInput: '0', expression: '', operator: null, previousValue: null, shouldResetInput: false }; updateCalculatorDisplay(); }
+    function inputNumber(number) { if (calculatorState.shouldResetInput) { calculatorState.currentInput = ''; calculatorState.shouldResetInput = false; } calculatorState.currentInput = calculatorState.currentInput === '0' ? number : calculatorState.currentInput + number; updateCalculatorDisplay(); }
+    function inputDecimal() { if (calculatorState.shouldResetInput) { calculatorState.currentInput = '0.'; calculatorState.shouldResetInput = false; updateCalculatorDisplay(); return; } if (!calculatorState.currentInput.includes('.')) calculatorState.currentInput += '.'; updateCalculatorDisplay(); }
+    function performCalculation(val1, val2, operator) { const n1 = parseFloat(val1); const n2 = parseFloat(val2); switch (operator) { case '+': return n1 + n2; case '-': return n1 - n2; case '*': return n1 * n2; case '/': return n2 === 0 ? 'Error' : n1 / n2; default: return n2; } }
+    function handleOperator(nextOperator) { const iv = parseFloat(calculatorState.currentInput); if (calculatorState.operator && calculatorState.previousValue !== null && !calculatorState.shouldResetInput) { const r = performCalculation(calculatorState.previousValue, iv, calculatorState.operator); calculatorState.currentInput = String(r); calculatorState.previousValue = r; calculatorState.expression += ` ${iv} ${nextOperator}`; } else { calculatorState.previousValue = iv; calculatorState.expression = `${iv} ${nextOperator}`; } calculatorState.operator = nextOperator; calculatorState.shouldResetInput = true; updateCalculatorDisplay(); }
+    function handleEquals() { if (calculatorState.operator && calculatorState.previousValue !== null) { const iv = parseFloat(calculatorState.currentInput); const r = performCalculation(calculatorState.previousValue, iv, calculatorState.operator); calculatorState.expression += ` ${iv} =`; calculatorState.currentInput = String(r); calculatorState.previousValue = null; calculatorState.operator = null; calculatorState.shouldResetInput = true; updateCalculatorDisplay(); } }
+    function handleToggleSign() { if (calculatorState.currentInput === '0' || calculatorState.currentInput === 'Error') return; calculatorState.currentInput = (parseFloat(calculatorState.currentInput) * -1).toString(); updateCalculatorDisplay(); }
+    function handlePercent() { if (calculatorState.currentInput === 'Error') return; if (calculatorState.previousValue !== null && calculatorState.operator) { calculatorState.currentInput = ((parseFloat(calculatorState.previousValue) * parseFloat(calculatorState.currentInput)) / 100).toString(); } else { calculatorState.currentInput = (parseFloat(calculatorState.currentInput) / 100).toString(); } calculatorState.shouldResetInput = true; updateCalculatorDisplay(); }
+    function handleDelete() { if (calculatorState.currentInput === 'Error') { resetCalculator(); return; } calculatorState.currentInput = calculatorState.currentInput.length > 1 ? calculatorState.currentInput.slice(0, -1) : '0'; updateCalculatorDisplay(); }
+    calculatorButtons.addEventListener('click', (e) => { if (!e.target.matches('button')) return; const { action, number, operator } = e.target.dataset; if (number) inputNumber(number); if (action === 'decimal') inputDecimal(); if (operator) handleOperator(operator); if (action === 'equals') handleEquals(); if (action === 'clear') resetCalculator(); if (action === 'toggle-sign') handleToggleSign(); if (action === 'percent') handlePercent(); if (action === 'backspace') handleDelete(); });
+
+    // --- Doubts Form Logic ---
+    doubtForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('doubtName').value;
+        const email = document.getElementById('doubtEmail').value;
+        const question = document.getElementById('doubtQuestion').value;
+        let fileInfo = "";
+        if (doubtFile.files.length > 0) {
+            fileInfo = `\n\nFile: ${doubtFile.files[0].name} (MANUALLY ATTACH THIS FILE!).`;
+        }
+        const subject = `Doubt: ${currentVideoData ? currentVideoData.title : 'N/A'} (ID: ${currentYoutubeId || 'N/A'})`;
+        const body = `Name: ${name}\nEmail: ${email}\n\nQuestion:\n${question}\n${fileInfo}`;
+        window.location.href = `mailto:rishvrajbgp@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        doubtStatus.textContent = 'Please send the email. Remember to attach files manually.';
+    });
+
+    // --- My Notes ---
+    function getNotesKey() { return `videoNotes_${currentYoutubeId}`; }
+    function loadNotes() { if (!currentYoutubeId) return; const savedNotes = localStorage.getItem(getNotesKey()); notesTextarea.value = savedNotes ? savedNotes : ''; notesStatus.textContent = ''; }
+    saveNotesBtn.addEventListener('click', () => { if (!currentYoutubeId) { notesStatus.textContent = 'Cannot save: No video loaded.'; return; } localStorage.setItem(getNotesKey(), notesTextarea.value); notesStatus.textContent = 'Notes saved!'; setTimeout(() => notesStatus.textContent = '', 3000); });
+
+    // --- Ratings ---
+    function getRatingKey() { return `videoRating_${currentYoutubeId}`; }
+    function loadRating() { if (!currentYoutubeId) return; const savedRating = localStorage.getItem(getRatingKey()); if (savedRating) { setStars(parseInt(savedRating)); currentRatingDisplay.textContent = `Your rating: ${savedRating} star(s)`; } else { setStars(0); currentRatingDisplay.textContent = `Your rating: Not rated`; } }
+    function setStars(ratingValue) { stars.forEach(star => star.classList.toggle('selected', parseInt(star.dataset.value) <= ratingValue)); }
+    starRatingContainer.addEventListener('click', (e) => { if (e.target.classList.contains('star')) { if (!currentYoutubeId) { currentRatingDisplay.textContent = 'Cannot rate: No video loaded.'; return; } const ratingValue = parseInt(e.target.dataset.value); setStars(ratingValue); localStorage.setItem(getRatingKey(), ratingValue.toString()); currentRatingDisplay.textContent = `Your rating: ${ratingValue} star(s)`; } });
+    starRatingContainer.addEventListener('mouseover', (e) => { if (e.target.classList.contains('star')) { const hoverValue = parseInt(e.target.dataset.value); stars.forEach(star => { star.style.color = parseInt(star.dataset.value) <= hoverValue ? 'gold' : (document.body.classList.contains('light-mode') ? '#aaa' : '#ccc'); }); } });
+    starRatingContainer.addEventListener('mouseout', () => { const savedRating = localStorage.getItem(getRatingKey()); setStars(savedRating ? parseInt(savedRating) : 0); stars.forEach(star => star.style.color = ''); });
+
+    // --- Start the player ---
+    initPlayer();
+});

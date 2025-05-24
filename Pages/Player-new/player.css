@@ -1,410 +1,237 @@
-/* Basic Reset & Defaults */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 :root {
-    --bg-dark: #1a1a1a;
-    --text-dark: #e0e0e0;
-    --card-dark: #2c2c2c;
-    --border-dark: #444;
-    --accent-dark: #e53935; /* Red accent */
-    --accent-hover-dark: #c62828;
-    --menu-bg-dark: #383838;
+    --primary-bg: #222;
+    --secondary-bg: #333;
+    --text-color: #f0f0f0;
+    --accent-color: #e50914; /* Netflix-like red */
+    --border-color: #444;
+    --tab-inactive-bg: #2a2a2a;
+    --tab-active-bg: #3f3f3f;
+    --button-bg: #4a4a4a;
+    --button-hover-bg: #5a5a5a;
+    --modal-overlay-bg: rgba(0,0,0,0.6);
 
-    --bg-light: #f4f4f4;
-    --text-light: #333;
-    --card-light: #ffffff;
-    --border-light: #ccc;
-    --accent-light: #d32f2f; /* Slightly darker red for light mode */
-    --accent-hover-light: #b71c1c;
-    --menu-bg-light: #eeeeee;
+    /* Google Calculator Inspired Colors (Dark Mode Base) */
+    --calc-bg: #202124;
+    --calc-display-text: #fff;
+    --calc-btn-bg: #3c4043; /* Standard buttons */
+    --calc-btn-hover-bg: #4a4e51;
+    --calc-btn-text: #e8eaed;
+    --calc-operator-bg: #5f6368; /* Operators */
+    --calc-operator-hover-bg: #70757a;
+    --calc-equals-bg: #8ab4f8; /* Blue for equals */
+    --calc-equals-hover-bg: #9ac1f9;
+    --calc-equals-text: #202124;
+    --calc-function-bg: #5f6368; /* AC, +/-, % */
+    --calc-expression-text: #bdc1c6;
 }
 
 body {
-    font-family: sans-serif;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    display: flex; /* Use flexbox for overall layout */
-    flex-direction: column; /* Stack header, error, main */
-    min-height: 100vh; /* Ensure body takes full viewport height */
-}
-
-body.dark-mode {
-    background-color: var(--bg-dark);
-    color: var(--text-dark);
-    --bg-color: var(--bg-dark);
-    --text-color: var(--text-dark);
-    --card-color: var(--card-dark);
-    --border-color: var(--border-dark);
-    --accent-color: var(--accent-dark);
-    --accent-hover: var(--accent-hover-dark);
-    --menu-bg: var(--menu-bg-dark);
-    --menu-border: var(--border-dark);
-    --menu-text: var(--text-dark);
-    --menu-button-bg: var(--card-dark);
-    --menu-button-hover-bg: #555;
+    font-family: 'Roboto', Arial, sans-serif; /* Roboto is used by Google */
+    margin: 0;
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
 }
 
 body.light-mode {
-    background-color: var(--bg-light);
-    color: var(--text-light);
-    --bg-color: var(--bg-light);
-    --text-color: var(--text-light);
-    --card-color: var(--card-light);
-    --border-color: var(--border-light);
-    --accent-color: var(--accent-light);
-    --accent-hover: var(--accent-hover-light);
-    --menu-bg: var(--menu-bg-light);
-    --menu-border: var(--border-light);
-    --menu-text: var(--text-light);
-    --menu-button-bg: var(--card-light);
-    --menu-button-hover-bg: #ddd;
+    --primary-bg: #f4f4f4;
+    --secondary-bg: #fff;
+    --text-color: #333;
+    --accent-color: #007bff; /* Player accent */
+    --border-color: #ddd;
+    --tab-inactive-bg: #e9ecef;
+    --tab-active-bg: #fff;
+    --button-bg: #007bff;
+    --button-hover-bg: #0056b3;
+    --modal-overlay-bg: rgba(0,0,0,0.4);
+
+    /* Google Calculator Inspired Colors (Light Mode) */
+    --calc-bg: #fff;
+    --calc-display-text: #202124;
+    --calc-btn-bg: #f1f3f4; /* Standard buttons */
+    --calc-btn-hover-bg: #e3e5e6;
+    --calc-btn-text: #3c4043;
+    --calc-operator-bg: #dadce0; /* Operators */
+    --calc-operator-hover-bg: #cdd0d3;
+    --calc-equals-bg: #4285f4; /* Google Blue for equals */
+    --calc-equals-hover-bg: #5a95f5;
+    --calc-equals-text: #fff;
+    --calc-function-bg: #dadce0;
+    --calc-expression-text: #5f6368;
 }
 
-/* Header */
-.player-header {
+/* General Player Styles (mostly unchanged, ensure consistency) */
+.player-container { max-width: 1000px; margin: 0 auto; background-color: var(--secondary-bg); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+.player-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: var(--primary-bg); border-bottom: 1px solid var(--border-color); }
+.player-header h1 { font-size: 1.5em; margin: 0; color: var(--text-color); }
+.hamburger-button { background: none; border: none; cursor: pointer; padding: 5px; }
+.hamburger-button img { width: 24px; height: 24px; filter: invert(1); }
+body.light-mode .hamburger-button img { filter: invert(0); }
+.video-area { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background-color: #000; }
+.video-area iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.tabs { display: flex; background-color: var(--primary-bg); border-bottom: 1px solid var(--accent-color); overflow-x: auto; }
+.tab-button { padding: 12px 20px; cursor: pointer; border: none; background-color: var(--tab-inactive-bg); color: var(--text-color); font-size: 0.9em; border-bottom: 3px solid transparent; transition: background-color 0.3s, border-color 0.3s; flex-shrink: 0; }
+.tab-button:hover { background-color: var(--tab-active-bg); }
+.tab-button.active { background-color: var(--tab-active-bg); border-bottom: 3px solid var(--accent-color); font-weight: bold; }
+.tab-content { padding: 20px; background-color: var(--secondary-bg); min-height: 150px; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+.tab-pane ul { list-style: none; padding: 0; margin: 0; }
+.tab-pane li { padding: 10px 0; border-bottom: 1px solid var(--border-color); }
+.tab-pane li:last-child { border-bottom: none; }
+.tab-pane a { color: var(--accent-color); text-decoration: none; }
+.tab-pane a:hover { text-decoration: underline; }
+.material-type { font-size: 0.8em; color: #aaa; margin-left: 10px; }
+body.light-mode .material-type { color: #777; }
+#notesTextarea { width: calc(100% - 22px); min-height: 150px; padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); background-color: var(--primary-bg); color: var(--text-color); border-radius: 4px; resize: vertical; }
+#saveNotesBtn { padding: 10px 15px; background-color: var(--button-bg); color: var(--text-color); border: none; border-radius: 4px; cursor: pointer; }
+#saveNotesBtn:hover { background-color: var(--button-hover-bg); }
+#notesStatus { font-size: 0.9em; margin-top: 10px; }
+.star-rating .star { font-size: 2em; color: #ccc; cursor: pointer; transition: color 0.2s; }
+.star-rating .star:hover, .star-rating .star.selected { color: gold; }
+body.light-mode .star-rating .star { color: #aaa; }
+body.light-mode .star-rating .star:hover, body.light-mode .star-rating .star.selected { color: #f5b301; }
+#videoTimelineList li { cursor: pointer; padding: 8px; border-bottom: 1px solid var(--border-color); }
+#videoTimelineList li:last-child { border-bottom: none; }
+#videoTimelineList li:hover { background-color: var(--tab-inactive-bg); }
+.timeline-time { font-weight: bold; color: var(--accent-color); margin-right: 10px; }
+.side-menu { height: 100%; width: 0; position: fixed; z-index: 1001; top: 0; right: 0; background-color: var(--secondary-bg); overflow-x: hidden; transition: 0.3s; padding-top: 60px; box-shadow: -5px 0 15px rgba(0,0,0,0.3); }
+.side-menu.open { width: 250px; }
+.side-menu ul { list-style: none; padding: 0; }
+.side-menu li button { padding: 15px 20px; text-decoration: none; font-size: 1.1em; color: var(--text-color); display: block; transition: 0.2s; background: none; border: none; width: 100%; text-align: left; cursor: pointer; }
+.side-menu li button:hover { background-color: var(--button-hover-bg); }
+.close-menu-button { position: absolute; top: 15px; right: 25px; font-size: 36px; background: none; border: none; color: var(--text-color); cursor: pointer; }
+body.light-mode .close-menu-button { color: #333; }
+.menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--modal-overlay-bg); z-index: 1000; }
+.menu-overlay.active { display: block; }
+
+/* Modal Styles */
+.modal { display: none; position: fixed; z-index: 1002; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: var(--modal-overlay-bg); align-items: center; justify-content: center; }
+.modal.show { display: flex; }
+.modal-content { background-color: var(--secondary-bg); margin: auto; padding: 20px; border: 1px solid var(--border-color); width: 90%; max-width: 500px; border-radius: 8px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+body.light-mode .modal-content { background-color: #fff; border: 1px solid #ccc; }
+.close-modal-btn { color: #aaa; position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; }
+.close-modal-btn:hover, .close-modal-btn:focus { color: var(--text-color); text-decoration: none; }
+body.light-mode .close-modal-btn:hover, body.light-mode .close-modal-btn:focus { color: #000; }
+
+/* New Calculator Styles */
+.calculator-modal-content {
+    background-color: var(--calc-bg); /* Use calculator specific background */
+    padding: 15px;
+    max-width: 360px; /* Typical calculator width */
+    border-radius: 12px;
+}
+.calculator {
     display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    background-color: var(--card-color);
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-color);
-    position: sticky; /* Make header sticky */
-    top: 0;
-    z-index: 100; /* Ensure header is above content */
-    width: 100%; /* Take full width */
+    flex-direction: column;
 }
-
-.back-button {
-    font-size: 1.8em;
-    color: var(--text-color);
-    text-decoration: none;
-    margin-right: 15px;
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-.back-button:hover {
-    color: var(--accent-color);
-}
-
-#video-title-header {
-    flex-grow: 1; /* Take available space */
-    font-size: 1.2em;
-    font-weight: normal;
-    text-align: center; /* Center title */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-left: 15px; /* Space between back button and title */
-    margin-right: 15px; /* Space between title and menu */
-}
-
-/* Hamburger Menu */
-.menu-container {
-    position: relative; /* Context for absolute positioning of dropdown */
-}
-
-.menu-icon {
-    font-size: 1.8em; /* Increased size */
-    cursor: pointer;
-    padding: 5px;
-    line-height: 1; /* Adjust line height for better vertical alignment */
-    color: var(--text-color);
-    transition: color 0.2s ease;
-    user-select: none; /* Prevent text selection */
-}
-.menu-icon:hover {
-     color: var(--accent-color);
-}
-
-.dropdown-menu {
-    display: none; /* Hidden by default */
-    position: absolute;
-    top: calc(100% + 5px); /* Position below the icon */
-    right: 0;
-    background-color: var(--menu-bg);
-    border: 1px solid var(--menu-border);
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 110; /* Above header content */
-    min-width: 150px; /* Minimum width */
-    padding: 5px 0; /* Padding top/bottom */
-}
-
-.dropdown-menu.show {
-    display: block; /* Show the menu */
-}
-
-.dropdown-menu button,
-.dropdown-menu a.menu-link-button { /* Style both buttons and links similarly */
-    display: block; /* Stack items vertically */
-    width: 100%;
-    padding: 10px 15px;
-    background-color: transparent; /* Use menu background */
-    border: none;
-    color: var(--menu-text);
-    text-align: left;
-    cursor: pointer;
-    font-size: 0.95em;
-    text-decoration: none; /* Remove underline from links */
-    white-space: nowrap;
-    transition: background-color 0.2s ease;
-}
-
-.dropdown-menu button:hover,
-.dropdown-menu a.menu-link-button:hover {
-    background-color: var(--menu-button-hover-bg);
-}
-
-
-/* Error Message Area */
-#error-message-area {
-    padding: 10px 15px;
-    background-color: #ffdddd; /* Light red background */
-    color: #d8000c; /* Dark red text */
-    text-align: center;
-    font-weight: bold;
-    display: none; /* Hidden by default */
-    border-bottom: 1px solid #ffbcc0;
-}
-#error-message-area.show {
-    display: block; /* Show when error occurs */
-}
-
-
-/* Main Content */
-.player-main {
-    /* No specific styles needed here now, flex in body handles layout */
-    flex-grow: 1; /* Allow main to take remaining space */
-}
-
-/* Video Section */
-.video-section {
-    background-color: #000; /* Black background behind player */
-    position: relative; /* Needed for potential future absolute elements */
-    max-width: 85%;   /* Limit width to 85% of the available space */
-    max-height: 85%; /* Limit height to 85% of the available space */
-    margin-left: auto;  /* Center the section horizontally */
-    margin-right: auto; /* Center the section horizontally */
-}
-
-.video-container {
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-    height: 0;
-    overflow: hidden;
-    max-width: 100%;
-    background: #000; /* Fallback background */
-}
-
-.video-container iframe,
-.video-container #youtube-player-placeholder {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none; /* Remove iframe border */
-}
-
-#youtube-player-placeholder {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #aaa;
-    font-size: 1.2em;
-}
-
-/* Player Controls Overlay - REMOVED */
-/* .player-controls-overlay { ... } */
-
-/* Info Section (Tabs & Content) */
-.info-section {
-    padding: 0;
-    background-color: var(--bg-color); /* Use body background */
-}
-
-.tabs {
-    display: flex;
-    overflow-x: auto; /* Allow horizontal scrolling on small screens */
-    border-bottom: 2px solid var(--border-color);
-    background-color: var(--card-color);
-    position: sticky; /* Make tabs sticky below header */
-    top: 57px; /* Adjust based on actual header height */
-    z-index: 90; /* Below header but above content */
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-.tabs::-webkit-scrollbar { /* Chrome, Safari, Opera */
-    display: none;
-}
-
-
-.tab-button {
-    padding: 12px 18px;
-    cursor: pointer;
-    border: none;
-    background-color: transparent;
-    color: var(--text-color);
-    font-size: 1em;
-    white-space: nowrap;
-    position: relative;
-    transition: color 0.2s ease, border-color 0.2s ease;
-    flex-shrink: 0; /* Prevent buttons from shrinking */
-    border-bottom: 3px solid transparent; /* Reserve space for active border */
-    margin-bottom: -2px; /* Align bottom border */
-}
-
-.tab-button:hover {
-    color: var(--accent-color);
-}
-
-.tab-button.active {
-    color: var(--accent-color);
-    font-weight: bold;
-    border-bottom-color: var(--accent-color);
-}
-
-.tab-content {
-    padding: 20px;
-    background-color: var(--bg-color); /* Match body */
-}
-
-.tab-pane {
-    display: none; /* Hide inactive panes */
-}
-
-.tab-pane.active {
-    display: block; /* Show active pane */
-}
-
-.tab-pane h2 {
-    margin-bottom: 15px;
-    font-size: 1.3em;
-    color: var(--text-color);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 5px;
-}
-
-/* Styling for lists within tabs */
-.tab-pane ul {
-    list-style: none;
-    padding: 0;
-}
-
-.tab-pane li,
-.tab-pane .list-item {
-    padding: 10px 5px;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background-color 0.2s ease;
-}
-.tab-pane li:last-child,
-.tab-pane .list-item:last-child {
-    border-bottom: none;
-}
-.tab-pane li:hover {
-    background-color: rgba(128, 128, 128, 0.1); /* Subtle hover */
-}
-
-/* Timeline specific styles */
-#timeline-list li {
-    cursor: pointer;
-}
-#timeline-list .time-stamp {
-    font-weight: bold;
-    margin-right: 15px;
-    color: var(--accent-color);
-    min-width: 50px; /* Ensure alignment */
+.calculator-display {
+    background-color: transparent; /* Display area is part of the calc-bg */
+    color: var(--calc-display-text);
     text-align: right;
+    padding: 20px 15px;
+    border-bottom: 1px solid var(--border-color); /* Optional separator */
+    margin-bottom: 10px;
 }
-#timeline-list .time-title {
-    flex-grow: 1;
-}
-
-/* Study Material & Related Videos Links/Buttons */
-.tab-pane a, .tab-pane .link-like {
-    color: var(--accent-color);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-.tab-pane a:hover, .tab-pane .link-like:hover {
-    color: var(--accent-hover);
-    text-decoration: underline;
-}
-
-.view-button {
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
+.calculator-expression {
+    min-height: 24px; /* Space for expression */
     font-size: 0.9em;
-    text-decoration: none; /* Remove underline if it's an <a> */
-    transition: background-color 0.2s ease;
-    display: inline-block; /* Needed for padding on <a> */
-    text-align: center;
-    min-width: 60px;
+    color: var(--calc-expression-text);
+    word-break: break-all;
+    margin-bottom: 4px;
+}
+.calculator-current-input {
+    font-size: 2.5em; /* Larger for current number/result */
+    font-weight: 500; /* Medium weight for numbers */
+    min-height: 48px; /* Ensure space even when '0' */
+    line-height: 1.2;
+}
+.calculator-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px; /* Gap between buttons */
+}
+.calc-btn {
+    background-color: var(--calc-btn-bg);
+    color: var(--calc-btn-text);
+    border: none;
+    font-size: 1.5em; /* Larger button text */
+    padding: 20px;
+    border-radius: 8px; /* Rounded buttons */
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.calc-btn:hover {
+    background-color: var(--calc-btn-hover-bg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.calc-btn:active {
+    transform: translateY(1px);
+}
+.calc-btn.function { /* AC, +/-, %, DEL */
+    background-color: var(--calc-function-bg);
+}
+.calc-btn.operator { /* +, -, *, / */
+    background-color: var(--calc-operator-bg);
+    font-size: 1.7em; /* Operators can be slightly larger */
+}
+.calc-btn.equals {
+    background-color: var(--calc-equals-bg);
+    color: var(--calc-equals-text);
+    grid-column: span 1; /* Standard size */
+    font-size: 1.7em;
+}
+.calc-btn.zero {
+    grid-column: span 2; /* Make 0 button wider */
 }
 
-.view-button:hover {
-    background-color: var(--accent-hover);
-    color: white;
-    text-decoration: none;
+/* Doubts Form Styles */
+#doubtsModal h2 { margin-top: 0; margin-bottom: 20px; color: var(--text-color); }
+#doubtForm label { display: block; margin-top: 10px; margin-bottom: 5px; font-weight: bold; color: var(--text-color); }
+#doubtForm input[type="text"],
+#doubtForm input[type="email"],
+#doubtForm textarea,
+#doubtForm input[type="file"] { /* Style file input somewhat */
+    width: calc(100% - 22px); padding: 10px; margin-bottom: 10px; border: 1px solid var(--border-color);
+    background-color: var(--primary-bg); color: var(--text-color); border-radius: 4px;
 }
-
-/* My Notes Textarea */
-#my-notes textarea {
-    width: 100%;
-    min-height: 150px;
-    padding: 10px;
-    border: 1px solid var(--border-color);
-    background-color: var(--card-color);
-    color: var(--text-color);
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 1em;
-    resize: vertical;
+#doubtForm input[type="file"] {
+    padding: 5px; /* File inputs are tricky to style perfectly cross-browser */
 }
+body.light-mode #doubtForm input[type="text"],
+body.light-mode #doubtForm input[type="email"],
+body.light-mode #doubtForm textarea,
+body.light-mode #doubtForm input[type="file"] {
+    background-color: #fff; color: #333; border: 1px solid #ced4da;
+}
+#doubtForm textarea { resize: vertical; min-height: 80px; }
+#doubtForm small { display: block; font-size: 0.8em; margin-top: -5px; margin-bottom: 10px; color: #aaa; }
+body.light-mode #doubtForm small { color: #777; }
+#doubtForm button[type="submit"] { padding: 10px 15px; background-color: var(--button-bg); color: var(--text-color); border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+#doubtForm button[type="submit"]:hover { background-color: var(--button-hover-bg); }
+#doubtStatus { margin-top: 15px; font-size: 0.9em; color: var(--text-color); }
 
-/* Responsive Adjustments */
-@media (max-width: 600px) {
-    #video-title-header {
-        font-size: 1em; /* Slightly smaller title */
-        margin-left: 5px;
-        margin-right: 5px;
-    }
-     .back-button {
-        font-size: 1.5em;
-        margin-right: 5px;
-    }
-     .menu-icon {
-        font-size: 1.5em;
-    }
-    .tabs {
-        top: 51px; /* Adjust sticky position if header height changes */
-    }
-    .tab-button {
-        padding: 10px 12px;
-        font-size: 0.9em;
-    }
-    .tab-content {
-        padding: 15px;
-    }
-    .tab-pane h2 {
-        font-size: 1.2em;
-    }
-     .dropdown-menu {
-        min-width: 130px; /* Smaller dropdown */
-    }
-    .dropdown-menu button,
-    .dropdown-menu a.menu-link-button {
-        padding: 8px 12px;
-        font-size: 0.9em;
-    }
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .player-header h1 { font-size: 1.2em; }
+    .tab-button { padding: 10px 15px; font-size: 0.85em; }
+    .side-menu.open { width: 200px; }
+    .modal-content { width: 90%; padding: 20px; }
+    .calculator-modal-content { padding: 10px; gap: 8px; } /* Reduce gap for smaller calc */
+    .calc-btn { padding: 15px; font-size: 1.3em; }
+    .calculator-current-input { font-size: 2em; }
+}
+@media (max-width: 480px) {
+    .player-header h1 { font-size: 1em; }
+    .tab-button { padding: 8px 10px; font-size: 0.8em; }
+    .modal-content { padding: 15px; }
+    .calculator-modal-content { max-width: calc(100% - 20px); margin: 10px; } /* Full width on small */
+    .calc-btn { padding: 12px; font-size: 1.2em; }
+    .calculator-current-input { font-size: 1.8em; }
+    .calculator-expression { font-size: 0.8em; }
+    #doubtForm label { font-size: 0.9em; }
+    #doubtForm input[type="text"], #doubtForm input[type="email"], #doubtForm textarea { padding: 8px; }
 }
